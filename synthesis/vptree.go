@@ -128,7 +128,11 @@ func split(center patch, ns []patch) (radius int, inner, outer []patch) {
 }
 
 func centroid(ns []patch) patch {
-	centroid := make([]rgb, patchLen())
+	if len(ns) == 0 {
+		return nil
+	}
+
+	centroid := make([]rgb, len(ns[0]))
 
 	for _, n := range ns {
 		for i, c := range n {
