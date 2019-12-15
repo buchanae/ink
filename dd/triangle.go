@@ -26,3 +26,14 @@ func (t Triangle) Mesh() Mesh {
 		Faces: []Face{{0, 1, 2}},
 	}
 }
+
+func StrokeTriangles(tris []Triangle, width float32) Mesh {
+	p := &Path{}
+	for _, t := range tris {
+		p.MoveTo(t.A)
+		p.LineTo(t.B)
+		p.LineTo(t.C)
+		p.LineTo(t.A)
+	}
+	return p.Stroke(width)
+}

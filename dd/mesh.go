@@ -11,6 +11,23 @@ func (m Mesh) Size() int {
 	return len(m.Verts)
 }
 
+// TODO need a better naming scheme for things
+//      the generate meshes?
+// TODO have the triangulation return a mesh
+//      with edges, hull, etc already filled in.
+func Triangles(tris []Triangle) Mesh {
+	verts := make([]XY, 0, len(tris)*3)
+	faces := make([]Face, 0, len(tris))
+
+	for _, t := range tris {
+		// TODO optimize vertex reuse
+		l := len(verts)
+		verts = append(verts, t.A, t.B, t.C)
+		faces = append(faces, Face{l, l + 1, l + 2})
+	}
+	return Mesh{verts, faces}
+}
+
 /*
 type Edge [2]uint32
 
@@ -63,33 +80,3 @@ func Merge(dst *Mesh, srcs ...*Mesh) {
 	}
 }
 */
-
-// TODO need a better naming scheme for things
-//      the generate meshes?
-// TODO have the triangulation return a mesh
-//      with edges, hull, etc already filled in.
-func Triangles(tris []Triangle) Mesh {
-	verts := make([]XY, 0, len(tris)*3)
-	faces := make([]Face, 0, len(tris))
-
-	for _, t := range tris {
-		// TODO optimize vertex reuse
-		l := len(verts)
-		verts = append(verts, t.A, t.B, t.C)
-		faces = append(faces, Face{l, l + 1, l + 2})
-	}
-	return Mesh{verts, faces}
-}
-
-func StrokeTriangles(tris []Triangle, width float32) Mesh {
-
-	p := &Path{}
-	for _, t := range tris {
-		p.MoveTo(t.A)
-		p.LineTo(t.B)
-		p.LineTo(t.C)
-		p.LineTo(t.A)
-	}
-
-	return p.Stroke(width)
-}
