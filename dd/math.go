@@ -1,4 +1,4 @@
-package d2
+package dd
 
 import "math"
 
@@ -17,5 +17,17 @@ func atan2(a, b float32) float32 {
 func acos(x float32) float32 {
 	y := float64(x)
 	z := math.Acos(y)
+	return float32(z)
+}
+
+func sin(x float32) float32 {
+	y := float64(x)
+	z := math.Sin(y)
+	return float32(z)
+}
+
+func cos(x float32) float32 {
+	y := float64(x)
+	z := math.Cos(y)
 	return float32(z)
 }

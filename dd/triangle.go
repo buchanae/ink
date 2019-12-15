@@ -1,8 +1,4 @@
-package d2
-
-func NewTriangle(a, b, c XY) Triangle {
-	return Triangle{a, b, c}
-}
+package dd
 
 type Triangle struct {
 	A, B, C XY
@@ -22,4 +18,11 @@ func (t Triangle) Contains(p XY) bool {
 	hasPos := (d1 > 0) || (d2 > 0) || (d3 > 0)
 
 	return !(hasNeg && hasPos)
+}
+
+func (t Triangle) Mesh() Mesh {
+	return Mesh{
+		Verts: []XY{t.A, t.B, t.C},
+		Faces: []Face{{0, 1, 2}},
+	}
 }

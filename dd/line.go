@@ -1,4 +1,4 @@
-package d2
+package dd
 
 func NewLine(a, b XY) Line {
 	return Line{a, b}

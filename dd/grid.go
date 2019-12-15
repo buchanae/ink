@@ -1,8 +1,13 @@
-package d2
+package dd
 
 type Cell struct {
 	XY
 	Row, Col int
+}
+
+type Grid struct {
+	Rows, Cols int
+	Cells      []Cell
 }
 
 func NewGrid(rows, cols int) Grid {
@@ -28,11 +33,6 @@ func NewGrid(rows, cols int) Grid {
 	return grid
 }
 
-type Grid struct {
-	Rows, Cols int
-	Cells      []Cell
-}
-
 func (g *Grid) IsEdge(row, col int) bool {
 	return row == 0 || col == 0 || row == g.Rows-1 || col == g.Cols-1
 }
@@ -50,6 +50,23 @@ func (g *Grid) Rects() []Rect {
 	}
 
 	return rects
+}
+
+func (g *Grid) Quads() []Quad {
+	// TODO precise capacity
+	quads := make([]Quad, 0, len(g.Cells))
+
+	for row := 0; row < g.Rows-1; row++ {
+		for col := 0; col < g.Cols-1; col++ {
+			a := g.Cell(row, col)
+			b := g.Cell(row, col+1)
+			c := g.Cell(row+1, col+1)
+			d := g.Cell(row+1, col)
+			q := Quad{a.XY, b.XY, c.XY, d.XY}
+			quads = append(quads, q)
+		}
+	}
+	return quads
 }
 
 func (g *Grid) Index(row, col int) int {

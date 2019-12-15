@@ -1,13 +1,9 @@
-package d2
+package dd
 
-func NewRect(a, b XY) Rect {
-	return Rect{a, b}
-}
-
-func RectXYWH(xy, wh XY) Rect {
+func RectAWH(a, wh XY) Rect {
 	return Rect{
-		A: xy,
-		B: xy.Add(wh),
+		A: a,
+		B: a.Add(wh),
 	}
 }
 
@@ -58,6 +54,28 @@ func (r Rect) Grow(amount float32) Rect {
 		A: XY{r.A.X - amount, r.A.Y - amount},
 		B: XY{r.B.X + amount, r.B.Y + amount},
 	}
+}
+
+func (r Rect) Mesh() Mesh {
+	return Mesh{
+		Verts: []XY{
+			r.A, {r.A.X, r.B.Y},
+			r.B, {r.B.X, r.A.Y},
+		},
+		Faces: []Face{
+			{0, 2, 1},
+			{0, 3, 2},
+		},
+	}
+}
+
+func (r Rect) Stroke(width float32) Mesh {
+	path := NewPath(
+		r.A, XY{r.A.X, r.B.Y},
+		r.B, XY{r.B.X, r.A.Y},
+		r.A,
+	)
+	return path.Stroke(width)
 }
 
 // Bounding box

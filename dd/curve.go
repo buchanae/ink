@@ -1,4 +1,4 @@
-package d2
+package dd
 
 type Quadratic struct {
 	A, B, Ctrl XY

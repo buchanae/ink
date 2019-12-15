@@ -1,8 +1,4 @@
-package d2
-
-func NewXY(x, y float32) XY {
-	return XY{x, y}
-}
+package dd
 
 type XY struct {
 	X, Y float32
