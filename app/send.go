@@ -1,8 +1,12 @@
-// +build !sendonly
+// +build sendonly
 
 package app
 
 import (
+	"encoding/gob"
+	"log"
+	"os"
+
 	"github.com/buchanae/ink/gfx"
 )
 
@@ -11,14 +15,8 @@ import (
 // If an error occurs while opening the window, Render panics.
 // If an error occurs while rendering the doc, Render logs the error.
 func Render(doc *gfx.Doc) {
-	app, err := NewApp(DefaultConfig())
+	err := gob.NewEncoder(os.Stdout).Encode(doc)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
-	go app.Render(doc)
-
-	// Most access to the window must be done on a single OS thread,
-	// so this code locks itself to the OS thread and handles all communication
-	// via SDL queues and Go channels.
-	app.Run()
 }

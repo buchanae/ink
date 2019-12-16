@@ -39,7 +39,7 @@ func main() {
 			m := q.Stroke(LineWidth)
 			z := NewShader(m)
 			z.SetColor(Red)
-			z.Set("a_center", s.Center())
+			z.Set("a_pivot", s.Center())
 			z.Set("a_rot", rand.Range(-Angle, Angle))
 
 			doc.Draw(z)

@@ -11,21 +11,20 @@ func (m Mesh) Size() int {
 	return len(m.Verts)
 }
 
-// TODO need a better naming scheme for things
-//      the generate meshes?
-// TODO have the triangulation return a mesh
-//      with edges, hull, etc already filled in.
-func Triangles(tris []Triangle) Mesh {
-	verts := make([]XY, 0, len(tris)*3)
-	faces := make([]Face, 0, len(tris))
-
-	for _, t := range tris {
-		// TODO optimize vertex reuse
-		l := len(verts)
-		verts = append(verts, t.A, t.B, t.C)
-		faces = append(faces, Face{l, l + 1, l + 2})
+func Merge(srcs ...Mesh) Mesh {
+	dst := Mesh{}
+	for _, src := range srcs {
+		offset := len(dst.Verts)
+		dst.Verts = append(dst.Verts, src.Verts...)
+		for _, face := range src.Faces {
+			dst.Faces = append(dst.Faces, Face{
+				offset + face[0],
+				offset + face[1],
+				offset + face[2],
+			})
+		}
 	}
-	return Mesh{verts, faces}
+	return dst
 }
 
 /*
@@ -64,19 +63,5 @@ func (m *Mesh) HullLines() []Line {
 		p.LineTo(b)
 	}
 	return p.Lines()
-}
-
-func Merge(dst *Mesh, srcs ...*Mesh) {
-	offset := len(dst.Verts)
-	for _, src := range srcs {
-		dst.Verts = append(dst.Verts, src.Verts...)
-		for _, face := range src.Faces {
-			dst.Faces = append(dst.Faces, Face{
-				offset + face[0],
-				offset + face[1],
-				offset + face[2],
-			})
-		}
-	}
 }
 */

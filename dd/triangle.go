@@ -37,3 +37,16 @@ func StrokeTriangles(tris []Triangle, width float32) Mesh {
 	}
 	return p.Stroke(width)
 }
+
+func Triangles(tris []Triangle) Mesh {
+	verts := make([]XY, 0, len(tris)*3)
+	faces := make([]Face, 0, len(tris))
+
+	for _, t := range tris {
+		// TODO optimize vertex reuse
+		l := len(verts)
+		verts = append(verts, t.A, t.B, t.C)
+		faces = append(faces, Face{l, l + 1, l + 2})
+	}
+	return Mesh{verts, faces}
+}

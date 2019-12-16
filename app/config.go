@@ -1,3 +1,5 @@
+// +build !sendonly
+
 package app
 
 import "github.com/buchanae/ink/win"

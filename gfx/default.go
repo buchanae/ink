@@ -5,7 +5,7 @@ const DefaultVert = `
 
 in vec2 a_vert;
 in vec2 a_uv;
-in vec2 a_center;
+in vec2 a_pivot;
 
 in vec2 a_pos;
 in float a_rot;
@@ -20,12 +20,12 @@ out vec2 v_vert;
 void main() {
   vec2 v = a_vert;
 
-  v -= a_center;
+  v -= a_pivot;
   v *= mat2(
      cos(a_rot), sin(a_rot),
     -sin(a_rot), cos(a_rot)
   );
-  v += a_center;
+  v += a_pivot;
   v += a_pos;
 
   // OpenGL fragment coordinates are [-1, 1]

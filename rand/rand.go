@@ -3,6 +3,7 @@ package rand
 import (
 	"math/rand"
 
+	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/math"
 )
@@ -101,4 +102,12 @@ func XYInTriangle(t dd.Triangle) dd.XY {
 
 func BlueNoise(n int, w, h, d float32) []dd.XY {
 	return src.BlueNoise(n, w, h, d)
+}
+
+func Color(c []color.RGBA) color.RGBA {
+	return src.Color(c)
+}
+
+func Palette() []color.RGBA {
+	return src.Palette()
 }

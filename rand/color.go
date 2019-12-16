@@ -10,10 +10,6 @@ func (r *Rand) Color(c []color.RGBA) color.RGBA {
 	return c[i]
 }
 
-func Color(c []color.RGBA) color.RGBA {
-	return src.Color(c)
-}
-
 func (r *Rand) Gray() color.RGBA {
 	f := r.Float()
 	return color.RGBA{f, f, f, 1}

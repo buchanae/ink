@@ -1,6 +1,7 @@
 package gfx
 
 import (
+	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 )
 
@@ -47,6 +48,10 @@ type Drawable interface {
 
 func NewDoc() *Doc {
 	return &Doc{}
+}
+
+func Clear(c color.RGBA) Fill {
+	return Fill{Fullscreen(), c}
 }
 
 type Doc struct {

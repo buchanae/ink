@@ -16,7 +16,7 @@ func main() {
 	}
 
 	m := NewShader(r.Mesh())
-	m.Set("a_center", r.Center())
+	m.Set("a_pivot", r.Center())
 	m.Set("a_rot", 0.4)
 	m.SetColor(Red)
 

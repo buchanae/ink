@@ -1,3 +1,5 @@
+// +build !sendonly
+
 package app
 
 import (
@@ -37,8 +39,14 @@ func asset(name string) ([]byte, error) {
 func build(doc *gfx.Doc, renderer *render.Renderer) error {
 
 	for _, layer := range doc.Layers {
-		shader, ok := layer.Value.(*gfx.Shader)
-		if !ok {
+
+		var shader gfx.Shader
+		switch z := layer.Value.(type) {
+		case *gfx.Shader:
+			shader = *z
+		case gfx.Shader:
+			shader = z
+		default:
 			log.Printf("skipping non-shader layer: %T", layer.Value)
 			// TODO
 			continue
