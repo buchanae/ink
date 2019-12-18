@@ -61,6 +61,7 @@ optimize:
 func (r *Renderer) render(dst msaa) error {
 	defer traceTime("render", time.Now())
 
+	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
 	glEnable(gl.BLEND)
 	//glEnable(gl.STENCIL_TEST)
