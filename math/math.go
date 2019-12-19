@@ -35,3 +35,17 @@ func Atan2(a, b float32) float32 {
 	e := math.Atan2(c, d)
 	return float32(e)
 }
+
+func Clamp(val, min, max float32) float32 {
+	if val > max {
+		return max
+	}
+	if val < min {
+		return min
+	}
+	return val
+}
+
+func Interp(percent, from, to float32) float32 {
+	return from + ((to - from) * percent)
+}

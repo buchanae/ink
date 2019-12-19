@@ -3,17 +3,23 @@ package rand
 import (
 	"math/rand"
 
+	"github.com/ojrac/opensimplex-go"
+
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/math"
 )
 
 func New(seed int64) *Rand {
-	return &Rand{rand.New(rand.NewSource(seed))}
+	return &Rand{
+		src:   rand.New(rand.NewSource(seed)),
+		noise: opensimplex.NewNormalized32(seed),
+	}
 }
 
 type Rand struct {
-	src *rand.Rand
+	src   *rand.Rand
+	noise opensimplex.Noise32
 }
 
 func (r *Rand) Intn(max int) int {
@@ -60,6 +66,18 @@ func (r *Rand) XYInTriangle(t dd.Triangle) dd.XY {
 	x := t1*t.A.X + t2*t.B.X + t3*t.C.X
 	y := t1*t.A.Y + t2*t.B.Y + t3*t.C.Y
 	return dd.XY{x, y}
+}
+
+func (r *Rand) Noise1(x float32) float32 {
+	return r.noise.Eval2(x, 1)
+}
+
+func (r *Rand) Noise2(x, y float32) float32 {
+	return r.noise.Eval2(x, y)
+}
+
+func (r *Rand) Noise3(x, y, z float32) float32 {
+	return r.noise.Eval3(x, y, z)
 }
 
 var src = New(1)
@@ -110,4 +128,16 @@ func Color(c []color.RGBA) color.RGBA {
 
 func Palette() []color.RGBA {
 	return src.Palette()
+}
+
+func Noise1(x float32) float32 {
+	return src.Noise1(x)
+}
+
+func Noise2(x, y float32) float32 {
+	return src.Noise2(x, y)
+}
+
+func Noise3(x, y, z float32) float32 {
+	return src.Noise3(x, y, z)
 }
