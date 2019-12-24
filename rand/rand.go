@@ -1,5 +1,14 @@
 package rand
 
+/*
+TODO:
+- distributions:
+  - binomial
+	- gamma
+	- exponential
+	- normal
+*/
+
 import (
 	"math/rand"
 
@@ -53,6 +62,13 @@ func (r *Rand) XYRange(min, max float32) dd.XY {
 	return dd.XY{
 		X: r.Range(min, max),
 		Y: r.Range(min, max),
+	}
+}
+
+func (r *Rand) XYInRect(z dd.Rect) dd.XY {
+	return dd.XY{
+		X: r.Range(z.A.X, z.B.X),
+		Y: r.Range(z.A.Y, z.B.Y),
 	}
 }
 
@@ -116,6 +132,10 @@ func XYRange(min, max float32) dd.XY {
 
 func XYInTriangle(t dd.Triangle) dd.XY {
 	return src.XYInTriangle(t)
+}
+
+func XYInRect(r dd.Rect) dd.XY {
+	return src.XYInRect(r)
 }
 
 func BlueNoise(n int, w, h, d float32) []dd.XY {
