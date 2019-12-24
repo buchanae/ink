@@ -49,6 +49,16 @@ func (r Rect) Shrink(amount float32) Rect {
 		B: XY{r.B.X - amount, r.B.Y - amount},
 	}
 }
+
+func (r Rect) Quad() Quad {
+	return Quad{
+		XY{r.A.X, r.A.Y},
+		XY{r.A.X, r.B.Y},
+		XY{r.B.X, r.B.Y},
+		XY{r.B.X, r.A.Y},
+	}
+}
+
 func (r Rect) Grow(amount float32) Rect {
 	return Rect{
 		A: XY{r.A.X - amount, r.A.Y - amount},
