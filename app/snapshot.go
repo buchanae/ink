@@ -25,7 +25,9 @@ func (app *App) snapshot() {
 
 	log.Printf("snapshot: %v x %v", width, height)
 	renderer := render.NewRenderer(width, height)
-	build(app.doc, renderer)
+
+	b := builder{renderer: renderer}
+	b.build(app.doc)
 
 	img, err := renderer.RenderToImage()
 	if err != nil {

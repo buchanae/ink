@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -19,8 +18,7 @@ const (
 	Angle          = 0.2
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(doc *Layer) {
 	grid := NewGrid(GridSize, GridSize)
 
 	for _, cell := range grid.Rects() {
@@ -33,18 +31,15 @@ func main() {
 				continue
 			}
 
-			s := cell.Shrink(float32(i+1) * Shrink)
-			q := QuadFromRect(s)
+			r := cell.Shrink(float32(i+1) * Shrink)
+			q := QuadFromRect(r)
 			q = rand.TweakQuad(q, TweakBox)
 			m := q.Stroke(LineWidth)
-			z := NewShader(m)
-			z.SetColor(Red)
-			z.Set("a_pivot", s.Center())
-			z.Set("a_rot", rand.Range(-Angle, Angle))
 
-			doc.Draw(z)
+			s := doc.Shader(m)
+			s.Set("a_color", Red)
+			s.Set("a_pivot", r.Center())
+			s.Set("a_rot", rand.Range(-Angle, Angle))
 		}
 	}
-
-	app.Render(doc)
 }

@@ -1,14 +1,19 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(z *Layer) {
 
-	app.Render(doc)
+	f := Fill{
+		Mesh: Rect{
+			XY{0.2, 0.2},
+			XY{0.8, 0.8},
+		},
+		Color: Blue,
+	}
+	z.Draw(f)
 }

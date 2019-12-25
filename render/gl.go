@@ -2,6 +2,7 @@ package render
 
 import (
 	"fmt"
+	"log"
 	"unsafe"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
@@ -315,7 +316,7 @@ func glStrs(strs ...string) (cstrs **uint8, free func()) {
 func glLogErr(name string) {
 	err := glCheckErr(name)
 	if err != nil {
-		log("%v", err)
+		log.Printf("%v", err)
 	}
 }
 

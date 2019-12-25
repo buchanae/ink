@@ -11,6 +11,10 @@ func (m Mesh) Size() int {
 	return len(m.Verts)
 }
 
+func (m Mesh) Mesh() Mesh {
+	return m
+}
+
 func Merge(srcs ...Mesh) Mesh {
 	dst := Mesh{}
 	for _, src := range srcs {

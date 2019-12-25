@@ -2,6 +2,7 @@ package render
 
 import (
 	"image"
+	"log"
 	"time"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
@@ -10,7 +11,6 @@ import (
 type Renderer struct {
 	width, height int
 	multisamples  int
-	layerID       int
 	images        map[image.Image]Image
 	shaders       map[Shader]compiled
 	textures      map[int]msaa
@@ -52,15 +52,14 @@ func (r *Renderer) RenderToImage() (image.Image, error) {
 /*
 TODO
 optimize:
-1. don't bother writing to a separate texture if the output is never used.
-   just draw to the main framebuffer.
 4. reuse textures. kinda like a compiler would reuse registers.
    tricky though, because the app could be holding on to a texture ID across frames,
 	 so would require knowing that the app doesn't hold a reference to the texture.
 */
 func (r *Renderer) render(dst msaa) error {
-	defer traceTime("render", time.Now())
+	defer traceTime("render")
 
+	// TODO maybe move these to renderPasses
 	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
 	glEnable(gl.BLEND)
@@ -75,7 +74,7 @@ func (r *Renderer) render(dst msaa) error {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	pb := passBuilder{}
+	pb := newPassBuilder()
 	links := findLinks(r.layers)
 
 	start := time.Now()
@@ -86,12 +85,7 @@ func (r *Renderer) render(dst msaa) error {
 			output = r.texture(layer.id)
 		}
 
-		prog, err := r.compile(layer.shader)
-		if err != nil {
-			return err
-		}
-
-		pb.AddLayer(prog, layer, output)
+		pb.AddLayer(layer, output)
 
 		/*
 			TODO render image
@@ -106,33 +100,29 @@ func (r *Renderer) render(dst msaa) error {
 					},
 				}
 		*/
-
-		if !layer.hide {
-			//pb.Composite(dst, output)
-		}
 	}
+
 	passes := pb.Passes()
 
-	trace("prep %s", time.Since(start))
 	trace("passes %d", len(passes))
 
 	for _, p := range passes {
-		r.renderPasses(p)
+		r.renderPass(p)
 	}
 
 	// TODO garbage collect resources
 	return nil
 }
 
-func (r *Renderer) renderPasses(p *pass) {
+func (r *Renderer) renderPass(p *pass) {
 
 	renderPassStart := time.Now()
 	trace("render pass %s", p.name)
+	trace("  output to %d", p.output.ID)
 
 	// TODO clear existing program entirely
 	// TODO need to cleanup cached buffers
-	// TODO determine number of clones (instances).
-	//count := 1
+	// TODO redo instancing
 
 	start := time.Now()
 
@@ -141,7 +131,7 @@ func (r *Renderer) renderPasses(p *pass) {
 	r.bindUniforms(p)
 	glBindVertexArray(p.vao)
 
-	trace("  render config %s", time.Since(start))
+	trace("  render config took %s", time.Since(start))
 
 	start = time.Now()
 	glDrawElements(
@@ -151,27 +141,26 @@ func (r *Renderer) renderPasses(p *pass) {
 		// 4 bytes in each uint32 face index
 		glPtrOffset(p.faceOffset*4),
 	)
-	trace("  draw elements %s", time.Since(start))
+	trace("  draw elements took %s", time.Since(start))
 
 	start = time.Now()
 	p.output.Paint()
 
-	trace("  output paint %s", time.Since(start))
-	trace("  render pass took %s", time.Since(renderPassStart))
+	trace("  output paint took %s", time.Since(start))
+	trace("  render pass took  %s", time.Since(renderPassStart))
 }
 
 func (r *Renderer) bindUniforms(p *pass) {
 	for _, uni := range p.prog.uniforms {
 		val, ok := p.uniforms[uni.Name]
 		if !ok {
-			log("  missing uniform: %s", uni.Name)
+			log.Printf("  missing uniform: %s", uni.Name)
 			continue
 		}
-		trace("  bind uniform %s to %#v", uni.Name, val)
 
 		err := uni.Bind(val)
 		if err != nil {
-			log("  ERR: binding uniform %q: %s", uni.Name, err)
+			log.Printf("error: binding uniform %q: %s", uni.Name, err)
 		}
 	}
 }
@@ -179,7 +168,7 @@ func (r *Renderer) bindUniforms(p *pass) {
 func (r *Renderer) texture(id int) msaa {
 	t, ok := r.textures[id]
 	if !ok {
-		t = newMsaa(r.width, r.height, r.multisamples)
+		t = newMsaa(id, r.width, r.height, r.multisamples)
 		r.textures[id] = t
 	}
 	return t

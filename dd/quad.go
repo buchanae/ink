@@ -20,10 +20,10 @@ func (b Quad) Stroke(lineWidth float32) Mesh {
 }
 
 func (b Quad) Mesh() Mesh {
-	return Triangles([]Triangle{
+	return Triangles{
 		{b.A, b.B, b.C},
 		{b.A, b.C, b.D},
-	})
+	}.Mesh()
 }
 
 func (b Quad) Bounds() Rect {

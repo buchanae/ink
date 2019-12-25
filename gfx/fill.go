@@ -2,23 +2,20 @@ package gfx
 
 import (
 	"github.com/buchanae/ink/color"
-	"github.com/buchanae/ink/dd"
 )
 
 type Fill struct {
-	Mesh  dd.Mesh
+	Mesh  Meshable
 	Color color.RGBA
 }
 
-func (f Fill) Draw(doc *Doc) *Layer {
-	return doc.Draw(&Shader{
+func (f Fill) Draw(l *Layer) {
+	l.Draw(&Shader{
 		Name: "Fill",
-		// TODO ! symbol relies on behavior defined
-		//        outside this package
-		Vert: "!default.vert",
-		Frag: "!fill.frag",
+		Vert: DefaultVert,
+		Frag: FillFrag,
 		Mesh: f.Mesh,
-		Uniforms: Uniforms{
+		Attrs: Attrs{
 			"u_color": f.Color,
 		},
 	})

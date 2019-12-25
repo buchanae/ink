@@ -15,6 +15,7 @@ import (
 // texture. Downstream shaders that read from this texture will read from the
 // antialiased texture.
 type msaa struct {
+	ID   int
 	Read struct {
 		FBO, Tex uint32
 	}
@@ -24,9 +25,10 @@ type msaa struct {
 	Width, Height, Multisamples int
 }
 
-func newMsaa(w, h, multisamples int) msaa {
+func newMsaa(id, w, h, multisamples int) msaa {
 
 	m := msaa{
+		ID:           id,
 		Width:        w,
 		Height:       h,
 		Multisamples: multisamples,
@@ -107,7 +109,7 @@ func (m *msaa) Clear() {
 
 // Blit the "write" texture into the anti-aliased "read" texture.
 func (m *msaa) Paint() {
-	// Blit the multisample texture (Write) to the regular texture (Read).
+	// Copy the multisample texture (Write) to the regular texture (Read).
 	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, m.Read.FBO)
 	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Write.FBO)
 

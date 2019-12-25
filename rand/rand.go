@@ -11,6 +11,7 @@ TODO:
 
 import (
 	"math/rand"
+	"time"
 
 	"github.com/ojrac/opensimplex-go"
 
@@ -97,6 +98,10 @@ func (r *Rand) Noise3(x, y, z float32) float32 {
 }
 
 var src = New(1)
+
+func SeedNow() {
+	src = New(time.Now().Unix())
+}
 
 func Intn(max int) int {
 	return src.Intn(max)

@@ -1,53 +1,43 @@
 package main
 
 import (
-	"bytes"
 	"encoding/gob"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
-	"time"
+	"path/filepath"
 
 	"github.com/buchanae/ink/app"
-	"github.com/buchanae/ink/color"
-	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
 
 func main() {
+	log.SetFlags(0)
+
 	if len(os.Args) != 2 {
 		fmt.Fprint(os.Stderr, "usage: ink file.go")
 		os.Exit(1)
 	}
 
-	gob.Register(gfx.Shader{})
-	gob.Register(color.RGBA{})
-	gob.Register(dd.XY{})
-	gob.Register([]color.RGBA{})
-	gob.Register([]dd.XY{})
+	watch := newWatcher()
 
-	watch, err := newWatcher()
+	path, err := filepath.Abs(os.Args[1])
 	if err != nil {
-		log.Print(err)
-		return
+		panic(err)
 	}
-
-	path := os.Args[1]
-	watch.Watch(path)
 
 	a, err := app.NewApp(app.DefaultConfig())
 	if err != nil {
 		panic(err)
 	}
 
+	watch.Watch(path)
+
 	refresh := func() {
-		doc, err := run(path)
-		if err != nil {
-			log.Print(err)
-			return
-		}
-		a.Render(doc)
+		run(a, path)
 	}
 
 	go func() {
@@ -63,29 +53,95 @@ func main() {
 	a.Run()
 }
 
-func run(path string) (*gfx.Doc, error) {
-	cmd := exec.Command("go", "run", "-tags", "sendonly", path)
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
+func run(app *app.App, path string) error {
+	tempDir, err := ioutil.TempDir("", "ink-run-")
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(tempDir)
+
+	inkPath := filepath.Join(tempDir, "ink.go")
+	err = copyFile(inkPath, path)
+	if err != nil {
+		return err
+	}
+
+	mainPath := filepath.Join(tempDir, "main.go")
+	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("go", "run", inkPath, mainPath)
+
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
 	cmd.Stderr = os.Stderr
-	cmd.Env = append(cmd.Env, os.Environ()...)
-	cmd.Env = append(cmd.Env, "INK_REMOTE=true")
 
-	start := time.Now()
-	err := cmd.Run()
+	err = cmd.Start()
 	if err != nil {
-		if ex, ok := err.(*exec.ExitError); ok {
-			log.Println(string(ex.Stderr))
+		return err
+	}
+
+	for {
+		doc := &gfx.Layer{}
+		dec := gob.NewDecoder(stdout)
+		err = dec.Decode(doc)
+		if err == io.EOF {
+			break
 		}
-		return nil, err
-	}
-	log.Printf("took: %s", time.Since(start))
+		if err != nil {
+			return err
+		}
 
-	doc := &gfx.Doc{}
-	dec := gob.NewDecoder(&stdout)
-	err = dec.Decode(doc)
-	if err != nil {
-		return nil, err
+		log.Print("render")
+		app.Render(doc)
 	}
-	return doc, nil
+
+	return cmd.Wait()
 }
+
+func copyFile(dstPath, srcPath string) error {
+	dst, err := os.Create(dstPath)
+	if err != nil {
+		return err
+	}
+	defer dst.Close()
+
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+
+	_, err = dst.Write([]byte("//line " + srcPath + ":1\n\n"))
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(dst, src)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+	return nil
+}
+
+const head = `
+package main
+
+import "os"
+import "encoding/gob"
+import "github.com/buchanae/ink/gfx"
+
+func main() {
+	layer := gfx.NewLayer()
+	Ink(layer)
+	err := gob.NewEncoder(os.Stdout).Encode(layer)
+	if err != nil {
+		os.Stderr.Write([]byte(err.Error()))
+		os.Stderr.Write([]byte("\n"))
+	}
+}
+`

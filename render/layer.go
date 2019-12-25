@@ -1,58 +1,81 @@
 package render
 
-func (r *Renderer) NewLayer(s Shader) *Layer {
-	r.layerID++
+func (r *Renderer) NewLayer(s Shader) (*Layer, error) {
+
+	prog, err := r.compile(s)
+	if err != nil {
+		return nil, err
+	}
+
+	tex := r.texture(s.ID)
+
 	l := &Layer{
-		id:       r.layerID,
-		shader:   s,
-		attrs:    map[string]bindingVal{},
-		uniforms: map[string]interface{}{},
+		id:          s.ID,
+		name:        s.Name,
+		vertexCount: s.VertexCount,
+		prog:        prog,
+		tex:         tex,
+		attrs:       map[string]bindingVal{},
+		uniforms:    map[string]interface{}{},
 	}
 	r.layers = append(r.layers, l)
-	return l
+	return l, nil
 }
 
 func (r *Renderer) ClearLayers() {
+	for _, l := range r.layers {
+		l.tex.Clear()
+	}
 	r.layers = nil
 }
 
 type Shader struct {
+	ID                    int
+	Name                  string
 	Vert, Frag, Geom, Out string
+	VertexCount           int
 }
 
 type Layer struct {
 	id          int
 	name        string
-	shader      Shader
+	prog        compiled
+	tex         msaa
 	vertexCount int
 	faces       []uint32
 	attrs       map[string]bindingVal
 	uniforms    map[string]interface{}
-	hide        bool
 }
 
-func (l *Layer) Name(n string) {
-	l.name = n
+func (l *Layer) ID() int {
+	return l.id
 }
 
-func (l *Layer) VertexCount(i int) {
-	l.vertexCount = i
+func (l *Layer) UniformNames() []string {
+	var names []string
+	for _, uni := range l.prog.uniforms {
+		names = append(names, uni.Name)
+	}
+	return names
 }
 
-func (l *Layer) Faces(f []uint32) {
+func (l *Layer) AttrNames() []string {
+	var names []string
+	for _, attr := range l.prog.attributes {
+		names = append(names, attr.Name)
+	}
+	return names
+}
+
+func (l *Layer) SetFaces(f []uint32) {
 	l.faces = f
 }
 
-func (l *Layer) Uniform(key string, val interface{}) {
+func (l *Layer) SetUniform(key string, val interface{}) {
 	l.uniforms[key] = val
 }
 
-func (l *Layer) FloatAttr(key string, val []float32) {
-	// 4 bytes in a float32
-	l.UnsafeAttr(key, val, len(val)*4)
-}
-
-func (l *Layer) UnsafeAttr(key string, val interface{}, bytes int) {
+func (l *Layer) SetAttr(key string, val interface{}, bytes int) {
 	// skip empty attributes to avoid panics
 	if bytes == 0 {
 		return

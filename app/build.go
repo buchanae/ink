@@ -3,7 +3,7 @@
 package app
 
 import (
-	"errors"
+	"fmt"
 	"log"
 
 	"github.com/buchanae/ink/color"
@@ -12,157 +12,183 @@ import (
 	"github.com/buchanae/ink/render"
 )
 
+/*
+// TODO redo asset loader
 var builtins = map[string][]byte{
 	"!default.vert": []byte(gfx.DefaultVert),
 	"!default.frag": []byte(gfx.DefaultFrag),
 	"!fill.frag":    []byte(gfx.FillFrag),
 	"!copy.frag":    []byte(gfx.CopyFrag),
+	"!mask.frag":    []byte(gfx.MaskFrag),
 	//"noise.frag":    gfx.NoiseFrag,
 	//"noiselib.glsl": gfx.NoiseLib,
 	//"blur.frag":     gfx.BlurFrag,
 	//"gradient.frag": gfx.GradientFrag,
-	//"mask.frag":     gfx.MaskFrag,
 }
 
-// TODO redo asset loader
 // figure out a good way to allow gfx to define builtins on the doc
 // without transfering on every doc render. need retained doc.
 func asset(name string) ([]byte, error) {
 	b, ok := builtins[name]
 	if !ok {
-		return nil, errors.New("unknown asset: " + name)
+		return nil, fmt.Errorf("unknown asset %q", name)
 	}
 	return b, nil
 }
+*/
 
-// build builds the doc into renderer layers
-func build(doc *gfx.Doc, renderer *render.Renderer) error {
+type builder struct {
+	layers   map[int]*render.Layer
+	renderer *render.Renderer
+}
 
-	for _, layer := range doc.Layers {
+func (b *builder) build(doc *gfx.Layer) {
+	if b.layers == nil {
+		b.layers = map[int]*render.Layer{}
+	}
 
-		var shader gfx.Shader
-		switch z := layer.Value.(type) {
+	for _, value := range doc.Values {
+		switch z := value.(type) {
+		case *gfx.Layer:
+			b.build(z)
+		case gfx.Layer:
+			b.build(&z)
 		case *gfx.Shader:
-			shader = *z
+			err := b.buildShader(doc.ID, z)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
 		case gfx.Shader:
-			shader = z
+			err := b.buildShader(doc.ID, &z)
+			if err != nil {
+				log.Printf("error: %v", err)
+			}
 		default:
-			log.Printf("skipping non-shader layer: %T", layer.Value)
-			// TODO
+			log.Printf("error: unknown layer type: %T", value)
+		}
+	}
+}
+
+func (b *builder) buildShader(id int, shader *gfx.Shader) error {
+
+	mesh := shader.Mesh.Mesh()
+	verts := mesh.Verts
+
+	if verts == nil {
+		return fmt.Errorf("empty verts")
+	}
+
+	rl, err := b.renderer.NewLayer(render.Shader{
+		ID:          id,
+		Name:        shader.Name,
+		Vert:        shader.Vert,
+		Frag:        shader.Frag,
+		VertexCount: len(verts),
+	})
+	if err != nil {
+		return err
+	}
+	b.layers[id] = rl
+
+	rl.SetAttr("a_vert", verts, len(verts)*2*4)
+
+	for _, name := range rl.AttrNames() {
+		val, ok := shader.Attrs[name]
+		if !ok {
+			//log.Printf("missing attribute: %s", name)
 			continue
 		}
 
-		vert, err := asset(shader.Vert)
-		if err != nil {
-			return err
+		switch z := val.(type) {
+
+		case []float32:
+			rl.SetAttr(name, z, len(z)*4)
+
+		case float32:
+			data := make([]float32, len(verts))
+			for i := range data {
+				data[i] = z
+			}
+			size := len(data) * 4
+			rl.SetAttr(name, data, size)
+
+		case float64:
+			data := make([]float32, len(verts))
+			for i := range data {
+				data[i] = float32(z)
+			}
+			size := len(data) * 4
+			rl.SetAttr(name, data, size)
+
+		case []dd.XY:
+			size := len(z) * 2 * 4
+			rl.SetAttr(name, z, size)
+
+		case []color.RGBA:
+			size := len(z) * 4 * 4
+			rl.SetAttr(name, z, size)
+
+		case color.RGBA:
+			data := make([]color.RGBA, len(verts))
+			for i := range data {
+				data[i] = z
+			}
+			size := len(data) * 4 * 4
+			rl.SetAttr(name, data, size)
+
+		case dd.XY:
+			data := make([]dd.XY, len(verts))
+			for i := range data {
+				data[i] = z
+			}
+			size := len(data) * 2 * 4
+			rl.SetAttr(name, data, size)
+
+		default:
+			log.Printf("error: unsupported attribute value type %T: %v", z, z)
+			continue
 		}
+	}
 
-		frag, err := asset(shader.Frag)
-		if err != nil {
-			return err
-		}
+	faces := make([]uint32, 0, len(mesh.Faces))
+	for _, f := range mesh.Faces {
+		faces = append(faces,
+			uint32(f[0]),
+			uint32(f[1]),
+			uint32(f[2]),
+		)
+	}
+	rl.SetFaces(faces)
 
-		mesh := shader.Mesh
-		verts := mesh.Verts
-		faces := mesh.Faces
-
-		if verts == nil {
-			log.Println("empty verts")
+	for _, name := range rl.UniformNames() {
+		v, ok := shader.Attrs[name]
+		if !ok {
+			log.Printf("missing uniform: %s", name)
 			continue
 		}
 
-		rl := renderer.NewLayer(render.Shader{
-			Vert: string(vert),
-			Frag: string(frag),
-		})
-		rl.Name(shader.Name)
-
-		rl.VertexCount(len(verts))
-		rl.UnsafeAttr("a_vert", verts, len(verts)*2*4)
-
-		for key, val := range shader.Attrs.Data {
-			switch z := val.(type) {
-
-			case []float32:
-				rl.FloatAttr(key, z)
-
-			case float32:
-				data := make([]float32, len(verts))
-				for i := range data {
-					data[i] = z
-				}
-				rl.FloatAttr(key, data)
-
-			case float64:
-				data := make([]float32, len(verts))
-				for i := range data {
-					data[i] = float32(z)
-				}
-				rl.FloatAttr(key, data)
-
-			case []dd.XY:
-				size := len(z) * 2 * 4
-				rl.UnsafeAttr(key, z, size)
-
-			case []color.RGBA:
-				size := len(z) * 4 * 4
-				rl.UnsafeAttr(key, z, size)
-
-			case color.RGBA:
-				data := make([]color.RGBA, len(verts))
-				for i := range data {
-					data[i] = z
-				}
-				size := len(data) * 4 * 4
-				rl.UnsafeAttr(key, data, size)
-
-			case dd.XY:
-				data := make([]dd.XY, len(verts))
-				for i := range data {
-					data[i] = z
-				}
-				size := len(data) * 2 * 4
-				rl.UnsafeAttr(key, data, size)
-
-			default:
-				log.Printf("error: unsupported attribute value type %T: %v", z, z)
+		switch z := v.(type) {
+		case dd.XY:
+			rl.SetUniform(name, [2]float32{z.X, z.Y})
+		case color.RGBA:
+			rl.SetUniform(name, [4]float32{z.R, z.G, z.B, z.A})
+		case gfx.Layer:
+			target, ok := b.layers[z.ID]
+			if !ok {
+				log.Printf("missing layer uniform: %d", z.ID)
 				continue
 			}
-		}
-
-		faceData := make([]uint32, 0, len(faces))
-		for _, f := range faces {
-			faceData = append(faceData,
-				uint32(f[0]),
-				uint32(f[1]),
-				uint32(f[2]),
-			)
-		}
-		rl.Faces(faceData)
-
-		for k, v := range shader.Uniforms {
-			switch z := v.(type) {
-			case dd.XY:
-				rl.Uniform(k, [2]float32{z.X, z.Y})
-			case color.RGBA:
-				rl.Uniform(k, [4]float32{z.R, z.G, z.B, z.A})
-			default:
-				rl.Uniform(k, v)
+			rl.SetUniform(name, target)
+		case *gfx.Layer:
+			target, ok := b.layers[z.ID]
+			if !ok {
+				log.Printf("missing layer uniform: %d", z.ID)
+				continue
 			}
+			rl.SetUniform(name, target)
+		default:
+			rl.SetUniform(name, v)
 		}
 	}
 	return nil
 }
-
-// Determine the size (in bytes) of the data.
-/*
-	var size int
-	switch z := val.(type) {
-	}
-
-	p.bindings = append(p.bindings, binding{
-		attr:  attr,
-		value: val,
-		size:  size,
-	})
-*/

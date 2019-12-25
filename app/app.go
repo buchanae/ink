@@ -10,12 +10,12 @@ import (
 	"github.com/buchanae/ink/win"
 )
 
-// App can render a gfx.Doc to a window.
+// App can render a gfx.Layer to a window.
 type App struct {
 	conf     Config
 	win      *win.Window
 	renderer *render.Renderer
-	doc      *gfx.Doc
+	doc      *gfx.Layer
 }
 
 // NewApp will open a new window.
@@ -57,17 +57,14 @@ func (app *App) Run() {
 }
 
 // Render renders the doc to the app window.
-func (app *App) Render(doc *gfx.Doc) {
-	// TODO it's unclear which renderer methods are thread safe
-	app.renderer.ClearLayers()
-
+func (app *App) Render(doc *gfx.Layer) {
 	app.win.Do(func() {
-		err := build(doc, app.renderer)
-		if err != nil {
-			log.Printf("error: %v", err)
-			return
-		}
-		err = app.renderer.RenderToScreen()
+		app.renderer.ClearLayers()
+
+		b := builder{renderer: app.renderer}
+		b.build(doc)
+
+		err := app.renderer.RenderToScreen()
 		if err != nil {
 			log.Printf("error: rendering: %v", err)
 		}

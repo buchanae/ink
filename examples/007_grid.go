@@ -1,15 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(z *Layer) {
 
 	colors := []RGBA{
 		Red, Blue, Green, Yellow,
@@ -17,11 +15,8 @@ func main() {
 
 	grid := NewGrid(20, 20)
 	for _, r := range grid.Rects() {
-		m := NewShader(r.Mesh())
-		c := rand.Color(colors)
-		m.SetColor(c)
-		doc.Draw(m)
+		r = r.Shrink(0.002)
+		s := z.Shader(r)
+		s.Set("a_color", rand.Color(colors))
 	}
-
-	app.Render(doc)
 }

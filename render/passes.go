@@ -1,7 +1,6 @@
 package render
 
 import (
-	"time"
 	"unsafe"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
@@ -40,9 +39,16 @@ type passBuilder struct {
 	attrBytes int
 }
 
-func (pb *passBuilder) AddLayer(prog compiled, layer *Layer, output msaa) {
+func newPassBuilder() *passBuilder {
+	return &passBuilder{
+		passes: make([]*pass, 0, 500),
+		faces:  make([]uint32, 0, 5000),
+	}
+}
+
+func (pb *passBuilder) AddLayer(layer *Layer, output msaa) {
 	p := &pass{
-		prog:        prog,
+		prog:        layer.prog,
 		output:      output,
 		name:        layer.name,
 		vertexCount: layer.vertexCount,
@@ -53,19 +59,15 @@ func (pb *passBuilder) AddLayer(prog compiled, layer *Layer, output msaa) {
 	pb.faces = append(pb.faces, layer.faces...)
 	pb.passes = append(pb.passes, p)
 
-	trace("attr values: %v", layer.attrs)
-
-	for _, attr := range prog.attributes {
-		trace("attr: %v", attr.Name)
+	for _, attr := range layer.prog.attributes {
 		val, ok := layer.attrs[attr.Name]
 		if !ok {
-			trace("attr skipped: %v", attr.Name)
 			continue
 		}
+
 		p.bindings = append(p.bindings, binding{
 			attr:   attr,
 			values: []bindingVal{val},
-			//size:   val.size,
 		})
 		pb.attrBytes += val.size
 	}
@@ -103,7 +105,7 @@ func (pb *passBuilder) uploadFaces() uint32 {
 }
 
 func (pb *passBuilder) upload() {
-	defer traceTime("  upload", time.Now())
+	defer traceTime("upload")
 
 	// upload faces (vertex index)
 	index := pb.uploadFaces()
@@ -142,7 +144,6 @@ func (pb *passBuilder) upload() {
 
 			for _, val := range b.values {
 				if val.size == 0 {
-					log("zero size attribute %v", b)
 					// protection against weird things panicing.
 					continue
 				}
@@ -162,7 +163,7 @@ func (pb *passBuilder) upload() {
 }
 
 func (pb *passBuilder) batch() {
-	defer traceTime("  batch", time.Now())
+	defer traceTime("batch")
 
 	var batched []*pass
 	var last *pass

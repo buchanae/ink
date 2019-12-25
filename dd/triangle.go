@@ -27,18 +27,9 @@ func (t Triangle) Mesh() Mesh {
 	}
 }
 
-func StrokeTriangles(tris []Triangle, width float32) Mesh {
-	p := &Path{}
-	for _, t := range tris {
-		p.MoveTo(t.A)
-		p.LineTo(t.B)
-		p.LineTo(t.C)
-		p.LineTo(t.A)
-	}
-	return p.Stroke(width)
-}
+type Triangles []Triangle
 
-func Triangles(tris []Triangle) Mesh {
+func (tris Triangles) Mesh() Mesh {
 	verts := make([]XY, 0, len(tris)*3)
 	faces := make([]Face, 0, len(tris))
 
@@ -49,4 +40,15 @@ func Triangles(tris []Triangle) Mesh {
 		faces = append(faces, Face{l, l + 1, l + 2})
 	}
 	return Mesh{verts, faces}
+}
+
+func (tris Triangles) Stroke(width float32) Mesh {
+	p := &Path{}
+	for _, t := range tris {
+		p.MoveTo(t.A)
+		p.LineTo(t.B)
+		p.LineTo(t.C)
+		p.LineTo(t.A)
+	}
+	return p.Stroke(width)
 }

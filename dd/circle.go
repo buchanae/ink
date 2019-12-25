@@ -2,9 +2,14 @@ package dd
 
 import "math"
 
+func Dot(xy XY) Circle {
+	return Circle{xy, 0.002, 6}
+}
+
 type Circle struct {
 	XY
-	Radius float32
+	Radius   float32
+	Segments int
 }
 
 func (c Circle) Bounds() Rect {
@@ -66,7 +71,11 @@ func (c Circle) IntersectsLine(l Line) bool {
 }
 
 // TODO split segment interpolation into a separate function
-func (c *Circle) Mesh(segments int) Mesh {
+func (c Circle) Mesh() Mesh {
+	segments := c.Segments
+	if segments <= 0 {
+		segments = 10
+	}
 
 	faces := make([]Face, 0, segments)
 	verts := make([]XY, 0, segments+1)

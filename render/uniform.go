@@ -109,8 +109,8 @@ func (u *uniform) Bind(val interface{}) error {
 		switch z := val.(type) {
 		case Image:
 			tex = z.tex
-		case msaa:
-			tex = z.Read.Tex
+		case *Layer:
+			tex = z.tex.Read.Tex
 		default:
 			return fmt.Errorf("type mismatch: expected texture, got %T", val)
 		}
