@@ -10,6 +10,11 @@ type Grid struct {
 	Cells      []Cell
 }
 
+// TODO grid size is confusing
+//      because the grid is actually a point
+//      grid, not a rectangle grid. Maybe
+//      don't create Cells automatically,
+//      and add Points() function instead.
 func NewGrid(rows, cols int) Grid {
 	grid := Grid{
 		Rows:  rows,

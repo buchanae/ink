@@ -147,6 +147,10 @@ func BlueNoise(n int, w, h, d float32) []dd.XY {
 	return src.BlueNoise(n, w, h, d)
 }
 
+func BlueNoiseInitial(n int, w, h, d float32, initial []dd.XY) []dd.XY {
+	return src.BlueNoiseInitial(n, w, h, d, initial)
+}
+
 func Color(c []color.RGBA) color.RGBA {
 	return src.Color(c)
 }

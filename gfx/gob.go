@@ -17,7 +17,7 @@ func init() {
 	gob.Register(dd.Quad{})
 	gob.Register(dd.Triangle{})
 	gob.Register(dd.Circle{})
-
+	gob.Register(dd.Triangles{})
 	gob.Register([]color.RGBA{})
 	gob.Register([]dd.XY{})
 }

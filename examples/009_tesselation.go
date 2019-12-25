@@ -1,18 +1,14 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/tess"
 )
 
-func main() {
-	doc := NewDoc()
-
-	bg := Fill{Fullscreen(), White}
-	doc.Draw(bg)
+func Ink(doc *Layer) {
+	doc.Clear(White)
 
 	xys := []XY{
 		{0.2, 0.2},
@@ -26,17 +22,9 @@ func main() {
 
 	tris := tess.Tesselate(xys)
 	m := Triangles(tris)
-	s := NewShader(m)
-	doc.Draw(s)
+	doc.Shader(m)
 
 	for _, xy := range xys {
-		// TODO four lines just to draw a small point is too much
-		// doc.Circle(c)
-		c := Circle{xy, 0.005}
-		s := NewShader(c.Mesh(10))
-		s.SetColor(Red)
-		doc.Draw(s)
+		doc.Dot(xy, Red)
 	}
-
-	app.Render(doc)
 }

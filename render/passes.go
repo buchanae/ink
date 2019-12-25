@@ -3,6 +3,7 @@ package render
 import (
 	"unsafe"
 
+	. "github.com/buchanae/ink/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -78,10 +79,7 @@ func (pb *passBuilder) Passes() []*pass {
 		return nil
 	}
 
-	trace("batching")
 	pb.batch()
-
-	trace("uploading")
 	pb.upload()
 
 	return pb.passes
@@ -105,7 +103,7 @@ func (pb *passBuilder) uploadFaces() uint32 {
 }
 
 func (pb *passBuilder) upload() {
-	defer traceTime("upload")
+	Trace("upload")
 
 	// upload faces (vertex index)
 	index := pb.uploadFaces()
@@ -163,7 +161,7 @@ func (pb *passBuilder) upload() {
 }
 
 func (pb *passBuilder) batch() {
-	defer traceTime("batch")
+	Trace("batch")
 
 	var batched []*pass
 	var last *pass
@@ -181,45 +179,45 @@ func (pb *passBuilder) batch() {
 		}
 	}
 	batched = append(batched, last)
-	trace("  merged passes %d to %d", len(pb.passes), len(batched))
+	Trace("  merged passes %d to %d", len(pb.passes), len(batched))
 	pb.passes = batched
 }
 
 func (pb *passBuilder) mergeable(a, b *pass) bool {
 	if a.prog.id != b.prog.id {
-		//trace("not mergeable: prog.ID")
+		//Trace("not mergeable: prog.ID")
 		return false
 	}
 	if len(a.bindings) != len(b.bindings) {
-		//trace("not mergeable: len(bindings)")
+		//Trace("not mergeable: len(bindings)")
 		return false
 	}
 	if len(a.uniforms) != len(b.uniforms) {
-		//trace("not mergeable: len(uniforms)")
+		//Trace("not mergeable: len(uniforms)")
 		return false
 	}
 	if a.output != b.output {
-		//trace("not mergeable: output")
+		//Trace("not mergeable: output")
 		return false
 	}
 	for i := range b.bindings {
 		if a.bindings[i].attr != b.bindings[i].attr {
-			//trace("not mergeable: binding.attr %v %v", a.bindings[i].attr, b.bindings[i].attr)
+			//Trace("not mergeable: binding.attr %v %v", a.bindings[i].attr, b.bindings[i].attr)
 			return false
 		}
 		if a.bindings[i].divisor != b.bindings[i].divisor {
-			//trace("not mergeable: binding.divisor")
+			//Trace("not mergeable: binding.divisor")
 			return false
 		}
 	}
 	for k, v := range a.uniforms {
 		c, ok := b.uniforms[k]
 		if !ok {
-			//trace("not mergeable: uniform !ok")
+			//Trace("not mergeable: uniform !ok")
 			return false
 		}
 		if c != v {
-			//trace("not mergeable: uniform value")
+			//Trace("not mergeable: uniform value")
 			return false
 		}
 	}

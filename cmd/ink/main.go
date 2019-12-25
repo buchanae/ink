@@ -12,6 +12,7 @@ import (
 
 	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/gfx"
+	. "github.com/buchanae/ink/trace"
 )
 
 func main() {
@@ -53,7 +54,26 @@ func main() {
 	a.Run()
 }
 
+type firstByteReader struct {
+	r     io.Reader
+	total int
+	done  bool
+}
+
+func (fbr *firstByteReader) Read(data []byte) (int, error) {
+	n, err := fbr.r.Read(data)
+	if !fbr.done {
+		Trace("first byte")
+		fbr.done = true
+	}
+	fbr.total += n
+	return n, err
+}
+
 func run(app *app.App, path string) error {
+	StartTrace()
+	Trace("run")
+
 	tempDir, err := ioutil.TempDir("", "ink-run-")
 	if err != nil {
 		return err
@@ -61,11 +81,14 @@ func run(app *app.App, path string) error {
 	defer os.RemoveAll(tempDir)
 
 	inkPath := filepath.Join(tempDir, "ink.go")
+
+	Trace("copy")
 	err = copyFile(inkPath, path)
 	if err != nil {
 		return err
 	}
 
+	Trace("write main")
 	mainPath := filepath.Join(tempDir, "main.go")
 	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
 	if err != nil {
@@ -80,14 +103,18 @@ func run(app *app.App, path string) error {
 	}
 	cmd.Stderr = os.Stderr
 
+	Trace("start")
 	err = cmd.Start()
 	if err != nil {
 		return err
 	}
 
+	reader := &firstByteReader{r: stdout}
+
 	for {
+		Trace("decode")
 		doc := &gfx.Layer{}
-		dec := gob.NewDecoder(stdout)
+		dec := gob.NewDecoder(reader)
 		err = dec.Decode(doc)
 		if err == io.EOF {
 			break
@@ -96,10 +123,12 @@ func run(app *app.App, path string) error {
 			return err
 		}
 
-		log.Print("render")
+		Trace("render")
 		app.Render(doc)
 	}
 
+	Trace("wait")
+	defer Trace("done %d bytes", reader.total)
 	return cmd.Wait()
 }
 

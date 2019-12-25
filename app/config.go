@@ -12,7 +12,7 @@ func DefaultConfig() Config {
 			Dir:    "snapshots",
 		},
 		Window: win.Config{
-			Name:   "zinc",
+			Name:   "ink",
 			X:      10,
 			Y:      10,
 			Width:  800,

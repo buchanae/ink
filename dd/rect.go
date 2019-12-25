@@ -7,6 +7,14 @@ func RectAWH(a, wh XY) Rect {
 	}
 }
 
+func RectCenter(center, wh XY) Rect {
+	half := wh.MulScalar(0.5)
+	return Rect{
+		A: center.Sub(half),
+		B: center.Add(half),
+	}
+}
+
 func Square(xy XY, size float32) Rect {
 	return Rect{
 		A: xy.Add(XY{size / 2, size / 2}),
@@ -23,6 +31,36 @@ func (r Rect) Center() XY {
 	//TODO wish ((r.B - r.A) * 0.5) + r.A
 }
 
+func (r Rect) Translate(xy XY) Rect {
+	return Rect{
+		A: r.A.Add(xy),
+		B: r.B.Add(xy),
+	}
+}
+
+func (r Rect) Rotate(rad float32, pivot XY) Rect {
+	return Rect{
+		A: r.A.Rotate(rad, pivot),
+		B: r.B.Rotate(rad, pivot),
+	}
+}
+
+func (r Rect) Contains(xy XY) bool {
+	if xy.X < r.A.X {
+		return false
+	}
+	if xy.Y < r.A.Y {
+		return false
+	}
+	if xy.X > r.B.X {
+		return false
+	}
+	if xy.Y > r.B.Y {
+		return false
+	}
+	return true
+}
+
 // Include will change the min/max bounds of the box
 // if x/y is greater/less than the current min/max points.
 // This is useful for updating bounding boxes.
@@ -36,10 +74,14 @@ func (r Rect) Include(xy XY) Rect {
 	if xy.X > r.B.X {
 		r.B.X = xy.X
 	}
-	if xy.Y < r.B.Y {
+	if xy.Y > r.B.Y {
 		r.B.Y = xy.Y
 	}
 	return r
+}
+
+func (r Rect) Interp(xy XY) XY {
+	return r.B.Sub(r.A).Mul(xy).Add(r.A)
 }
 
 // TODO should "amount" be a percentage?

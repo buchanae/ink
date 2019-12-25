@@ -2,10 +2,6 @@ package dd
 
 import "math"
 
-func Dot(xy XY) Circle {
-	return Circle{xy, 0.002, 6}
-}
-
 type Circle struct {
 	XY
 	Radius   float32

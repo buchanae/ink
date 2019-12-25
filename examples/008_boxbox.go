@@ -8,8 +8,8 @@ import (
 )
 
 const (
-	GridSize       = 15
-	Boxes          = 5
+	GridSize       = 20
+	Boxes          = 7
 	LineWidth      = 0.0015
 	SkipCellChance = 0.05
 	SkipBoxChance  = 0.20
@@ -19,9 +19,15 @@ const (
 )
 
 func Ink(doc *Layer) {
+	rand.SeedNow()
+	doc.Clear(White)
 	grid := NewGrid(GridSize, GridSize)
 
-	for _, cell := range grid.Rects() {
+	p := rand.Palette()
+
+	for i, rect := range grid.Rects() {
+		cell := grid.Cells[i]
+
 		if rand.Bool(SkipCellChance) {
 			continue
 		}
@@ -31,15 +37,18 @@ func Ink(doc *Layer) {
 				continue
 			}
 
-			r := cell.Shrink(float32(i+1) * Shrink)
+			r := rect.Shrink(float32(i+1) * Shrink)
 			q := QuadFromRect(r)
-			q = rand.TweakQuad(q, TweakBox)
+			//q = rand.TweakQuad(q, TweakBox)
 			m := q.Stroke(LineWidth)
 
 			s := doc.Shader(m)
-			s.Set("a_color", Red)
+			s.Set("a_color", rand.Color(p))
 			s.Set("a_pivot", r.Center())
-			s.Set("a_rot", rand.Range(-Angle, Angle))
+
+			if cell.Row > 5 {
+				s.Set("a_rot", rand.Range(-Angle, Angle))
+			}
 		}
 	}
 }

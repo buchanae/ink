@@ -7,14 +7,11 @@ func (r *Renderer) NewLayer(s Shader) (*Layer, error) {
 		return nil, err
 	}
 
-	tex := r.texture(s.ID)
-
 	l := &Layer{
 		id:          s.ID,
 		name:        s.Name,
 		vertexCount: s.VertexCount,
 		prog:        prog,
-		tex:         tex,
 		attrs:       map[string]bindingVal{},
 		uniforms:    map[string]interface{}{},
 	}

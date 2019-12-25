@@ -7,6 +7,7 @@ import (
 
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
+	. "github.com/buchanae/ink/trace"
 	"github.com/buchanae/ink/win"
 )
 
@@ -61,8 +62,10 @@ func (app *App) Render(doc *gfx.Layer) {
 	app.win.Do(func() {
 		app.renderer.ClearLayers()
 
+		Trace("start build")
 		b := builder{renderer: app.renderer}
 		b.build(doc)
+		Trace("built")
 
 		err := app.renderer.RenderToScreen()
 		if err != nil {

@@ -3,8 +3,8 @@ package render
 import (
 	"image"
 	"log"
-	"time"
 
+	. "github.com/buchanae/ink/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -31,17 +31,23 @@ func NewRenderer(width, height int) *Renderer {
 func (r *Renderer) RenderToScreen() error {
 	main := r.texture(0)
 	main.Clear()
+
 	err := r.render(main)
 	if err != nil {
 		return err
 	}
+
+	Trace("blit")
 	main.Blit(0)
+
+	Trace("done")
 	return nil
 }
 
 func (r *Renderer) RenderToImage() (image.Image, error) {
 	main := r.texture(0)
 	main.Clear()
+
 	err := r.render(main)
 	if err != nil {
 		return nil, err
@@ -57,7 +63,7 @@ optimize:
 	 so would require knowing that the app doesn't hold a reference to the texture.
 */
 func (r *Renderer) render(dst msaa) error {
-	defer traceTime("render")
+	Trace("render")
 
 	// TODO maybe move these to renderPasses
 	glViewport(0, 0, int32(r.width), int32(r.height))
@@ -74,10 +80,10 @@ func (r *Renderer) render(dst msaa) error {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
+	Trace("build")
 	pb := newPassBuilder()
 	links := findLinks(r.layers)
 
-	start := time.Now()
 	for _, layer := range r.layers {
 
 		output := dst
@@ -104,7 +110,7 @@ func (r *Renderer) render(dst msaa) error {
 
 	passes := pb.Passes()
 
-	trace("passes %d", len(passes))
+	Trace("passes %d", len(passes))
 
 	for _, p := range passes {
 		r.renderPass(p)
@@ -116,24 +122,20 @@ func (r *Renderer) render(dst msaa) error {
 
 func (r *Renderer) renderPass(p *pass) {
 
-	renderPassStart := time.Now()
-	trace("render pass %s", p.name)
-	trace("  output to %d", p.output.ID)
+	Trace("render pass %s", p.name)
+	Trace("  output to %d", p.output.ID)
 
 	// TODO clear existing program entirely
 	// TODO need to cleanup cached buffers
 	// TODO redo instancing
 
-	start := time.Now()
-
+	Trace("  gl config")
 	glBindFramebuffer(gl.FRAMEBUFFER, p.output.Write.FBO)
 	glUseProgram(p.prog.id)
 	r.bindUniforms(p)
 	glBindVertexArray(p.vao)
 
-	trace("  render config took %s", time.Since(start))
-
-	start = time.Now()
+	Trace("  draw elements")
 	glDrawElements(
 		gl.TRIANGLES,
 		int32(p.faceCount),
@@ -141,13 +143,11 @@ func (r *Renderer) renderPass(p *pass) {
 		// 4 bytes in each uint32 face index
 		glPtrOffset(p.faceOffset*4),
 	)
-	trace("  draw elements took %s", time.Since(start))
 
-	start = time.Now()
+	Trace("  output.Paint")
 	p.output.Paint()
 
-	trace("  output paint took %s", time.Since(start))
-	trace("  render pass took  %s", time.Since(renderPassStart))
+	Trace("  pass done")
 }
 
 func (r *Renderer) bindUniforms(p *pass) {

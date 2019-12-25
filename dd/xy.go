@@ -52,3 +52,14 @@ func (a XY) Distance(b XY) float32 {
 func (a XY) Dot(b XY) float32 {
 	return a.X*b.X + a.Y*b.Y
 }
+
+func (a XY) Rotate(rad float32, pivot XY) XY {
+	cr := cos(rad)
+	sr := sin(rad)
+	p := a.Sub(pivot)
+	b := XY{
+		X: p.X*cr - p.Y*sr,
+		Y: p.X*sr + p.Y*cr,
+	}
+	return b.Add(pivot)
+}
