@@ -66,7 +66,7 @@ func Ink(doc *Layer) {
 	}
 
 	doc.Draw(Mask{
-		Mesh:   Fullscreen,
+		Rect:   Fullscreen,
 		Source: l2,
 		Mask:   mask,
 	})

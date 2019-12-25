@@ -1,7 +1,9 @@
 package gfx
 
+import "github.com/buchanae/ink/dd"
+
 type Mask struct {
-	Mesh         Meshable
+	Rect         dd.Rect
 	Source, Mask *Layer
 }
 
@@ -10,7 +12,7 @@ func (m Mask) Draw(l *Layer) {
 		Name: "Mask",
 		Vert: DefaultVert,
 		Frag: MaskFrag,
-		Mesh: m.Mesh,
+		Mesh: m.Rect,
 		Attrs: Attrs{
 			"u_source": m.Source,
 			"u_mask":   m.Mask,
