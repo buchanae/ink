@@ -8,6 +8,14 @@ type Line struct {
 	A, B XY
 }
 
+func (l Line) Start() XY {
+	return l.A
+}
+
+func (l Line) End() XY {
+	return l.B
+}
+
 func (l Line) Length() float32 {
 	return sqrt(l.SquaredLength())
 }

@@ -1,7 +1,32 @@
 package dd
 
+type Cubic struct {
+	A, B         XY
+	CtrlA, CtrlB XY
+}
+
+func (c Cubic) Start() XY {
+	return c.A
+}
+
+func (c Cubic) End() XY {
+	return c.B
+}
+
+func (c Cubic) Interpolate(p float32) XY {
+	panic("not implemented")
+}
+
 type Quadratic struct {
 	A, B, Ctrl XY
+}
+
+func (q Quadratic) Start() XY {
+	return q.A
+}
+
+func (q Quadratic) End() XY {
+	return q.B
 }
 
 func (q Quadratic) Interpolate(p float32) XY {
@@ -14,8 +39,8 @@ func (q Quadratic) Interpolate(p float32) XY {
 }
 
 type Curve interface {
-	Segments() []Curve
-	Length() float32
+	//Segments() []Curve
+	//Length() float32
 	Start() XY
 	End() XY
 	Interpolate(p float32) XY

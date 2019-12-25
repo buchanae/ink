@@ -21,6 +21,22 @@ func (c Circle) Bounds() Rect {
 	}
 }
 
+// TODO Contains or Intersects or both?
+func (c Circle) ContainsPoint(xy XY) bool {
+	l := Line{c.XY, xy}
+	return l.Length() <= c.Radius
+}
+
+func (c Circle) DistanceToPoint(xy XY) float32 {
+	l := Line{c.XY, xy}
+	return l.Length() - c.Radius
+}
+
+func (c Circle) DistanceToCircle(d Circle) float32 {
+	l := Line{c.XY, d.XY}
+	return l.Length() - c.Radius - d.Radius
+}
+
 func (c Circle) IntersectsCircle(d Circle) bool {
 	l := Line{c.XY, d.XY}
 	// distance between circle centers

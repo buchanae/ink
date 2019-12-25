@@ -11,6 +11,9 @@ require (
 	github.com/muesli/gamut v0.0.0-20190807050624-0d3f7d26a44e
 	github.com/muesli/kmeans v0.0.0-20190917235210-80dfc71e6c5a // indirect
 	github.com/ojrac/opensimplex-go v1.0.1
+	github.com/pointlander/compress v1.1.0 // indirect
+	github.com/pointlander/jetset v1.0.0 // indirect
+	github.com/pointlander/peg v1.0.0 // indirect
 	github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f
 	github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1 // indirect
 	github.com/veandco/go-sdl2 v0.4.0-rc.1.0.20191208053522-3d9b5d6d1911

@@ -1,0 +1,76 @@
+package svg
+
+type pathParser Peg {
+  builder
+}
+
+path <- wsp* movetoDrawtos? wsp* !.
+
+movetoDrawtos <- movetoDrawto wsp* movetoDrawtos
+  / movetoDrawto
+
+movetoDrawto <- moveto wsp* drawtos?
+
+drawtos <- drawto wsp* drawtos
+  / drawto
+
+drawto <- closepath
+  / cubicto
+  / quadto
+  / lineto
+
+moveto <- 'M' wsp* movetoArgs { p.MoveTo(true) }
+        / 'm' wsp* movetoArgs { p.MoveTo(false) }
+
+movetoArgs <- pair comma? linetoArgs
+  / pair
+
+lineto <- 'L' wsp* linetoArgs { p.LineTo(true) }
+        / 'l' wsp* linetoArgs { p.LineTo(false) }
+
+closepath <- [zZ] { p.ClosePath() }
+
+linetoArgs <- pair comma? linetoArgs
+            / pair
+
+cubicto <- 'C' wsp* cubictoArgs { p.CubicTo(true) }
+         / 'c' wsp* cubictoArgs { p.CubicTo(false) }
+
+cubictoArgs <- cubictoArg comma? cubictoArgs
+  / cubictoArg
+
+cubictoArg <- pair comma? pair comma? pair
+
+quadto <- 'Q' wsp* quadtoArgs { p.QuadraticTo(true) }
+        / 'q' wsp* quadtoArgs { p.QuadraticTo(false) }
+
+quadtoArgs <- quadtoArg comma? quadtoArgs
+  / quadtoArg
+
+quadtoArg <- pair comma? pair
+
+digits <- [0-9]+
+
+pair <- coord comma? coord
+
+coord <- <number> { p.Coord(buffer[begin:end]) }
+
+number <- sign? float
+  / sign? integer
+
+nonneg <- float / integer
+
+comma <- wsp+ ','? wsp* / ',' wsp*
+
+integer <- digits
+
+float <- fract exponent?
+  / digits exponent
+
+fract <- digits? '.' digits
+  / digits '.'
+
+exponent <- [eE] sign? digits
+
+wsp <- ' ' / '\t' / '\r' / '\n'
+sign <- '-' / '+'
