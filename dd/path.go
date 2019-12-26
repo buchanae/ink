@@ -74,6 +74,7 @@ func (p *Path) Close() {
 	p.LineTo(first)
 }
 
+// TODO subdivide options
 func (p *Path) Lines() []Line {
 	var lines []Line
 	for _, sub := range p.subpaths {
@@ -81,8 +82,8 @@ func (p *Path) Lines() []Line {
 			switch z := seg.(type) {
 			case Line:
 				lines = append(lines, z)
-				// TODO
 			case Cubic:
+				// TODO
 				lines = append(lines, Line{z.Start(), z.End()})
 			case Quadratic:
 				xys := Subdivide(z, 10)

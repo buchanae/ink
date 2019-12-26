@@ -2,36 +2,7 @@ package svg
 
 import (
 	"github.com/buchanae/ink/dd"
-	"github.com/buchanae/ink/tess"
 )
-
-// TODO get rid of width/height
-func Mesh(raw string, width, height float32) (dd.Mesh, error) {
-
-	path, err := Parse(raw, width, height)
-	if err != nil {
-		return dd.Mesh{}, err
-	}
-	_ = path
-
-	var points []dd.XY
-
-	for i, p := range points {
-		points[i] = dd.XY{p.X / width, p.Y / height}
-	}
-
-	triangles := tess.Tesselate(points)
-	mesh := dd.Triangles(triangles).Mesh()
-
-	// TODO not sure why I can't flip verts before triangulation
-	for i, v := range mesh.Verts {
-		v.Y = 1 - v.Y
-		mesh.Verts[i] = v
-	}
-
-	return mesh, nil
-	//sort.Sort(sortPoints{points, center})
-}
 
 type sortPoints struct {
 	points []dd.XY
