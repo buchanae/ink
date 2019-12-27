@@ -7,7 +7,7 @@ import (
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *Layer) {
+func Ink(doc *Doc) {
 	rand.SeedNow()
 	doc.Clear(White)
 

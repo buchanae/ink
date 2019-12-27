@@ -1,5 +1,6 @@
 package gfx
 
+// TODO want to remove these dependencies from code used by sketches
 import (
 	"encoding/gob"
 

@@ -3,7 +3,7 @@ package render
 import (
 	"unsafe"
 
-	. "github.com/buchanae/ink/trace"
+	"github.com/buchanae/ink/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -38,6 +38,11 @@ type passBuilder struct {
 	faces  []uint32
 	// Total number of bytes needed to store all attributes.
 	attrBytes int
+
+	// opengl buffer IDs
+	attrBufID uint32
+	faceBufID uint32
+	vaos      []uint32
 }
 
 func newPassBuilder() *passBuilder {
@@ -45,6 +50,12 @@ func newPassBuilder() *passBuilder {
 		passes: make([]*pass, 0, 500),
 		faces:  make([]uint32, 0, 5000),
 	}
+}
+
+func (pb *passBuilder) Cleanup() {
+	glDeleteBuffers(1, &pb.attrBufID)
+	glDeleteBuffers(1, &pb.faceBufID)
+	glDeleteVertexArrays(int32(len(pb.vaos)), &pb.vaos[0])
 }
 
 func (pb *passBuilder) AddLayer(layer *Layer, output msaa) {
@@ -85,11 +96,10 @@ func (pb *passBuilder) Passes() []*pass {
 	return pb.passes
 }
 
-func (pb *passBuilder) uploadFaces() uint32 {
+func (pb *passBuilder) uploadFaces() {
 	// Element buffers are used for indexed rendering.
-	var buf uint32
-	glGenBuffers(1, &buf)
-	glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, buf)
+	glGenBuffers(1, &pb.faceBufID)
+	glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, pb.faceBufID)
 
 	glBufferData(
 		gl.ELEMENT_ARRAY_BUFFER,
@@ -98,35 +108,32 @@ func (pb *passBuilder) uploadFaces() uint32 {
 		glPtr(pb.faces),
 		gl.STATIC_DRAW,
 	)
-
-	return buf
 }
 
 func (pb *passBuilder) upload() {
-	Trace("upload")
+	trace.Log("upload")
 
 	// upload faces (vertex index)
-	index := pb.uploadFaces()
+	pb.uploadFaces()
 
 	// The data from all attributes is stored in one large buffer.
 	// A "binding" describes the slice of the buffer that holds data
 	// for a single attribute.
-	var buf uint32
-	glGenBuffers(1, &buf)
-	glBindBuffer(gl.ARRAY_BUFFER, buf)
+	glGenBuffers(1, &pb.attrBufID)
+	glBindBuffer(gl.ARRAY_BUFFER, pb.attrBufID)
 	glBufferData(gl.ARRAY_BUFFER, pb.attrBytes, nil, gl.STATIC_DRAW)
 
 	// Each pass has one VAO, which stores the configuration of all its
 	// attributes: location of the data in the buffer, enabled/disable,
 	// types, divisors, etc.
-	vaos := make([]uint32, len(pb.passes))
-	glGenVertexArrays(int32(len(pb.passes)), &vaos[0])
+	pb.vaos = make([]uint32, len(pb.passes))
+	glGenVertexArrays(int32(len(pb.passes)), &pb.vaos[0])
 
 	offset := 0
 	for i, p := range pb.passes {
-		p.vao = vaos[i]
+		p.vao = pb.vaos[i]
 		glBindVertexArray(p.vao)
-		glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, index)
+		glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, pb.faceBufID)
 
 		for _, b := range p.bindings {
 
@@ -161,7 +168,7 @@ func (pb *passBuilder) upload() {
 }
 
 func (pb *passBuilder) batch() {
-	Trace("batch")
+	trace.Log("batch")
 
 	var batched []*pass
 	var last *pass
@@ -179,45 +186,45 @@ func (pb *passBuilder) batch() {
 		}
 	}
 	batched = append(batched, last)
-	Trace("  merged passes %d to %d", len(pb.passes), len(batched))
+	trace.Log("  merged passes %d to %d", len(pb.passes), len(batched))
 	pb.passes = batched
 }
 
 func (pb *passBuilder) mergeable(a, b *pass) bool {
 	if a.prog.id != b.prog.id {
-		//Trace("not mergeable: prog.ID")
+		//trace.Log("not mergeable: prog.ID")
 		return false
 	}
 	if len(a.bindings) != len(b.bindings) {
-		//Trace("not mergeable: len(bindings)")
+		//trace.Log("not mergeable: len(bindings)")
 		return false
 	}
 	if len(a.uniforms) != len(b.uniforms) {
-		//Trace("not mergeable: len(uniforms)")
+		//trace.Log("not mergeable: len(uniforms)")
 		return false
 	}
 	if a.output != b.output {
-		//Trace("not mergeable: output")
+		//trace.Log("not mergeable: output")
 		return false
 	}
 	for i := range b.bindings {
 		if a.bindings[i].attr != b.bindings[i].attr {
-			//Trace("not mergeable: binding.attr %v %v", a.bindings[i].attr, b.bindings[i].attr)
+			//trace.Log("not mergeable: binding.attr %v %v", a.bindings[i].attr, b.bindings[i].attr)
 			return false
 		}
 		if a.bindings[i].divisor != b.bindings[i].divisor {
-			//Trace("not mergeable: binding.divisor")
+			//trace.Log("not mergeable: binding.divisor")
 			return false
 		}
 	}
 	for k, v := range a.uniforms {
 		c, ok := b.uniforms[k]
 		if !ok {
-			//Trace("not mergeable: uniform !ok")
+			//trace.Log("not mergeable: uniform !ok")
 			return false
 		}
 		if c != v {
-			//Trace("not mergeable: uniform value")
+			//trace.Log("not mergeable: uniform value")
 			return false
 		}
 	}

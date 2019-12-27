@@ -12,7 +12,7 @@ const (
 	RandPoint  = 0.03
 )
 
-func Ink(doc *Layer) {
+func Ink(doc *Doc) {
 	rand.SeedNow()
 
 	doc.Clear(White)

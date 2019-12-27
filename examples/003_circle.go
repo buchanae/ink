@@ -6,7 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(z *Layer) {
+func Ink(z *Doc) {
 	f := Fill{
 		Mesh: Circle{
 			XY:       XY{0.5, 0.5},

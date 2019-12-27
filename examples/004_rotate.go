@@ -6,7 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(z *Layer) {
+func Ink(z *Doc) {
 
 	r := Rect{
 		XY{0.2, 0.2},

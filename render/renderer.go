@@ -4,7 +4,7 @@ import (
 	"image"
 	"log"
 
-	. "github.com/buchanae/ink/trace"
+	"github.com/buchanae/ink/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -37,10 +37,10 @@ func (r *Renderer) RenderToScreen() error {
 		return err
 	}
 
-	Trace("blit")
+	trace.Log("blit")
 	main.Blit(0)
 
-	Trace("done")
+	trace.Log("done")
 	return nil
 }
 
@@ -63,7 +63,7 @@ optimize:
 	 so would require knowing that the app doesn't hold a reference to the texture.
 */
 func (r *Renderer) render(dst msaa) error {
-	Trace("render")
+	trace.Log("render")
 
 	// TODO maybe move these to renderPasses
 	glViewport(0, 0, int32(r.width), int32(r.height))
@@ -80,8 +80,10 @@ func (r *Renderer) render(dst msaa) error {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	Trace("build")
+	trace.Log("build")
 	pb := newPassBuilder()
+	defer pb.Cleanup()
+
 	links := findLinks(r.layers)
 
 	for _, layer := range r.layers {
@@ -110,7 +112,7 @@ func (r *Renderer) render(dst msaa) error {
 
 	passes := pb.Passes()
 
-	Trace("passes %d", len(passes))
+	trace.Log("passes %d", len(passes))
 
 	for _, p := range passes {
 		r.renderPass(p)
@@ -122,20 +124,20 @@ func (r *Renderer) render(dst msaa) error {
 
 func (r *Renderer) renderPass(p *pass) {
 
-	Trace("render pass %s", p.name)
-	Trace("  output to %d", p.output.ID)
+	trace.Log("render pass %s", p.name)
+	trace.Log("  output to %d", p.output.ID)
 
 	// TODO clear existing program entirely
 	// TODO need to cleanup cached buffers
 	// TODO redo instancing
 
-	Trace("  gl config")
+	trace.Log("  gl config")
 	glBindFramebuffer(gl.FRAMEBUFFER, p.output.Write.FBO)
 	glUseProgram(p.prog.id)
 	r.bindUniforms(p)
 	glBindVertexArray(p.vao)
 
-	Trace("  draw elements")
+	trace.Log("  draw elements")
 	glDrawElements(
 		gl.TRIANGLES,
 		int32(p.faceCount),
@@ -144,10 +146,10 @@ func (r *Renderer) renderPass(p *pass) {
 		glPtrOffset(p.faceOffset*4),
 	)
 
-	Trace("  output.Paint")
+	trace.Log("  output.Paint")
 	p.output.Paint()
 
-	Trace("  pass done")
+	trace.Log("  pass done")
 }
 
 func (r *Renderer) bindUniforms(p *pass) {

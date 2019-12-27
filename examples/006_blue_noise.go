@@ -6,7 +6,7 @@ import (
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(z *Layer) {
+func Ink(z *Doc) {
 
 	xys := rand.BlueNoise(500, 1, 1, 0.02)
 

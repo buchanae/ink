@@ -7,7 +7,7 @@ import (
 	"github.com/buchanae/ink/tess"
 )
 
-func Ink(doc *Layer) {
+func Ink(doc *Doc) {
 	doc.Clear(White)
 
 	xys := []XY{

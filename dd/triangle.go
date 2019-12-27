@@ -4,6 +4,11 @@ type Triangle struct {
 	A, B, C XY
 }
 
+// TODO http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment4/Assignment4_KD.htm
+func (t Triangle) Centroid() XY {
+	return t.A.Add(t.B).Add(t.C).DivScalar(3)
+}
+
 func (t Triangle) Contains(p XY) bool {
 	// https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
 	sign := func(a, b, c XY) float32 {

@@ -16,19 +16,20 @@ func init() {
 	buf := bufio.NewWriterSize(os.Stderr, 50000)
 	logger = log.New(buf, "", 0)
 	go func() {
-		for range time.Tick(time.Second) {
+		for range time.Tick(500 * time.Millisecond) {
 			buf.Flush()
 		}
 	}()
 }
 
-func StartTrace() {
+func Start() {
 	start = time.Now()
 }
 
-func Trace(msg string, args ...interface{}) {
+func Log(msg string, args ...interface{}) {
 	if On {
 		d := time.Since(start)
+		// for relative times
 		//start = time.Now()
 		fms := float64(d) / float64(time.Millisecond)
 		nargs := append([]interface{}{}, fms)

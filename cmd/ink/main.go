@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"encoding/gob"
+	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -9,23 +11,28 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"sync"
 
 	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/gfx"
-	. "github.com/buchanae/ink/trace"
+	"github.com/buchanae/ink/trace"
 )
+
+func init() {
+	flag.BoolVar(&trace.On, "trace", trace.On, "Enable trace output")
+}
 
 func main() {
 	log.SetFlags(0)
+	flag.Parse()
+	args := flag.Args()
 
-	if len(os.Args) != 2 {
+	if len(args) != 1 {
 		fmt.Fprint(os.Stderr, "usage: ink file.go")
 		os.Exit(1)
 	}
 
-	watch := newWatcher()
-
-	path, err := filepath.Abs(os.Args[1])
+	path, err := filepath.Abs(args[0])
 	if err != nil {
 		panic(err)
 	}
@@ -35,16 +42,25 @@ func main() {
 		panic(err)
 	}
 
+	watch := newWatcher()
 	watch.Watch(path)
 
-	refresh := func() {
-		run(a, path)
-	}
-
 	go func() {
-		refresh()
-		for range watch.changes {
-			refresh()
+		wg := sync.WaitGroup{}
+
+		for {
+			ctx, cancel := context.WithCancel(context.Background())
+
+			wg.Add(1)
+			go func() {
+				run(ctx, a, path)
+				wg.Done()
+			}()
+
+			<-watch.changes
+			log.Println("change")
+			cancel()
+			wg.Wait()
 		}
 	}()
 
@@ -63,16 +79,16 @@ type firstByteReader struct {
 func (fbr *firstByteReader) Read(data []byte) (int, error) {
 	n, err := fbr.r.Read(data)
 	if !fbr.done {
-		Trace("first byte")
+		trace.Log("first byte")
 		fbr.done = true
 	}
 	fbr.total += n
 	return n, err
 }
 
-func run(app *app.App, path string) error {
-	StartTrace()
-	Trace("run")
+func run(ctx context.Context, app *app.App, path string) error {
+	trace.Start()
+	trace.Log("run")
 
 	tempDir, err := ioutil.TempDir("", "ink-run-")
 	if err != nil {
@@ -82,37 +98,45 @@ func run(app *app.App, path string) error {
 
 	inkPath := filepath.Join(tempDir, "ink.go")
 
-	Trace("copy")
+	trace.Log("copy")
 	err = copyFile(inkPath, path)
 	if err != nil {
 		return err
 	}
 
-	Trace("write main")
+	trace.Log("write main")
 	mainPath := filepath.Join(tempDir, "main.go")
 	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
 	if err != nil {
 		return err
 	}
 
-	cmd := exec.Command("go", "run", inkPath, mainPath)
+	cmd := exec.CommandContext(ctx, "go", "run", inkPath, mainPath)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		return err
+		return fmt.Errorf("getting stdout pipe: %v", err)
 	}
 	cmd.Stderr = os.Stderr
 
-	Trace("start")
+	// CommandContext doesn't work as expected when used with subshells and stdout.
+	// https://groups.google.com/forum/#!topic/golang-nuts/sbuYR7WpsZg
+	// Close the stdout pipe explicitly when context is done.
+	go func() {
+		<-ctx.Done()
+		stdout.Close()
+	}()
+
+	trace.Log("start")
 	err = cmd.Start()
 	if err != nil {
-		return err
+		return fmt.Errorf("starting: %v", err)
 	}
 
 	reader := &firstByteReader{r: stdout}
 
 	for {
-		Trace("decode")
+		trace.Log("decode")
 		doc := &gfx.Layer{}
 		dec := gob.NewDecoder(reader)
 		err = dec.Decode(doc)
@@ -120,16 +144,21 @@ func run(app *app.App, path string) error {
 			break
 		}
 		if err != nil {
-			return err
+			return fmt.Errorf("decoding: %v", err)
 		}
 
-		Trace("render")
+		trace.Log("render")
 		app.Render(doc)
 	}
 
-	Trace("wait")
-	defer Trace("done %d bytes", reader.total)
-	return cmd.Wait()
+	trace.Log("wait")
+	defer trace.Log("done %d bytes", reader.total)
+	err = cmd.Wait()
+	if err != nil {
+		return fmt.Errorf("cmd: %v", err)
+	}
+
+	return nil
 }
 
 func copyFile(dstPath, srcPath string) error {
@@ -159,18 +188,9 @@ func copyFile(dstPath, srcPath string) error {
 
 const head = `
 package main
-
-import "os"
-import "encoding/gob"
 import "github.com/buchanae/ink/gfx"
 
 func main() {
-	layer := gfx.NewLayer()
-	Ink(layer)
-	err := gob.NewEncoder(os.Stdout).Encode(layer)
-	if err != nil {
-		os.Stderr.Write([]byte(err.Error()))
-		os.Stderr.Write([]byte("\n"))
-	}
+	gfx.Run(Ink)
 }
 `
