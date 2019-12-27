@@ -49,6 +49,34 @@ func (a XY) Distance(b XY) float32 {
 	return b.Sub(a).Length()
 }
 
+func (a XY) DistanceToLine(l Line) float32 {
+	n := a.nearestToLine(l)
+	return a.Distance(n)
+}
+
+func (a XY) nearestToLine(l Line) XY {
+	d := l.Length()
+	x1 := l.A.X
+	y1 := l.A.Y
+	x2 := l.B.X
+	y2 := l.B.Y
+	x3 := a.X
+	y3 := a.Y
+	u := ((x3-x1)*(x2-x1) + (y3-y1)*(y2-y1)) / (d * d)
+
+	// if closest point is one of the l vertices
+	if u < 0 {
+		return l.A
+	}
+	if u > 1 {
+		return l.B
+	}
+
+	ix := x1 + u*(x2-x1)
+	iy := y1 + u*(y2-y1)
+	return XY{ix, iy}
+}
+
 func (a XY) Dot(b XY) float32 {
 	return a.X*b.X + a.Y*b.Y
 }
