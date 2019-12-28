@@ -53,9 +53,15 @@ func newPassBuilder() *passBuilder {
 }
 
 func (pb *passBuilder) Cleanup() {
-	glDeleteBuffers(1, &pb.attrBufID)
-	glDeleteBuffers(1, &pb.faceBufID)
-	glDeleteVertexArrays(int32(len(pb.vaos)), &pb.vaos[0])
+	if pb.attrBufID != 0 {
+		glDeleteBuffers(1, &pb.attrBufID)
+	}
+	if pb.faceBufID != 0 {
+		glDeleteBuffers(1, &pb.faceBufID)
+	}
+	if len(pb.vaos) > 0 {
+		glDeleteVertexArrays(int32(len(pb.vaos)), &pb.vaos[0])
+	}
 }
 
 func (pb *passBuilder) AddLayer(layer *Layer, output msaa) {
