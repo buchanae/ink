@@ -7,19 +7,14 @@ import (
 )
 
 type Image struct {
+	id int
 	// OpenGL texture handle.
 	tex uint32
 }
 
-// TODO this is not thread safe
-// contradicts renderer.NewLayer, which is thread safe
+func (r *Renderer) NewImage(id int, img image.Image) Image {
 
-func (r *Renderer) NewImage(img image.Image) Image {
-	if i, ok := r.images[img]; ok {
-		return i
-	}
-
-	loaded := Image{}
+	loaded := Image{id: id}
 
 	glGenTextures(1, &loaded.tex)
 	glBindTexture(gl.TEXTURE_2D, loaded.tex)
@@ -56,6 +51,6 @@ func (r *Renderer) NewImage(img image.Image) Image {
 		glPtr(pixels),
 	)
 
-	r.images[img] = loaded
+	r.images[id] = loaded
 	return loaded
 }

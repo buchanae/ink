@@ -1,5 +1,7 @@
 package gfx
 
+import "image"
+
 var currentID int
 
 func nextID() int {
@@ -26,6 +28,15 @@ func (d *Doc) LayerID() int {
 	return 0
 }
 
+func (d *Doc) NewImage(img image.Image) Layer {
+	l := newLayer(d)
+	d.nodes = append(d.nodes, Node{
+		LayerID: l.id,
+		Op:      img,
+	})
+	return l
+}
+
 func (d *Doc) AddShader(s *Shader) {
 	d.nodes = append(d.nodes, Node{
 		Op: s,
@@ -50,6 +61,10 @@ func (l *layer) NewLayer() Layer {
 
 func (l *layer) LayerID() int {
 	return l.id
+}
+
+func (l *layer) NewImage(img image.Image) Layer {
+	return l.doc.NewImage(img)
 }
 
 func (l *layer) AddShader(s *Shader) {

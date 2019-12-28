@@ -20,9 +20,6 @@ func (r *Renderer) NewLayer(s Shader) (*Layer, error) {
 }
 
 func (r *Renderer) ClearLayers() {
-	for _, l := range r.layers {
-		l.tex.Clear()
-	}
 	r.layers = nil
 }
 
@@ -37,7 +34,6 @@ type Layer struct {
 	id          int
 	name        string
 	prog        compiled
-	tex         msaa
 	vertexCount int
 	faces       []uint32
 	attrs       map[string]bindingVal

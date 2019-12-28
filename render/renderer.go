@@ -11,9 +11,9 @@ import (
 type Renderer struct {
 	width, height int
 	multisamples  int
-	images        map[image.Image]Image
 	shaders       map[Shader]compiled
 	textures      map[int]msaa
+	images        map[int]Image
 	layers        []*Layer
 }
 
@@ -22,20 +22,16 @@ func NewRenderer(width, height int) *Renderer {
 		width:        width,
 		height:       height,
 		multisamples: 4,
-		images:       map[image.Image]Image{},
 		shaders:      map[Shader]compiled{},
 		textures:     map[int]msaa{},
+		images:       map[int]Image{},
 	}
 }
 
 func (r *Renderer) RenderToScreen() error {
 	main := r.texture(0)
 	main.Clear()
-
-	err := r.render(main)
-	if err != nil {
-		return err
-	}
+	r.render(main)
 
 	trace.Log("blit")
 	main.Blit(0)
@@ -47,11 +43,7 @@ func (r *Renderer) RenderToScreen() error {
 func (r *Renderer) RenderToImage() (image.Image, error) {
 	main := r.texture(0)
 	main.Clear()
-
-	err := r.render(main)
-	if err != nil {
-		return nil, err
-	}
+	r.render(main)
 	return main.Image(), nil
 }
 
@@ -62,25 +54,22 @@ optimize:
    tricky though, because the app could be holding on to a texture ID across frames,
 	 so would require knowing that the app doesn't hold a reference to the texture.
 */
-func (r *Renderer) render(dst msaa) error {
+func (r *Renderer) render(dst msaa) {
 	trace.Log("render")
 
 	// TODO maybe move these to renderPasses
 	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
 	glEnable(gl.BLEND)
-	//glEnable(gl.STENCIL_TEST)
 
 	/*
 		glBlendFunc(src.factor, dst.factor)
-		src comes from the texture being rendered
-		dst is the data currently in the color buffer
-				(rendered by previous layer/frame)
+		src is the new color being added
+		dst is the existing color
 		result = src.color * src.factor + dst.color * dst.factor
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	trace.Log("build")
 	pb := newPassBuilder()
 	defer pb.Cleanup()
 
@@ -94,32 +83,14 @@ func (r *Renderer) render(dst msaa) error {
 		}
 
 		pb.AddLayer(layer, output)
-
-		/*
-			TODO render image
-			rw := float32(loaded.w) / float32(r.width)
-			rh := float32(loaded.h) / float32(r.height)
-				shader := &gfx.Shader{
-					Vert: "/default.vert",
-					Frag: "/copy.frag",
-					Mesh: gfx.RectXYWH(0.5, 0.5, rw, rh),
-					Uniforms: gfx.Uniforms{
-						"u_image": loaded.tex,
-					},
-				}
-		*/
 	}
 
 	passes := pb.Passes()
-
 	trace.Log("passes %d", len(passes))
 
 	for _, p := range passes {
 		r.renderPass(p)
 	}
-
-	// TODO garbage collect resources
-	return nil
 }
 
 func (r *Renderer) renderPass(p *pass) {
@@ -152,10 +123,19 @@ func (r *Renderer) renderPass(p *pass) {
 	trace.Log("  pass done")
 }
 
+// TODO bind uniforms should be a dead simple loop
+//      without any preprocessing (logic, type checking, etc).
+//      move all preprocessing to something like pass builder.
+//
+//      consider exposing a public resource holding a handle
+//      to the preprocessed passes and resources. might
+//      make a clear separation between preprocessing and
+//      execution. might help abstract rendering backends later.
 func (r *Renderer) bindUniforms(p *pass) {
 	for _, uni := range p.prog.uniforms {
 		val, ok := p.uniforms[uni.Name]
 		if !ok {
+			// TODO return error list from render
 			log.Printf("  missing uniform: %s", uni.Name)
 			continue
 		}
@@ -166,7 +146,18 @@ func (r *Renderer) bindUniforms(p *pass) {
 				continue
 			}
 
-			val = r.texture(id)
+			tex, ok := r.textures[id]
+			if !ok {
+				img, ok := r.images[id]
+				if !ok {
+					log.Printf("  missing texture ID: %d", id)
+					continue
+				} else {
+					val = img
+				}
+			} else {
+				val = tex
+			}
 		}
 
 		err := uni.Bind(val)

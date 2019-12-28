@@ -3,6 +3,7 @@ package gfx
 // TODO want to remove these dependencies from code used by sketches
 import (
 	"encoding/gob"
+	"image"
 
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
@@ -20,4 +21,5 @@ func init() {
 	gob.Register(dd.Triangles{})
 	gob.Register([]color.RGBA{})
 	gob.Register([]dd.XY{})
+	gob.Register(image.RGBA{})
 }

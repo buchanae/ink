@@ -1,6 +1,7 @@
 package gfx
 
 import (
+	"image"
 	"log"
 
 	"github.com/buchanae/ink/color"
@@ -25,5 +26,6 @@ type Meshable interface {
 type Layer interface {
 	LayerID() int
 	NewLayer() Layer
+	NewImage(image.Image) Layer
 	AddShader(*Shader)
 }

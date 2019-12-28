@@ -109,8 +109,6 @@ func (u *uniform) Bind(val interface{}) error {
 		switch z := val.(type) {
 		case Image:
 			tex = z.tex
-		case *Layer:
-			tex = z.tex.Read.Tex
 		case msaa:
 			tex = z.Read.Tex
 		default:

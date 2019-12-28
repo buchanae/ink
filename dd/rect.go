@@ -35,7 +35,6 @@ type Rect struct {
 
 func (r Rect) Center() XY {
 	return r.B.Sub(r.A).MulScalar(0.5).Add(r.A)
-	//TODO wish ((r.B - r.A) * 0.5) + r.A
 }
 
 func (r Rect) Translate(xy XY) Rect {

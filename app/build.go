@@ -4,6 +4,7 @@ package app
 
 import (
 	"fmt"
+	"image"
 	"log"
 
 	"github.com/buchanae/ink/color"
@@ -29,10 +30,16 @@ func (b *builder) build(nodes []gfx.Node) {
 			if err != nil {
 				log.Printf("error: %v", err)
 			}
+		case image.RGBA:
+			b.buildImage(node.LayerID, &z)
 		default:
 			log.Printf("error: unknown node type: %T", node.Op)
 		}
 	}
+}
+
+func (b *builder) buildImage(id int, img *image.RGBA) {
+	b.renderer.NewImage(id, img)
 }
 
 func (b *builder) buildShader(id int, shader *gfx.Shader) error {
