@@ -7,12 +7,19 @@ import (
 )
 
 func Ink(doc *Doc) {
+	// TODO blur looks different on black background. why is that?
+	Clear(doc, White)
+
 	Fill{
-		Mesh: Circle{
-			XY:       XY{0.5, 0.5},
-			Radius:   0.2,
-			Segments: 40,
+		Mesh: Rect{
+			XY{0.2, 0.2},
+			XY{0.8, 0.8},
 		},
 		Color: Blue,
+	}.Draw(doc)
+
+	Blur{
+		Passes: 2,
+		Source: doc,
 	}.Draw(doc)
 }

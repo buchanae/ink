@@ -159,6 +159,15 @@ func (r *Renderer) bindUniforms(p *pass) {
 			log.Printf("  missing uniform: %s", uni.Name)
 			continue
 		}
+		if uni.Type == gl.SAMPLER_2D {
+			id, ok := val.(int)
+			if !ok {
+				log.Printf("  invalid type for texture ID: %T", val)
+				continue
+			}
+
+			val = r.texture(id)
+		}
 
 		err := uni.Bind(val)
 		if err != nil {
@@ -179,10 +188,19 @@ func (r *Renderer) texture(id int) msaa {
 func findLinks(layers []*Layer) map[int]struct{} {
 	links := map[int]struct{}{}
 	for _, layer := range layers {
-		for _, uni := range layer.uniforms {
-			if l, ok := uni.(*Layer); ok {
-				links[l.id] = struct{}{}
+		for _, uni := range layer.prog.uniforms {
+			val, ok := layer.uniforms[uni.Name]
+			if !ok {
+				continue
 			}
+			if uni.Type != gl.SAMPLER_2D {
+				continue
+			}
+			id, ok := val.(int)
+			if !ok {
+				continue
+			}
+			links[id] = struct{}{}
 		}
 	}
 	return links

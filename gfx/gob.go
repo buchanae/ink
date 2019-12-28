@@ -10,7 +10,6 @@ import (
 
 func init() {
 	gob.Register(Shader{})
-	gob.Register(Layer{})
 	gob.Register(color.RGBA{})
 	gob.Register(dd.XY{})
 	gob.Register(dd.Mesh{})

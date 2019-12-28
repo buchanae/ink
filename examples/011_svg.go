@@ -13,7 +13,7 @@ import (
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
-	doc.Clear(White)
+	Clear(doc, White)
 
 	p, err := svg.Parse(oregon, 800, 800)
 	if err != nil {
@@ -41,7 +41,8 @@ func Ink(doc *Doc) {
 		}
 	}
 	tm := Triangles(tris)
-	ts := doc.Shader(tm)
+	ts := NewShader(tm)
+	ts.Draw(doc)
 
 	pal := rand.Palette()
 	triColors := []RGBA{}
@@ -59,11 +60,11 @@ func Ink(doc *Doc) {
 		xy = XY{xy.X, 1 - xy.Y}
 		m.Verts[i] = xy
 	}
-	doc.Shader(m)
+	NewShader(m).Draw(doc)
 
 	for _, xy := range xys {
 		xy = XY{xy.X, 1 - xy.Y}
-		doc.Dot(xy, Red)
+		Dot{XY: xy}.Draw(doc)
 	}
 }
 

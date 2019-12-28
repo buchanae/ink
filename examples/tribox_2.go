@@ -11,20 +11,20 @@ const (
 	ShrinkRect   = 0.003
 	RandPoint    = 0.03
 	CircleRadius = 0.05
-	Stroke       = true
+	Stroke       = false
 	StrokeWidth  = 0.001
 )
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
 
-	doc.Clear(White)
+	Clear(doc, White)
 
 	grid := NewGrid(10, 10)
 	colors := rand.Palette()
 
-	l2 := doc.Layer()
-	mask := doc.Layer()
+	l2 := doc.NewLayer()
+	mask := doc.NewLayer()
 
 	for _, r := range grid.Rects() {
 		r = r.Shrink(ShrinkRect)
@@ -45,29 +45,31 @@ func Ink(doc *Doc) {
 			//f := Fill{t, rnd.Color(colors)}
 			//l2.Draw(f)
 
-			l2.Shader(t).
-				Set("a_color", rand.Color(colors))
+			s := NewShader(t)
+			s.Set("a_color", rand.Color(colors))
+			s.Draw(l2)
 		}
 
 		if Stroke {
 			stk := tris.Stroke(StrokeWidth)
-			l2.Shader(stk).
-				Set("a_color", White)
+			s := NewShader(stk)
+			s.Set("a_color", White)
+			s.Draw(l2)
 		}
 
-		mask.Draw(Fill{
+		Fill{
 			Mesh: Circle{
 				XY:       r.Center(),
 				Radius:   CircleRadius,
 				Segments: 40,
 			},
 			Color: Black,
-		})
+		}.Draw(mask)
 	}
 
-	doc.Draw(Mask{
+	Mask{
 		Rect:   Fullscreen,
 		Source: l2,
 		Mask:   mask,
-	})
+	}.Draw(doc)
 }

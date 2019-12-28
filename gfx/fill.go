@@ -9,8 +9,8 @@ type Fill struct {
 	Color color.RGBA
 }
 
-func (f Fill) Draw(l *Layer) {
-	l.Draw(&Shader{
+func (f Fill) Draw(l Layer) {
+	l.AddShader(&Shader{
 		Name: "Fill",
 		Vert: DefaultVert,
 		Frag: FillFrag,

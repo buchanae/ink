@@ -8,7 +8,7 @@ import (
 )
 
 func Ink(doc *Doc) {
-	doc.Clear(White)
+	Clear(doc, White)
 
 	xys := []XY{
 		{0.2, 0.2},
@@ -22,9 +22,10 @@ func Ink(doc *Doc) {
 
 	tris := tess.Tesselate(xys)
 	m := Triangles(tris)
-	doc.Shader(m)
+	NewShader(m).Draw(doc)
 
 	for _, xy := range xys {
-		doc.Dot(xy, Red)
+		d := Dot{XY: xy, Color: Red, Size: 0.005}
+		d.Draw(doc)
 	}
 }

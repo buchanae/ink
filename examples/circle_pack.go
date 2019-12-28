@@ -10,7 +10,7 @@ import (
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
-	doc.Clear(White)
+	Clear(doc, White)
 
 	noise := rand.BlueNoise(5000, 1, 1, 0.02)
 	box := Rect{
@@ -30,7 +30,7 @@ func Ink(doc *Doc) {
 	}
 
 	for _, xy := range xys {
-		doc.Dot(xy, Red)
+		Dot{XY: xy}.Draw(doc)
 	}
 
 	colors := rand.Palette()
@@ -40,13 +40,15 @@ func Ink(doc *Doc) {
 		c := rand.Color(colors)
 		c.A = 0.3
 		for _, tri := range cell.Tris {
-			s := doc.Shader(tri)
+			s := NewShader(tri)
 			s.Set("a_color", c)
+			s.Draw(doc)
 		}
 
 		for _, e := range cell.Edges {
 			m := e.Stroke(0.002)
-			doc.Shader(m)
+			s := NewShader(m)
+			s.Draw(doc)
 		}
 	}
 }

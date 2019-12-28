@@ -10,8 +10,8 @@ type Gradient struct {
 	A, B color.RGBA
 }
 
-func (g Gradient) Draw(l *Layer) {
-	l.Draw(&Shader{
+func (g Gradient) Draw(l Layer) {
+	l.AddShader(&Shader{
 		Name: "Gradient",
 		Vert: DefaultVert,
 		Frag: GradientFrag,

@@ -4,18 +4,18 @@ import "github.com/buchanae/ink/dd"
 
 type Mask struct {
 	Rect         dd.Rect
-	Source, Mask *Layer
+	Source, Mask Layer
 }
 
-func (m Mask) Draw(l *Layer) {
-	l.Draw(&Shader{
+func (m Mask) Draw(l Layer) {
+	l.AddShader(&Shader{
 		Name: "Mask",
 		Vert: DefaultVert,
 		Frag: MaskFrag,
 		Mesh: m.Rect,
 		Attrs: Attrs{
-			"u_source": m.Source,
-			"u_mask":   m.Mask,
+			"u_source": m.Source.LayerID(),
+			"u_mask":   m.Mask.LayerID(),
 			"a_uv": []float32{
 				0, 0,
 				0, 1,

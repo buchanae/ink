@@ -8,7 +8,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(z *Doc) {
+func Ink(doc *Doc) {
 
 	// TODO add helper for equilateral
 	t := Triangle{
@@ -17,17 +17,18 @@ func Ink(z *Doc) {
 		XY{0.5, 0.8},
 	}
 
-	m := z.Shader(t)
+	m := NewShader(t)
+	m.Draw(doc)
 
 	m.Set("a_color", []RGBA{
 		Red, Green, Blue,
 	})
 	m.Set("a_pivot", t.Centroid())
 
-	z.Dot(t.Centroid(), White)
+	Dot{XY: t.Centroid(), Color: White}.Draw(doc)
 
 	var rot float32
-	z.OnFrame = func(f Frame) {
+	doc.OnFrame = func(f Frame) {
 		log.Println("frame")
 		m.Set("a_rot", rot)
 		rot += 0.01

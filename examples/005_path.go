@@ -6,7 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(z *Doc) {
+func Ink(doc *Doc) {
 
 	p := Path{}
 	p.MoveTo(XY{0.2, 0.2})
@@ -19,6 +19,5 @@ func Ink(z *Doc) {
 	p.LineTo(XY{0.3, 0.7})
 
 	m := p.Stroke(0.01)
-	f := Fill{m, Red}
-	z.Draw(f)
+	Fill{m, Red}.Draw(doc)
 }

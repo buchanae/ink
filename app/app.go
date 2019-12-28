@@ -16,7 +16,7 @@ type App struct {
 	conf     Config
 	win      *win.Window
 	renderer *render.Renderer
-	doc      *gfx.Layer
+	nodes    []gfx.Node
 }
 
 // NewApp will open a new window.
@@ -41,7 +41,7 @@ func (app *App) Run() {
 					return
 
 				case win.SnapshotEvent:
-					if app.doc != nil {
+					if app.nodes != nil {
 						app.win.Do(app.snapshot)
 					}
 
@@ -57,14 +57,14 @@ func (app *App) Run() {
 	app.win.Run()
 }
 
-// Render renders the doc to the app window.
-func (app *App) Render(doc *gfx.Layer) {
+// Render renders the nodes to the app window.
+func (app *App) Render(nodes []gfx.Node) {
 	app.win.Do(func() {
 		app.renderer.ClearLayers()
 
 		trace.Log("start build")
 		b := builder{renderer: app.renderer}
-		b.build(doc)
+		b.build(nodes)
 		trace.Log("built")
 
 		err := app.renderer.RenderToScreen()
@@ -73,6 +73,6 @@ func (app *App) Render(doc *gfx.Layer) {
 		}
 	})
 
-	app.doc = doc
+	app.nodes = nodes
 	app.win.Swap()
 }

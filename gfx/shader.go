@@ -18,8 +18,8 @@ func NewShader(m Meshable) *Shader {
 	}
 }
 
-func (s *Shader) Draw(l *Layer) {
-	l.Values = append(l.Values, s)
+func (s *Shader) Draw(l Layer) {
+	l.AddShader(s)
 }
 
 func (s *Shader) Set(name string, val interface{}) {

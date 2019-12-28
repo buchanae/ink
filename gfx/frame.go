@@ -2,19 +2,9 @@ package gfx
 
 import (
 	"encoding/gob"
-	"log"
 	"os"
 	"time"
 )
-
-func init() {
-	log.SetFlags(0)
-}
-
-type Doc struct {
-	Layer
-	OnFrame func(Frame)
-}
 
 type Frame struct {
 	Time time.Time
@@ -24,7 +14,7 @@ func Run(f func(*Doc)) {
 
 	doc := &Doc{}
 	f(doc)
-	send(doc.Layer)
+	send(doc)
 
 	if doc.OnFrame == nil {
 		return
@@ -34,12 +24,12 @@ func Run(f func(*Doc)) {
 		time.Sleep(20 * time.Millisecond)
 		frame := Frame{Time: time.Now()}
 		doc.OnFrame(frame)
-		send(doc.Layer)
+		send(doc)
 	}
 }
 
-func send(layer Layer) {
-	err := gob.NewEncoder(os.Stdout).Encode(layer)
+func send(doc *Doc) {
+	err := gob.NewEncoder(os.Stdout).Encode(doc.nodes)
 	if err != nil {
 		os.Stderr.Write([]byte("sending: "))
 		os.Stderr.Write([]byte(err.Error()))

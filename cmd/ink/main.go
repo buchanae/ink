@@ -137,9 +137,9 @@ func run(ctx context.Context, app *app.App, path string) error {
 
 	for {
 		trace.Log("decode")
-		doc := &gfx.Layer{}
+		nodes := []gfx.Node{}
 		dec := gob.NewDecoder(reader)
-		err = dec.Decode(doc)
+		err = dec.Decode(&nodes)
 		if err == io.EOF {
 			break
 		}
@@ -148,7 +148,7 @@ func run(ctx context.Context, app *app.App, path string) error {
 		}
 
 		trace.Log("render")
-		app.Render(doc)
+		app.Render(nodes)
 	}
 
 	trace.Log("wait")

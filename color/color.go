@@ -8,6 +8,12 @@ type RGBA struct {
 	R, G, B, A float32
 }
 
+var zero RGBA
+
+func (r RGBA) IsZero() bool {
+	return r == zero
+}
+
 var (
 	Transparent          = RGBA{0, 0, 0, 0}
 	Cornflowerblue       = RGBA{R: 0.39215687, G: 0.58431375, B: 0.92941177, A: 1}

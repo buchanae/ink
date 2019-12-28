@@ -27,7 +27,7 @@ func (app *App) snapshot() {
 	renderer := render.NewRenderer(width, height)
 
 	b := builder{renderer: renderer}
-	b.build(app.doc)
+	b.build(app.nodes)
 
 	img, err := renderer.RenderToImage()
 	if err != nil {

@@ -20,7 +20,7 @@ const (
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
-	doc.Clear(White)
+	Clear(doc, White)
 	grid := NewGrid(GridSize, GridSize)
 
 	p := rand.Palette()
@@ -42,9 +42,10 @@ func Ink(doc *Doc) {
 			//q = rand.TweakQuad(q, TweakBox)
 			m := q.Stroke(LineWidth)
 
-			s := doc.Shader(m)
+			s := NewShader(m)
 			s.Set("a_color", rand.Color(p))
 			s.Set("a_pivot", r.Center())
+			s.Draw(doc)
 
 			if cell.Row > 5 {
 				s.Set("a_rot", rand.Range(-Angle, Angle))

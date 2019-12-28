@@ -13,33 +13,24 @@ import (
 )
 
 type builder struct {
-	layers   map[int]*render.Layer
 	renderer *render.Renderer
 }
 
-func (b *builder) build(doc *gfx.Layer) {
-	if b.layers == nil {
-		b.layers = map[int]*render.Layer{}
-	}
-
-	for _, value := range doc.Values {
-		switch z := value.(type) {
-		case *gfx.Layer:
-			b.build(z)
-		case gfx.Layer:
-			b.build(&z)
+func (b *builder) build(nodes []gfx.Node) {
+	for _, node := range nodes {
+		switch z := node.Op.(type) {
 		case *gfx.Shader:
-			err := b.buildShader(doc.ID, z)
+			err := b.buildShader(node.LayerID, z)
 			if err != nil {
 				log.Printf("error: %v", err)
 			}
 		case gfx.Shader:
-			err := b.buildShader(doc.ID, &z)
+			err := b.buildShader(node.LayerID, &z)
 			if err != nil {
 				log.Printf("error: %v", err)
 			}
 		default:
-			log.Printf("error: unknown layer type: %T", value)
+			log.Printf("error: unknown node type: %T", node.Op)
 		}
 	}
 }
@@ -63,7 +54,6 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 	if err != nil {
 		return err
 	}
-	b.layers[id] = rl
 
 	rl.SetAttr("a_vert", verts, len(verts)*2*4)
 
@@ -147,20 +137,6 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 			rl.SetUniform(name, [2]float32{z.X, z.Y})
 		case color.RGBA:
 			rl.SetUniform(name, [4]float32{z.R, z.G, z.B, z.A})
-		case gfx.Layer:
-			target, ok := b.layers[z.ID]
-			if !ok {
-				log.Printf("missing layer uniform: %d", z.ID)
-				continue
-			}
-			rl.SetUniform(name, target)
-		case *gfx.Layer:
-			target, ok := b.layers[z.ID]
-			if !ok {
-				log.Printf("missing layer uniform: %d", z.ID)
-				continue
-			}
-			rl.SetUniform(name, target)
 		default:
 			rl.SetUniform(name, v)
 		}

@@ -17,8 +17,15 @@ func RectCenter(center, wh XY) Rect {
 
 func Square(xy XY, size float32) Rect {
 	return Rect{
-		A: xy.Add(XY{size / 2, size / 2}),
+		A: xy,
 		B: xy.Add(XY{size, size}),
+	}
+}
+func SquareCenter(center XY, size float32) Rect {
+	half := size / 2
+	return Rect{
+		A: center.SubScalar(half),
+		B: center.AddScalar(half),
 	}
 }
 
