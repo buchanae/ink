@@ -1,5 +1,11 @@
 package dd
 
+func RectWH(w, h float32) Rect {
+	return Rect{
+		B: XY{w, h},
+	}
+}
+
 func RectAWH(a, wh XY) Rect {
 	return Rect{
 		A: a,

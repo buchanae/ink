@@ -5,7 +5,11 @@ type Shader struct {
 	Vert, Frag, Geom string
 	Mesh             Meshable
 	Attrs            Attrs
+	Divisors         Divisors
+	InstanceCount    int
 }
+
+type Divisors map[string]int
 
 type Attrs map[string]interface{}
 

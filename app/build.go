@@ -1,5 +1,3 @@
-// +build !sendonly
-
 package app
 
 import (
@@ -52,17 +50,18 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 	}
 
 	rl, err := b.renderer.NewLayer(render.Shader{
-		ID:          id,
-		Name:        shader.Name,
-		Vert:        shader.Vert,
-		Frag:        shader.Frag,
-		VertexCount: len(verts),
+		ID:            id,
+		Name:          shader.Name,
+		Vert:          shader.Vert,
+		Frag:          shader.Frag,
+		VertexCount:   len(verts),
+		InstanceCount: shader.InstanceCount,
 	})
 	if err != nil {
 		return err
 	}
 
-	rl.SetAttr("a_vert", verts, len(verts)*2*4)
+	rl.SetAttr("a_vert", verts, len(verts)*2*4, 0)
 
 	for _, name := range rl.AttrNames() {
 		val, ok := shader.Attrs[name]
@@ -71,10 +70,12 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 			continue
 		}
 
+		divisor := shader.Divisors[name]
+
 		switch z := val.(type) {
 
 		case []float32:
-			rl.SetAttr(name, z, len(z)*4)
+			rl.SetAttr(name, z, len(z)*4, divisor)
 
 		case float32:
 			data := make([]float32, len(verts))
@@ -82,7 +83,7 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 				data[i] = z
 			}
 			size := len(data) * 4
-			rl.SetAttr(name, data, size)
+			rl.SetAttr(name, data, size, divisor)
 
 		case float64:
 			data := make([]float32, len(verts))
@@ -90,15 +91,15 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 				data[i] = float32(z)
 			}
 			size := len(data) * 4
-			rl.SetAttr(name, data, size)
+			rl.SetAttr(name, data, size, divisor)
 
 		case []dd.XY:
 			size := len(z) * 2 * 4
-			rl.SetAttr(name, z, size)
+			rl.SetAttr(name, z, size, divisor)
 
 		case []color.RGBA:
 			size := len(z) * 4 * 4
-			rl.SetAttr(name, z, size)
+			rl.SetAttr(name, z, size, divisor)
 
 		case color.RGBA:
 			data := make([]color.RGBA, len(verts))
@@ -106,7 +107,7 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 				data[i] = z
 			}
 			size := len(data) * 4 * 4
-			rl.SetAttr(name, data, size)
+			rl.SetAttr(name, data, size, divisor)
 
 		case dd.XY:
 			data := make([]dd.XY, len(verts))
@@ -114,7 +115,7 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 				data[i] = z
 			}
 			size := len(data) * 2 * 4
-			rl.SetAttr(name, data, size)
+			rl.SetAttr(name, data, size, divisor)
 
 		default:
 			log.Printf("error: unsupported attribute value type %T: %v", z, z)

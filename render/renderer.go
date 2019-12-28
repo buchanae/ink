@@ -57,19 +57,6 @@ optimize:
 func (r *Renderer) render(dst msaa) {
 	trace.Log("render")
 
-	// TODO maybe move these to renderPasses
-	glViewport(0, 0, int32(r.width), int32(r.height))
-	glEnable(gl.MULTISAMPLE)
-	glEnable(gl.BLEND)
-
-	/*
-		glBlendFunc(src.factor, dst.factor)
-		src is the new color being added
-		dst is the existing color
-		result = src.color * src.factor + dst.color * dst.factor
-	*/
-	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
 	pb := newPassBuilder()
 	defer pb.Cleanup()
 
@@ -95,12 +82,27 @@ func (r *Renderer) render(dst msaa) {
 
 func (r *Renderer) renderPass(p *pass) {
 
+	glViewport(0, 0, int32(r.width), int32(r.height))
+	glEnable(gl.MULTISAMPLE)
+	glEnable(gl.BLEND)
+
+	/*
+		glBlendFunc(src.factor, dst.factor)
+		src is the new color being added
+		dst is the existing color
+		result = src.color * src.factor + dst.color * dst.factor
+	*/
+	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
 	trace.Log("render pass %s", p.name)
 	trace.Log("  output to %d", p.output.ID)
 
 	// TODO clear existing program entirely
-	// TODO need to cleanup cached buffers
 	// TODO redo instancing
+	count := 1
+	if p.instanceCount > 1 {
+		count = p.instanceCount
+	}
 
 	trace.Log("  gl config")
 	glBindFramebuffer(gl.FRAMEBUFFER, p.output.Write.FBO)
@@ -109,12 +111,13 @@ func (r *Renderer) renderPass(p *pass) {
 	glBindVertexArray(p.vao)
 
 	trace.Log("  draw elements")
-	glDrawElements(
+	glDrawElementsInstanced(
 		gl.TRIANGLES,
 		int32(p.faceCount),
 		gl.UNSIGNED_INT,
 		// 4 bytes in each uint32 face index
 		glPtrOffset(p.faceOffset*4),
+		int32(count),
 	)
 
 	trace.Log("  output.Paint")

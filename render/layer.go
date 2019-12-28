@@ -8,12 +8,13 @@ func (r *Renderer) NewLayer(s Shader) (*Layer, error) {
 	}
 
 	l := &Layer{
-		id:          s.ID,
-		name:        s.Name,
-		vertexCount: s.VertexCount,
-		prog:        prog,
-		attrs:       map[string]bindingVal{},
-		uniforms:    map[string]interface{}{},
+		id:            s.ID,
+		name:          s.Name,
+		vertexCount:   s.VertexCount,
+		instanceCount: s.InstanceCount,
+		prog:          prog,
+		attrs:         map[string]bindingVal{},
+		uniforms:      map[string]interface{}{},
 	}
 	r.layers = append(r.layers, l)
 	return l, nil
@@ -28,16 +29,18 @@ type Shader struct {
 	Name                  string
 	Vert, Frag, Geom, Out string
 	VertexCount           int
+	InstanceCount         int
 }
 
 type Layer struct {
-	id          int
-	name        string
-	prog        compiled
-	vertexCount int
-	faces       []uint32
-	attrs       map[string]bindingVal
-	uniforms    map[string]interface{}
+	id            int
+	name          string
+	prog          compiled
+	vertexCount   int
+	instanceCount int
+	faces         []uint32
+	attrs         map[string]bindingVal
+	uniforms      map[string]interface{}
 }
 
 func (l *Layer) ID() int {
@@ -68,13 +71,14 @@ func (l *Layer) SetUniform(key string, val interface{}) {
 	l.uniforms[key] = val
 }
 
-func (l *Layer) SetAttr(key string, val interface{}, bytes int) {
+func (l *Layer) SetAttr(key string, val interface{}, bytes, divisor int) {
 	// skip empty attributes to avoid panics
 	if bytes == 0 {
 		return
 	}
 	l.attrs[key] = bindingVal{
-		value: glPtr(val),
-		size:  bytes,
+		value:   glPtr(val),
+		size:    bytes,
+		divisor: divisor,
 	}
 }

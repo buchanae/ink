@@ -8,20 +8,22 @@ import (
 )
 
 type pass struct {
-	name        string
-	prog        compiled
-	uniforms    map[string]interface{}
-	output      msaa
-	vao         uint32
-	bindings    []binding
-	vertexCount int
-	faceOffset  int
-	faceCount   int
+	name          string
+	prog          compiled
+	uniforms      map[string]interface{}
+	output        msaa
+	vao           uint32
+	bindings      []binding
+	vertexCount   int
+	faceOffset    int
+	faceCount     int
+	instanceCount int
 }
 
 type bindingVal struct {
-	value unsafe.Pointer
-	size  int
+	value   unsafe.Pointer
+	size    int
+	divisor int
 }
 
 type binding struct {
@@ -66,13 +68,14 @@ func (pb *passBuilder) Cleanup() {
 
 func (pb *passBuilder) AddLayer(layer *Layer, output msaa) {
 	p := &pass{
-		prog:        layer.prog,
-		output:      output,
-		name:        layer.name,
-		vertexCount: layer.vertexCount,
-		uniforms:    layer.uniforms,
-		faceOffset:  len(pb.faces),
-		faceCount:   len(layer.faces),
+		prog:          layer.prog,
+		output:        output,
+		name:          layer.name,
+		vertexCount:   layer.vertexCount,
+		uniforms:      layer.uniforms,
+		faceOffset:    len(pb.faces),
+		faceCount:     len(layer.faces),
+		instanceCount: layer.instanceCount,
 	}
 	pb.faces = append(pb.faces, layer.faces...)
 	pb.passes = append(pb.passes, p)
@@ -84,8 +87,9 @@ func (pb *passBuilder) AddLayer(layer *Layer, output msaa) {
 		}
 
 		p.bindings = append(p.bindings, binding{
-			attr:   attr,
-			values: []bindingVal{val},
+			attr:    attr,
+			values:  []bindingVal{val},
+			divisor: uint32(val.divisor),
 		})
 		pb.attrBytes += val.size
 	}
@@ -152,6 +156,7 @@ func (pb *passBuilder) upload() {
 				0,     // stride
 				glPtrOffset(offset),
 			)
+			glVertexAttribDivisor(b.attr.Loc, b.divisor)
 
 			for _, val := range b.values {
 				if val.size == 0 {
@@ -167,7 +172,6 @@ func (pb *passBuilder) upload() {
 					val.value,
 				)
 				offset += val.size
-				//glVertexAttribDivisor(b.attr.Loc, b.divisor)
 			}
 		}
 	}
