@@ -1,9 +1,9 @@
 package main
 
 import (
+	"log"
 	"time"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -12,79 +12,58 @@ import (
 )
 
 const (
-	N       = 850
-	Strokes = 1
-	Padding = 0.000
+	Lines   = 20
+	Strokes = 20
+	N       = 1000
+	// percentage of W
+	// only works for small N
+	Padding = 0.00
+	W       = (1 / float32(N)) * (1 - Padding)
 
-	MinRange = 0.001
-	MaxRange = 0.3
-	RangeInc = 0.005
-
-	MaxAlpha = 1
-	MinAlpha = 0
-
+	// min/max y-axis starting position
 	MinY = 0.1
 	MaxY = 0.9
+
+	D    = 0.004
+	B    = 0.3
+	MaxD = 0.2
+	M    = 0.4
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(doc *Doc) {
+	rand.SeedNow()
+	Clear(doc, White)
+	palette := rand.Palette()
 
-	doc.Draw(Clear(White))
-
-	r := rand.New(time.Now().Unix())
-	r = rand.New(6)
-
-	p := r.Palette()
+	start := time.Now()
+	ys := make([]float32, Lines)
+	for i := range ys {
+		ys[i] = rand.Range(MinY, MaxY)
+	}
 
 	for j := 0; j < Strokes; j++ {
 
-		l := r.Range(MinY, MaxY)
-		l = 0.5
-		c := r.Color(p)
-		h := float32(0)
-		inc := float32(0)
+		y := ys[rand.Intn(len(ys))]
+		dy := rand.Range(0.01, 0.1)
+		color := rand.Color(palette)
 
 		for i := 0; i < N; i++ {
 			x := float32(i) / N
-			w := float32(1) / N
 
-			if i%10 == 0 {
-				inc = r.Range(-RangeInc, RangeInc)
-			}
+			dy += rand.Range(-D, D)
+			dy = math.Clamp(dy, 0, MaxD)
 
-			h += inc
-			h = math.Clamp(h, MinRange, MaxRange)
+			xy := XY{x, y}
+			wh := XY{W, dy}
+			r := RectCenter(xy, wh)
 
-			r := Rect{
-				A: XY{x + Padding, l - h},
-				B: XY{x + w - Padding, l + h},
-			}
-
-			//	alpha := Interp(h/MaxRange, MaxAlpha, MinAlpha)
-			//log.Println(h, h2, alpha, h2/0.5)
-			//alpha = h2 / 0.5
-			//alpha := float32(1.0)
-			alpha := float32(1)
-
-			s := NewShader(r.Mesh())
-			s.SetColor(RGBA{c.R, c.G, c.B, alpha})
-			doc.Draw(s)
+			s := NewShader(r)
+			sc := color
+			sc.A = 1 - dy/B - M
+			s.Set("a_color", sc)
+			s.Draw(doc)
 		}
 	}
 
-	app.Render(doc)
-}
-
-func octaves(x, y float32, N int) float32 {
-	var n float32
-	var z float32 = 50
-	var amp float32 = 1
-
-	for j := 0; j < N; j++ {
-		n += rand.Noise2(x*z, y) * amp
-		amp *= 0.010
-		z = z * 2
-	}
-	return n
+	log.Printf("run time: %s", time.Since(start))
 }

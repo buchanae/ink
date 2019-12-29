@@ -28,6 +28,8 @@ func (b *builder) build(nodes []gfx.Node) {
 			if err != nil {
 				log.Printf("error: %v", err)
 			}
+		case image.Gray:
+			b.buildImage(node.LayerID, &z)
 		case image.RGBA:
 			b.buildImage(node.LayerID, &z)
 		default:
@@ -36,7 +38,7 @@ func (b *builder) build(nodes []gfx.Node) {
 	}
 }
 
-func (b *builder) buildImage(id int, img *image.RGBA) {
+func (b *builder) buildImage(id int, img image.Image) {
 	b.renderer.NewImage(id, img)
 }
 

@@ -22,4 +22,5 @@ func init() {
 	gob.Register([]color.RGBA{})
 	gob.Register([]dd.XY{})
 	gob.Register(image.RGBA{})
+	gob.Register(image.Gray{})
 }

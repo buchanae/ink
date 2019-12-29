@@ -4,18 +4,21 @@ uniform float u_time;
 uniform float u_speed;
 uniform float u_turbulence;
 uniform sampler2D u_noise;
+
 in vec2 a_vert;
 in vec2 a_uv;
 in vec2 a_pos;
 in float a_rot;
 in vec2 a_size;
+
 out vec2 v_uv;
 
 void main() {
   float amp = .05;
   vec2 v = a_vert;
   vec2 s = a_size;
-  float z = texture(u_noise, a_vert).r * u_turbulence;
+//  float z = texture(u_noise, a_vert).r * u_turbulence;
+  float z = u_turbulence;
   s += vec2(0, z);
 
   mat2 scaleMat = mat2(

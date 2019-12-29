@@ -2,6 +2,7 @@ package gfx
 
 import (
 	"encoding/gob"
+	"log"
 	"os"
 	"time"
 )
@@ -29,10 +30,13 @@ func Run(f func(*Doc)) {
 }
 
 func send(doc *Doc) {
+	start := time.Now()
+
 	err := gob.NewEncoder(os.Stdout).Encode(doc.nodes)
 	if err != nil {
 		os.Stderr.Write([]byte("sending: "))
 		os.Stderr.Write([]byte(err.Error()))
 		os.Stderr.Write([]byte("\n"))
 	}
+	log.Printf("send time: %s", time.Since(start))
 }

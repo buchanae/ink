@@ -15,7 +15,8 @@ void main() {
       base + u_blur,
       1 - distance(v_uv, vec2(0.5))
   );
-  color = vec4(u_color.rgb, d * u_opacity);
+
+  color = vec4(u_color.rgb, u_opacity);
+  //color = vec4(u_color.rgb, d * u_opacity);
   //color = vec4(vec2(vUV), 1, 1);
-  //color = vec4(1, 1, 1, d * u_opacity);
 }

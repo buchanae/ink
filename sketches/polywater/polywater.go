@@ -1,6 +1,8 @@
 package main
 
 import (
+	"io/ioutil"
+
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -8,99 +10,119 @@ import (
 )
 
 const (
-	layers  = 15
-	N       = 280
-	opacity = 0.8
-	blur    = 0.98
-	S       = .3
+	layers             = 1
+	N                  = 400
+	opacity    float32 = 0.5
+	turbulence float32 = .14
+	blur       float32 = 0.28
+	speed      float32 = 0
+	time       float32 = 0
+	S          float32 = .3
 )
 
-func Ink(doc *gfx.Doc) {
+func Ink(doc *Doc) {
+	Clear(doc, White)
 
-	noiseLayer := doc.NewLayer()
-	noiseLayer.AddShader(&Shader{
-		Vert: DefaultVert,
-		Frag: loadShader("sketches/polywater/snoise.frag"),
-		Mesh: Fullscreen,
-		Attrs: Attrs{
-			"u_speed": 0,
-			"u_time":  0,
-			"a_uv": []float32{
-				0, 0,
-				0, 1,
-				1, 1,
-				1, 0,
-			},
-		},
-	})
+	/*
+			noiseLayer := doc.NewLayer()
+			noiseLayer.AddShader(&Shader{
+				Vert: DefaultVert,
+				Frag: loadShader("sketches/polywater/snoise.frag"),
+				Mesh: Fullscreen,
+				Attrs: Attrs{
+					"u_speed": speed,
+					"u_time":  time,
+					"a_uv": []float32{
+						0, 0,
+						0, 1,
+						1, 1,
+						1, 0,
+					},
+				},
+			})
+		log.Printf("noise layer ID: %d", noiseLayer.LayerID())
+	*/
 
-	polys := doc.NewLayer()
+	//polys := doc.NewLayer()
 
 	for j := 0; j < layers; j++ {
 
-		boxy := .69 - float32(j)*0.08
+		boxy := .69 - float32(j)*0.01
 
-		// TODO clones (instancing)
-		rec := gfx.Rect(0, 0, 1, 1)
+		rec := RectWH(0.5, 0.5)
 
 		pos := make([]XY, N)
-		rot := make(float32, N)
+		rot := make([]float32, N)
 		size := make([]XY, N)
 
 		for i := 0; i < N; i++ {
 			size[i] = XY{
-				X: rand.Range(S, S+.10) + 0.10*float32(j),
+				X: rand.Range(S, S+.30) + 0.10*float32(j),
 				Y: rand.Range(S, S+.00) + 0.00*float32(j),
 			}
 			pos[i] = XY{
 				X: rand.Range(.00, 1.0),
-				Y: rand.Range(.02, .1) + 0.02*float32(j),
+				Y: rand.Range(.00, .005) + 0.02*float32(j),
 			}
-			rot[i] = rand.Range(0, 10.3)
+			rot[i] = rand.Angle()
 		}
 
-		polys.AddShader(&Shader{
-			Name: "Polys",
-			Vert: loadShader("sketches/polywater/paint.vert"),
-			Frag: loadShader("sketches/polywater/paint.frag"),
-			Mesh: rec,
-			Attrs: Attrs{
-				"a_pos":        pos,
-				"a_rot":        rot,
-				"a_size":       size,
-				"u_turbulence": .24,
-				"u_noise":      noise,
-				"u_boxy":       boxy,
-				"u_blur":       blur,
-				"u_opacity":    opacity,
-				"u_speed":      0,
-				"u_time":       0,
-				"u_color":      RGBA{1, 1, 1, 1},
+		doc.AddShader(&Shader{
+			Name:          "Polys",
+			InstanceCount: N,
+			Vert:          loadShader("sketches/polywater/paint.vert"),
+			Frag:          loadShader("sketches/polywater/paint.frag"),
+			Mesh:          rec,
+			Divisors: Divisors{
+				"a_pos":  1,
+				"a_rot":  1,
+				"a_size": 1,
 			},
-		})
-
-		doc.AddShader(&gfx.Shader{
-			Name: "PolyMask",
-			Vert: DefaultVert,
-			Frag: loadShader("sketches/polywater/mask.frag"),
-			Mesh: Fullscreen,
 			Attrs: Attrs{
-				"u_color":   RGBA{0, .3, 0, 1},
-				"u_opacity": 1 - float32(j)*0.25,
-				"u_mask":    polys.LayerID,
+				"a_pos":  pos,
+				"a_rot":  rot,
+				"a_size": size,
 				"a_uv": []float32{
 					0, 0,
 					0, 1,
 					1, 1,
 					1, 0,
 				},
+				"u_turbulence": turbulence,
+				//"u_noise":      noiseLayer.LayerID(),
+				"u_boxy":    boxy,
+				"u_blur":    blur,
+				"u_opacity": opacity,
+				"u_speed":   speed,
+				"u_time":    time,
+				"u_color":   RGBA{0, 0, 1, 1},
 			},
 		})
+
+		/*
+			doc.AddShader(&gfx.Shader{
+				Name: "PolyMask",
+				Vert: DefaultVert,
+				Frag: loadShader("sketches/polywater/mask.frag"),
+				Mesh: Fullscreen,
+				Attrs: Attrs{
+					"u_color":   RGBA{0, .3, 0, 1},
+					"u_opacity": 1 - float32(j)*0.25,
+					"u_mask":    polys.LayerID(),
+					"a_uv": []float32{
+						0, 0,
+						0, 1,
+						1, 1,
+						1, 0,
+					},
+				},
+			})
+		*/
 	}
 }
 
 func loadShader(path string) string {
-	b, err := io.ReadFile(path)
+	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		panic(err)
 	}
