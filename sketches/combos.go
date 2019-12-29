@@ -26,7 +26,8 @@ func Ink(doc *Doc) {
 			A: box.Interp(r.A),
 			B: box.Interp(r.B),
 		}
-		stk := r.Stroke(0.0005)
+		stk := r.Stroke()
+		stk.Width = 0.0005
 		strokes = append(strokes, stk)
 
 		sub := NewGrid(4, 4)

@@ -54,7 +54,8 @@ func Ink(doc *Doc) {
 	}
 	ts.Set("a_color", triColors)
 
-	m := p.Stroke(0.002)
+	m := p.Stroke()
+	m.Width = 0.002
 	for i := range m.Verts {
 		xy := m.Verts[i]
 		xy = XY{xy.X, 1 - xy.Y}

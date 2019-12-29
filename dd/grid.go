@@ -15,6 +15,11 @@ type Grid struct {
 //      grid, not a rectangle grid. Maybe
 //      don't create Cells automatically,
 //      and add Points() function instead.
+//
+// ALso row/cols is y/x, while everything else is x/y (width/height)
+//
+// TODO want other ways to create grids, especially non-square grids
+//      with cells with similar width/height
 func NewGrid(rows, cols int) Grid {
 	grid := Grid{
 		Rows:  rows,

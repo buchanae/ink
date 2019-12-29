@@ -7,11 +7,24 @@ type Mesh struct {
 	Faces []Face
 }
 
+func NewMesh(tris []Triangle) Mesh {
+	return Mesh{}.AddTriangles(tris)
+}
+
 func (m Mesh) Size() int {
 	return len(m.Verts)
 }
 
 func (m Mesh) Mesh() Mesh {
+	return m
+}
+
+func (m Mesh) AddTriangles(tris []Triangle) Mesh {
+	for _, t := range tris {
+		l := len(m.Verts)
+		m.Verts = append(m.Verts, t.A, t.B, t.C)
+		m.Faces = append(m.Faces, Face{l, l + 1, l + 2})
+	}
 	return m
 }
 

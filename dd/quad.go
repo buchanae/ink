@@ -4,28 +4,37 @@ type Quad struct {
 	A, B, C, D XY
 }
 
-// TODO XFromY or YToX or Y2X
-func QuadFromRect(r Rect) Quad {
-	return Quad{
-		XY{r.A.X, r.A.Y},
-		XY{r.A.X, r.B.Y},
-		XY{r.B.X, r.B.Y},
-		XY{r.B.X, r.A.Y},
-	}
+func (q Quad) Stroke() Stroke {
+	path := NewPath(q.A, q.B, q.C, q.D)
+	path.Close()
+	stroke := path.Stroke()
+	stroke.Closed = true
+	return stroke
 }
 
-func (b Quad) Stroke(lineWidth float32) Mesh {
-	path := NewPath(b.A, b.B, b.C, b.D, b.A)
-	return path.Stroke(lineWidth)
-}
-
-func (b Quad) Mesh() Mesh {
+func (q Quad) Mesh() Mesh {
 	return Triangles{
-		{b.A, b.B, b.C},
-		{b.A, b.C, b.D},
+		{q.A, q.B, q.C},
+		{q.A, q.C, q.D},
 	}.Mesh()
 }
 
-func (b Quad) Bounds() Rect {
-	return Bounds([]XY{b.A, b.B, b.C, b.D})
+func (q Quad) Bounds() Rect {
+	return Bounds([]XY{q.A, q.B, q.C, q.D})
+}
+
+/*
+TODO what is the quad center?
+func (q Quad) Rotate(rad float32) Quad {
+	return q.RotateAround(rad, q.Center())
+}
+*/
+
+func (q Quad) RotateAround(rad float32, pivot XY) Quad {
+	return Quad{
+		A: q.A.Rotate(rad, pivot),
+		B: q.B.Rotate(rad, pivot),
+		C: q.C.Rotate(rad, pivot),
+		D: q.D.Rotate(rad, pivot),
+	}
 }

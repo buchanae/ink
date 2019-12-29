@@ -64,7 +64,8 @@ func main() {
 	}
 
 	for _, b := range boxes {
-		l := b.Stroke(lineWidth)
+		l := b.Stroke()
+		l.Width = lineWidth
 		s := NewShader(l)
 		s.SetColor(color.Black)
 		doc.Draw(s)

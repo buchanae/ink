@@ -72,7 +72,8 @@ func Ink(doc *Doc) {
 
 	{
 		m := Triangles(tris)
-		stk := m.Stroke(0.001)
+		stk := m.Stroke()
+		stk.Width = 0.001
 		s := doc.Shader(stk)
 		s.Set("a_color", White)
 	}

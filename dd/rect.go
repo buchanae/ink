@@ -50,17 +50,11 @@ func (r Rect) Translate(xy XY) Rect {
 	}
 }
 
-func (r Rect) Rotate(rad float32, pivot XY) Rect {
-	return Rect{
-		A: r.A.Rotate(rad, pivot),
-		B: r.B.Rotate(rad, pivot),
-	}
-}
-
 func (r Rect) Contains(xy XY) bool {
 	if xy.X < r.A.X {
 		return false
 	}
+
 	if xy.Y < r.A.Y {
 		return false
 	}
@@ -133,13 +127,15 @@ func (r Rect) Mesh() Mesh {
 	}
 }
 
-func (r Rect) Stroke(width float32) Mesh {
+func (r Rect) Stroke() Stroke {
 	path := NewPath(
 		r.A, XY{r.A.X, r.B.Y},
 		r.B, XY{r.B.X, r.A.Y},
 		r.A,
 	)
-	return path.Stroke(width)
+	stroke := path.Stroke()
+	stroke.Closed = true
+	return stroke
 }
 
 // Bounding box

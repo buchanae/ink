@@ -57,11 +57,8 @@ func (l Line) RelativeAngle(m Line) float32 {
 	return atan2(d.Y, d.X) - atan2(c.Y, c.X)
 }
 
-func (l Line) Stroke(width float32) Mesh {
-	p := &Path{}
-	p.MoveTo(l.A)
-	p.LineTo(l.B)
-	return p.Stroke(width)
+func (l Line) Stroke() Stroke {
+	return Stroke{Lines: []Line{l}}
 }
 
 // Close the lines by adding a line from the first last point to the first.

@@ -1,15 +1,30 @@
 package dd
 
+// TODO stroke options: miter, cap, etc.
+type Stroke struct {
+	Lines  []Line
+	Width  float32
+	Closed bool
+}
+
+func (s Stroke) Mesh() Mesh {
+	return NewMesh(s.Triangles())
+}
+
 // TODO unfinished. need to stroke half width in both directions.
 //      currently stroking full width in one direciton.
-func Stroke(lines []Line, width float32, closed bool) []Triangle {
-	if len(lines) < 2 {
-		closed = false
+func (s Stroke) Triangles() []Triangle {
+	if len(s.Lines) == 0 {
+		return nil
 	}
 
-	// TODO a single line is a special case
-	if len(lines) == 1 {
-		l := lines[0]
+	width := s.Width
+	if width == 0 {
+		width = 0.001
+	}
+
+	if len(s.Lines) == 1 {
+		l := s.Lines[0]
 		n := l.Normal().SetLength(width)
 		return []Triangle{
 			{l.A, l.B, l.A.Add(n)},
@@ -20,14 +35,14 @@ func Stroke(lines []Line, width float32, closed bool) []Triangle {
 	var tris []Triangle
 	var prev [2]XY
 
-	for i, line := range lines {
+	for i, line := range s.Lines {
 		n := line.Normal()
 		var next Line
 
 		// if on the last line, cap the end points
-		if i == len(lines)-1 {
-			if closed {
-				next = lines[0]
+		if i == len(s.Lines)-1 {
+			if s.Closed {
+				next = s.Lines[0]
 			} else {
 				tris = append(tris,
 					Triangle{prev[0], prev[1], line.B},
@@ -36,14 +51,14 @@ func Stroke(lines []Line, width float32, closed bool) []Triangle {
 				break
 			}
 		} else {
-			next = lines[i+1]
+			next = s.Lines[i+1]
 		}
 
 		// if on the first line, initialize the start points
 		if i == 0 {
-			if closed {
-				prev[0] = lines[len(lines)-1].B
-				prev[1] = miterPoint(lines[len(lines)-1], line, width)
+			if s.Closed {
+				prev[0] = s.Lines[len(s.Lines)-1].B
+				prev[1] = miterPoint(s.Lines[len(s.Lines)-1], line, width)
 			} else {
 				prev[0] = line.A
 				prev[1] = line.A.Add(n.SetLength(width))

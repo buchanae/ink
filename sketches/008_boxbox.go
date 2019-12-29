@@ -40,7 +40,8 @@ func Ink(doc *Doc) {
 			r := rect.Shrink(float32(i+1) * Shrink)
 			q := QuadFromRect(r)
 			//q = rand.TweakQuad(q, TweakBox)
-			m := q.Stroke(LineWidth)
+			m := q.Stroke()
+			m.Width = LineWidth
 
 			s := NewShader(m)
 			s.Set("a_color", rand.Color(p))

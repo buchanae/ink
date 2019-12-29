@@ -97,21 +97,9 @@ func (p *Path) Lines() []Line {
 	return lines
 }
 
-// TODO stroke options: closed, width, miter, cap, etc.
 // TODO closed path seems to have a glitch at the final miter joint?
-func (p *Path) Stroke(width float32) Mesh {
-	var verts []XY
-	var faces []Face
-
-	lines := p.Lines()
-
-	tris := Stroke(lines, width, false)
-	for _, t := range tris {
-		l := len(verts)
-		verts = append(verts, t.A, t.B, t.C)
-		faces = append(faces, Face{l, l + 1, l + 2})
-	}
-	return Mesh{verts, faces}
+func (p *Path) Stroke() Stroke {
+	return Stroke{Lines: p.Lines()}
 }
 
 type subpath struct {

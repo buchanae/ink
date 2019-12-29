@@ -51,7 +51,8 @@ func Ink(doc *Doc) {
 		}
 
 		if Stroke {
-			stk := tris.Stroke(StrokeWidth)
+			stk := tris.Stroke()
+			stk.Width = StrokeWidth
 			s := NewShader(stk)
 			s.Set("a_color", White)
 			s.Draw(l2)

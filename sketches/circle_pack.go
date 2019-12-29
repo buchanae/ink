@@ -46,7 +46,8 @@ func Ink(doc *Doc) {
 		}
 
 		for _, e := range cell.Edges {
-			m := e.Stroke(0.002)
+			m := e.Stroke()
+			m.Width = 0.002
 			s := NewShader(m)
 			s.Draw(doc)
 		}

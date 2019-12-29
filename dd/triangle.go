@@ -47,7 +47,7 @@ func (tris Triangles) Mesh() Mesh {
 	return Mesh{verts, faces}
 }
 
-func (tris Triangles) Stroke(width float32) Mesh {
+func (tris Triangles) Stroke() Stroke {
 	p := &Path{}
 	for _, t := range tris {
 		p.MoveTo(t.A)
@@ -55,5 +55,5 @@ func (tris Triangles) Stroke(width float32) Mesh {
 		p.LineTo(t.C)
 		p.LineTo(t.A)
 	}
-	return p.Stroke(width)
+	return p.Stroke()
 }
