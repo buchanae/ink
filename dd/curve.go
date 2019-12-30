@@ -52,7 +52,7 @@ func Midpoint(c Curve) XY {
 
 func Subdivide(c Curve, n int) []XY {
 	var xys []XY
-	for i := 1; i <= n; i++ {
+	for i := 0; i <= n; i++ {
 		p := float32(i) / float32(n)
 		xys = append(xys, c.Interpolate(p))
 	}

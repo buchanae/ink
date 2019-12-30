@@ -58,7 +58,7 @@ func (l Line) RelativeAngle(m Line) float32 {
 }
 
 func (l Line) Stroke() Stroke {
-	return Stroke{Lines: []Line{l}}
+	return Stroke{Curves: []Curve{l}}
 }
 
 // Close the lines by adding a line from the first last point to the first.

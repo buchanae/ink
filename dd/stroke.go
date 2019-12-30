@@ -2,7 +2,7 @@ package dd
 
 // TODO stroke options: miter, cap, etc.
 type Stroke struct {
-	Lines  []Line
+	Curves []Curve
 	Width  float32
 	Closed bool
 }
@@ -14,7 +14,8 @@ func (s Stroke) Mesh() Mesh {
 // TODO unfinished. need to stroke half width in both directions.
 //      currently stroking full width in one direciton.
 func (s Stroke) Triangles() []Triangle {
-	if len(s.Lines) == 0 {
+	lines := s.lines()
+	if len(lines) == 0 {
 		return nil
 	}
 
@@ -23,8 +24,8 @@ func (s Stroke) Triangles() []Triangle {
 		width = 0.001
 	}
 
-	if len(s.Lines) == 1 {
-		l := s.Lines[0]
+	if len(lines) == 1 {
+		l := lines[0]
 		n := l.Normal().SetLength(width)
 		return []Triangle{
 			{l.A, l.B, l.A.Add(n)},
@@ -35,14 +36,14 @@ func (s Stroke) Triangles() []Triangle {
 	var tris []Triangle
 	var prev [2]XY
 
-	for i, line := range s.Lines {
+	for i, line := range lines {
 		n := line.Normal()
 		var next Line
 
 		// if on the last line, cap the end points
-		if i == len(s.Lines)-1 {
+		if i == len(lines)-1 {
 			if s.Closed {
-				next = s.Lines[0]
+				next = lines[0]
 			} else {
 				tris = append(tris,
 					Triangle{prev[0], prev[1], line.B},
@@ -51,14 +52,14 @@ func (s Stroke) Triangles() []Triangle {
 				break
 			}
 		} else {
-			next = s.Lines[i+1]
+			next = lines[i+1]
 		}
 
 		// if on the first line, initialize the start points
 		if i == 0 {
 			if s.Closed {
-				prev[0] = s.Lines[len(s.Lines)-1].B
-				prev[1] = miterPoint(s.Lines[len(s.Lines)-1], line, width)
+				prev[0] = lines[len(lines)-1].B
+				prev[1] = miterPoint(lines[len(lines)-1], line, width)
 			} else {
 				prev[0] = line.A
 				prev[1] = line.A.Add(n.SetLength(width))
@@ -76,6 +77,24 @@ func (s Stroke) Triangles() []Triangle {
 	}
 
 	return tris
+}
+
+func (s Stroke) lines() []Line {
+	// TODO dynamic segment count using error margin
+	segments := 50
+
+	var lines []Line
+	for _, curve := range s.Curves {
+		if l, ok := curve.(Line); ok {
+			lines = append(lines, l)
+			continue
+		}
+
+		xys := Subdivide(curve, segments)
+		ls := Connect(xys...)
+		lines = append(lines, ls...)
+	}
+	return lines
 }
 
 func miterPoint(a, b Line, width float32) XY {

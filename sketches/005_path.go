@@ -19,5 +19,6 @@ func Ink(doc *Doc) {
 	p.LineTo(XY{0.3, 0.7})
 
 	m := p.Stroke()
+	m.Width = 0.002
 	Fill{m, Red}.Draw(doc)
 }

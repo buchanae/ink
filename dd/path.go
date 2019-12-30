@@ -74,32 +74,17 @@ func (p *Path) Close() {
 	p.LineTo(first)
 }
 
-// TODO subdivide options
-func (p *Path) Lines() []Line {
-	var lines []Line
+func (p *Path) Curves() []Curve {
+	var curves []Curve
 	for _, sub := range p.subpaths {
-		for _, seg := range sub.segments {
-			switch z := seg.(type) {
-			case Line:
-				lines = append(lines, z)
-			case Cubic:
-				// TODO
-				lines = append(lines, Line{z.Start(), z.End()})
-			case Quadratic:
-				xys := Subdivide(z, 10)
-				ls := Connect(xys...)
-				lines = append(lines, ls...)
-			default:
-				panic("unknown segment type")
-			}
-		}
+		curves = append(curves, sub.segments...)
 	}
-	return lines
+	return curves
 }
 
 // TODO closed path seems to have a glitch at the final miter joint?
 func (p *Path) Stroke() Stroke {
-	return Stroke{Lines: p.Lines()}
+	return Stroke{Curves: p.Curves()}
 }
 
 type subpath struct {
