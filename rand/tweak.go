@@ -2,10 +2,12 @@ package rand
 
 import "github.com/buchanae/ink/dd"
 
-func TweakMesh(mesh dd.Mesh, amount float32) {
+func TweakMesh(mesh dd.Mesh, amount float32) dd.Mesh {
+	mesh = mesh.Copy()
 	for i := range mesh.Verts {
 		mesh.Verts[i] = TweakXY(mesh.Verts[i], amount)
 	}
+	return mesh
 }
 
 func TweakXY(xy dd.XY, amount float32) dd.XY {
