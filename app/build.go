@@ -32,6 +32,8 @@ func (b *builder) build(nodes []gfx.Node) {
 			b.buildImage(node.LayerID, &z)
 		case image.RGBA:
 			b.buildImage(node.LayerID, &z)
+		case image.Image:
+			b.buildImage(node.LayerID, z)
 		default:
 			log.Printf("error: unknown node type: %T", node.Op)
 		}
@@ -43,6 +45,10 @@ func (b *builder) buildImage(id int, img image.Image) {
 }
 
 func (b *builder) buildShader(id int, shader *gfx.Shader) error {
+
+	if shader.Mesh == nil {
+		return fmt.Errorf("nil mesh")
+	}
 
 	mesh := shader.Mesh.Mesh()
 	verts := mesh.Verts
