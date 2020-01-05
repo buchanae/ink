@@ -2,15 +2,10 @@ package gfx
 
 import (
 	"image"
-	"log"
 
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 )
-
-func init() {
-	log.SetFlags(0)
-}
 
 // TODO use opengl Clear command
 func Clear(l Layer, c color.RGBA) {

@@ -12,7 +12,12 @@ func nextID() int {
 type Doc struct {
 	OnFrame func(Frame)
 
+	id    int
 	nodes []Node
+}
+
+func NewDoc() *Doc {
+	return &Doc{id: nextID()}
 }
 
 type Node struct {
@@ -20,12 +25,20 @@ type Node struct {
 	Op      interface{}
 }
 
+func (d *Doc) Nodes() []Node {
+	return d.nodes
+}
+
 func (d *Doc) NewLayer() Layer {
 	return newLayer(d)
 }
 
 func (d *Doc) LayerID() int {
-	return 0
+	return d.id
+}
+
+func (d *Doc) Clear() {
+	d.nodes = nil
 }
 
 func (d *Doc) NewImage(img image.Image) Layer {
