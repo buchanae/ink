@@ -99,12 +99,12 @@ func newMsaa(id, w, h, multisamples int) msaa {
 
 func (m *msaa) Clear() {
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
-	glClearColor(0, 0, 0, 0)
-	glClear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT)
+	glClearColor(0, 0, 0, 1)
+	glClear(gl.COLOR_BUFFER_BIT)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
-	glClearColor(0, 0, 0, 0)
-	glClear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT)
+	glClearColor(0, 0, 0, 1)
+	glClear(gl.COLOR_BUFFER_BIT)
 }
 
 // Blit the "write" texture into the anti-aliased "read" texture.
@@ -135,9 +135,46 @@ func (m *msaa) Blit(to uint32) {
 	)
 }
 
+func (m *msaa) Pixels(x, y, w, h float32) []uint8 {
+
+	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
+	xi := int(x * float32(m.Width))
+	yi := int(y * float32(m.Height))
+	wi := int(w * float32(m.Width))
+	hi := int(h * float32(m.Height))
+
+	if xi < 0 {
+		xi = 0
+	}
+	if yi < 0 {
+		yi = 0
+	}
+	if wi > m.Width {
+		wi = m.Width
+	}
+	if hi > m.Height {
+		hi = m.Height
+	}
+
+	pixels := make([]uint8, wi*hi*4)
+
+	// TODO how to allow flexible querying without complex API?
+	//      e.g. get only red pixels
+	glReadPixels(
+		int32(xi),
+		int32(yi),
+		int32(wi),
+		int32(hi),
+		gl.RGBA, gl.UNSIGNED_BYTE, glPtr(pixels),
+	)
+
+	return pixels
+}
+
 func (m *msaa) Image() image.Image {
 
 	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
+
 	pixels := make([]uint8, m.Width*m.Height*4)
 	glReadPixels(
 		0, 0,
@@ -156,10 +193,12 @@ func (m *msaa) Image() image.Image {
 				G: pixels[i+1],
 				B: pixels[i+2],
 				// alpha is premultiplied at this point.
+				// TODO difficult to retrieve pixel data where alpha hasn't been premultiplied
 				A: 255,
 			})
 		}
 	}
+
 	return img
 }
 
