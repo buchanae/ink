@@ -14,6 +14,10 @@ type Image struct {
 
 func (r *Renderer) NewImage(id int, img image.Image) Image {
 
+	if x, ok := r.images[id]; ok {
+		return x
+	}
+
 	loaded := Image{id: id}
 
 	glGenTextures(1, &loaded.tex)
