@@ -1,5 +1,7 @@
 package color
 
+import "image/color"
+
 func NewRGBA(r, g, b, a float32) RGBA {
 	return RGBA{r, g, b, a}
 }
@@ -12,6 +14,25 @@ var zero RGBA
 
 func (r RGBA) IsZero() bool {
 	return r == zero
+}
+
+func ToGo(c RGBA) color.Color {
+	return color.RGBA{
+		R: uint8(c.R * 255),
+		G: uint8(c.G * 255),
+		B: uint8(c.B * 255),
+		A: uint8(c.A * 255),
+	}
+}
+
+func FromGo(c color.Color) RGBA {
+	r, g, b, a := c.RGBA()
+	return RGBA{
+		R: float32(r) / 65536,
+		G: float32(g) / 65536,
+		B: float32(b) / 65536,
+		A: float32(a) / 65536,
+	}
 }
 
 var (
