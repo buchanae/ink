@@ -33,12 +33,6 @@ func Ink(doc *Doc) {
 		Mesh: dd.RectCenter(dd.XY{0.5, 0.5}, dd.XY{rw, rh}),
 		Attrs: Attrs{
 			"u_image": l.LayerID(),
-			"a_uv": []float32{
-				0, 0,
-				0, 1,
-				1, 1,
-				1, 0,
-			},
 		},
 	})
 }

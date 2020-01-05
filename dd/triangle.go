@@ -44,7 +44,7 @@ func (tris Triangles) Mesh() Mesh {
 		verts = append(verts, t.A, t.B, t.C)
 		faces = append(faces, Face{l, l + 1, l + 2})
 	}
-	return Mesh{verts, faces}
+	return Mesh{Verts: verts, Faces: faces}
 }
 
 func (tris Triangles) Stroke() Stroke {

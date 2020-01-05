@@ -66,12 +66,6 @@ func Ink(doc *Doc) {
 				"u_heightmap":    heightmap.LayerID(),
 				"u_color":        rand.Color(palette),
 				"u_alpha_offset": AlphaOffset,
-				"a_uv": []float32{
-					0, 0,
-					0, 1,
-					1, 1,
-					1, 0,
-				},
 			},
 		}
 		s.Draw(doc)

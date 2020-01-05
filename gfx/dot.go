@@ -28,12 +28,6 @@ func (dot Dot) Draw(l Layer) {
 		},
 		Attrs: Attrs{
 			"u_color": dot.Color,
-			"a_uv": []float32{
-				0, 0,
-				0, 1,
-				1, 1,
-				1, 0,
-			},
 		},
 	})
 }

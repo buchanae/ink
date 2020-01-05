@@ -5,6 +5,7 @@ type Face [3]int
 type Mesh struct {
 	Verts []XY
 	Faces []Face
+	UV    []XY
 }
 
 func NewMesh(tris []Triangle) Mesh {
@@ -17,6 +18,26 @@ func (m Mesh) Size() int {
 
 func (m Mesh) Mesh() Mesh {
 	return m
+}
+
+func (m Mesh) Triangles() []Triangle {
+	tris := make([]Triangle, len(m.Faces))
+	for i, face := range m.Faces {
+		tris[i] = Triangle{
+			A: m.Verts[face[0]],
+			B: m.Verts[face[1]],
+			C: m.Verts[face[2]],
+		}
+	}
+	return tris
+}
+
+func (m Mesh) Copy() Mesh {
+	c := Mesh{}
+	c.Verts = append(c.Verts, m.Verts...)
+	c.Faces = append(c.Faces, m.Faces...)
+	c.UV = append(c.UV, m.UV...)
+	return c
 }
 
 func (m Mesh) AddTriangles(tris []Triangle) Mesh {

@@ -116,7 +116,7 @@ func (c Circle) Mesh() Mesh {
 		})
 	}
 
-	mesh := Mesh{verts, faces}
+	mesh := Mesh{Verts: verts, Faces: faces}
 	// TODO
 	normals := make([]XY, mesh.Size())
 

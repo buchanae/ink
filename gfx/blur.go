@@ -29,12 +29,6 @@ func (b Blur) Draw(out Layer) {
 			Attrs: Attrs{
 				"source":     in.LayerID(),
 				"horizontal": horizontal,
-				"a_uv": []float32{
-					0, 0,
-					0, 1,
-					1, 1,
-					1, 0,
-				},
 			},
 		})
 		horizontal = !horizontal

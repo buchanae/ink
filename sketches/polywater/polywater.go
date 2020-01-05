@@ -32,12 +32,6 @@ func Ink(doc *Doc) {
 				Attrs: Attrs{
 					"u_speed": speed,
 					"u_time":  time,
-					"a_uv": []float32{
-						0, 0,
-						0, 1,
-						1, 1,
-						1, 0,
-					},
 				},
 			})
 		log.Printf("noise layer ID: %d", noiseLayer.LayerID())
@@ -79,15 +73,9 @@ func Ink(doc *Doc) {
 				"a_size": 1,
 			},
 			Attrs: Attrs{
-				"a_pos":  pos,
-				"a_rot":  rot,
-				"a_size": size,
-				"a_uv": []float32{
-					0, 0,
-					0, 1,
-					1, 1,
-					1, 0,
-				},
+				"a_pos":        pos,
+				"a_rot":        rot,
+				"a_size":       size,
 				"u_turbulence": turbulence,
 				//"u_noise":      noiseLayer.LayerID(),
 				"u_boxy":    boxy,
@@ -109,12 +97,6 @@ func Ink(doc *Doc) {
 					"u_color":   RGBA{0, .3, 0, 1},
 					"u_opacity": 1 - float32(j)*0.25,
 					"u_mask":    polys.LayerID(),
-					"a_uv": []float32{
-						0, 0,
-						0, 1,
-						1, 1,
-						1, 0,
-					},
 				},
 			})
 		*/

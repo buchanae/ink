@@ -43,6 +43,10 @@ func (r Rect) Center() XY {
 	return r.B.Sub(r.A).MulScalar(0.5).Add(r.A)
 }
 
+func (r Rect) Size() XY {
+	return r.B.Sub(r.A)
+}
+
 func (r Rect) Translate(xy XY) Rect {
 	return Rect{
 		A: r.A.Add(xy),
@@ -124,6 +128,12 @@ func (r Rect) Mesh() Mesh {
 			{0, 2, 1},
 			{0, 3, 2},
 		},
+		UV: []XY{
+			{0, 0},
+			{0, 1},
+			{1, 1},
+			{1, 0},
+		},
 	}
 }
 
@@ -160,7 +170,7 @@ func Bounds(xys []XY) Rect {
 		if xy.X > r.B.X {
 			r.B.X = xy.X
 		}
-		if xy.Y < r.B.Y {
+		if xy.Y > r.B.Y {
 			r.B.Y = xy.Y
 		}
 	}

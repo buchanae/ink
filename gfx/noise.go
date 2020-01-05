@@ -36,12 +36,6 @@ func (n Noise) Draw(out Layer) {
 			"u_mult":     n.Mult,
 			"u_color":    n.Color,
 			"u_sizemult": n.SizeMult,
-			"a_uv": []float32{
-				0, 0,
-				0, 1,
-				1, 1,
-				1, 0,
-			},
 		},
 	})
 }

@@ -19,12 +19,6 @@ func (g Gradient) Draw(l Layer) {
 		Attrs: Attrs{
 			"u_color_a": g.A,
 			"u_color_b": g.B,
-			"a_uv": []float32{
-				0, 0,
-				0, 1,
-				1, 1,
-				1, 0,
-			},
 		},
 	})
 }

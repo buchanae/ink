@@ -64,6 +64,7 @@ func (b *builder) buildShader(id int, shader *gfx.Shader) error {
 	}
 
 	rl.SetAttr("a_vert", verts, len(verts)*2*4, 0)
+	rl.SetAttr("a_uv", mesh.UV, len(mesh.UV)*2*4, 0)
 
 	for _, name := range rl.AttrNames() {
 		val, ok := shader.Attrs[name]
