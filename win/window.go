@@ -7,14 +7,14 @@ import (
 	"time"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
-	"github.com/veandco/go-sdl2/sdl"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 func init() {
 	runtime.LockOSThread()
 }
 
-var initSDL, initGL sync.Once
+var initGLFW, initGL sync.Once
 
 type Config struct {
 	Name          string
@@ -27,7 +27,7 @@ type Window struct {
 	conf     Config
 	events   chan Event
 	commands chan func()
-	window   *sdl.Window
+	window   *glfw.Window
 }
 
 // NewWindow opens a new window.
@@ -55,33 +55,34 @@ func (win *Window) Do(cmd func()) {
 
 func (win *Window) Swap() {
 	win.commands <- func() {
-		win.window.GLSwap()
+		win.window.SwapBuffers()
 	}
 }
 
-// run handles all sdl window operations.
 func (win *Window) Run() {
 
 	var err error
-	initSDL.Do(func() {
-		err = sdl.Init(sdl.INIT_EVERYTHING)
+	initGLFW.Do(func() {
+		err = glfw.Init()
 	})
 	if err != nil {
 		// TODO not sure what to do with errors
-		log.Printf("error: initializing sdl: %v", err)
+		log.Printf("error: initializing glfw: %v", err)
 		return
 	}
 	// TODO this is not the right place/way to call this,
 	//      because there could be multiple windows on a thread.
-	defer sdl.Quit()
+	defer glfw.Terminate()
 
-	sdl.GLSetAttribute(sdl.GL_CONTEXT_PROFILE_MASK, sdl.GL_CONTEXT_PROFILE_CORE)
+	glfw.WindowHint(glfw.ContextVersionMajor, 3)
+	glfw.WindowHint(glfw.ContextVersionMinor, 3)
+	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
+	glfw.WindowHint(glfw.OpenGLProfile, glfw.OpenGLCoreProfile)
 
-	window, err := sdl.CreateWindow(
+	window, err := glfw.CreateWindow(
+		win.conf.Width, win.conf.Height,
 		win.conf.Name,
-		int32(win.conf.X), int32(win.conf.Y),
-		int32(win.conf.Width), int32(win.conf.Height),
-		sdl.WINDOW_OPENGL,
+		nil, nil,
 	)
 	if err != nil {
 		// TODO not sure what to do with errors
@@ -90,13 +91,7 @@ func (win *Window) Run() {
 	}
 	defer window.Destroy()
 
-	context, err := window.GLCreateContext()
-	if err != nil {
-		// TODO not sure what to do with errors
-		log.Printf("error: creating opengl context: %v", err)
-		return
-	}
-	defer sdl.GLDeleteContext(context)
+	window.MakeContextCurrent()
 
 	// TODO once the Renderer methods are thread safe,
 	//      move this to Renderer.render()
@@ -111,30 +106,22 @@ func (win *Window) Run() {
 	win.window = window
 	check := time.Tick(20 * time.Millisecond)
 
-	for {
-		for ev := sdl.PollEvent(); ev != nil; ev = sdl.PollEvent() {
-			switch z := ev.(type) {
+	for !window.ShouldClose() {
 
-			case *sdl.WindowEvent:
+		glfw.PollEvents()
+		/* TODO redo key events
 
-			case *sdl.QuitEvent:
-				win.events <- QuitEvent
-				// TODO figure out how to quit gracefully
-				//      currently not closing events/commands channels
-				return
-
-			case *sdl.KeyboardEvent:
-				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_X {
-					win.events <- SnapshotEvent
-				}
-				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
-					win.events <- RefreshEvent
-				}
-				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
-					win.events <- ReturnEvent
-				}
+		case *sdl.KeyboardEvent:
+			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_X {
+				win.events <- SnapshotEvent
 			}
-		}
+			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
+				win.events <- RefreshEvent
+			}
+			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
+				win.events <- ReturnEvent
+			}
+		*/
 
 	outer:
 		for {
