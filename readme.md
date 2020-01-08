@@ -2,7 +2,7 @@
 
 Ink is a framework for creative 2D graphics in [Go](https://golang.org), based on OpenGL.
 
-# Example: a simple triangle
+### Example: a simple triangle
 Install:
 ```
 go install github.com/buchanae/ink
@@ -44,10 +44,10 @@ Ink opens a window and renders your triangle:
 
 ![Triangle example](./_static/ink_example.png)
 
-# Status
+### Status
 
 This is a young project. It's tested only on MacOS 10.14.
 
-# Implementation Notes
+### Implementation Notes
 
 Currently, Ink is based on OpenGL only, although other backends are desired. Ink is also focused primarily on 2D graphics so far, because everything is simpler in two dimensions, although I'd like to extend it to 3D some day.
