@@ -6,6 +6,16 @@ import (
 	"github.com/buchanae/ink/win"
 )
 
+func Run(f func(*gfx.Doc)) {
+	a, err := NewApp(DefaultConfig())
+	if err != nil {
+		panic(err)
+	}
+	doc := gfx.NewDoc()
+	go f(doc)
+	a.Run()
+}
+
 // App can render a gfx.Layer to a window.
 type App struct {
 	conf     Config
