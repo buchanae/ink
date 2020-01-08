@@ -17,9 +17,10 @@ func init() {
 var initGLFW, initGL sync.Once
 
 type Config struct {
-	Name          string
+	Title         string
 	X, Y          int
 	Width, Height int
+	Visible       bool
 }
 
 // Window holds a handle to an OS window.
@@ -59,6 +60,30 @@ func (win *Window) Swap() {
 	}
 }
 
+func (win *Window) SetSize(w, h int) {
+	win.commands <- func() {
+		win.window.SetSize(w, h)
+	}
+}
+
+func (win *Window) SetPos(x, y int) {
+	win.commands <- func() {
+		win.window.SetPos(x, y)
+	}
+}
+
+func (win *Window) SetTitle(title string) {
+	win.commands <- func() {
+		win.window.SetTitle(title)
+	}
+}
+
+func (win *Window) Show() {
+	win.commands <- func() {
+		win.window.Show()
+	}
+}
+
 func (win *Window) Run() {
 
 	var err error
@@ -74,6 +99,9 @@ func (win *Window) Run() {
 	//      because there could be multiple windows on a thread.
 	defer glfw.Terminate()
 
+	if !win.conf.Visible {
+		glfw.WindowHint(glfw.Visible, glfw.False)
+	}
 	glfw.WindowHint(glfw.ContextVersionMajor, 3)
 	glfw.WindowHint(glfw.ContextVersionMinor, 3)
 	glfw.WindowHint(glfw.OpenGLForwardCompatible, glfw.True)
@@ -81,7 +109,7 @@ func (win *Window) Run() {
 
 	window, err := glfw.CreateWindow(
 		win.conf.Width, win.conf.Height,
-		win.conf.Name,
+		win.conf.Title,
 		nil, nil,
 	)
 	if err != nil {
@@ -90,6 +118,8 @@ func (win *Window) Run() {
 		return
 	}
 	defer window.Destroy()
+
+	window.SetPos(win.conf.X, win.conf.Y)
 
 	window.MakeContextCurrent()
 

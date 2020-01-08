@@ -23,10 +23,15 @@ type Doc struct {
 	ID     int
 	Images map[int]image.Image
 	Ops    []Op
+	Config Config
 }
 
 func NewDoc() *Doc {
-	return &Doc{ID: nextID()}
+	return &Doc{
+		ID: nextID(),
+		// TODO need to pull this from app
+		Config: DefaultConfig(),
+	}
 }
 
 func (d *Doc) Filter(layerID ...int) *Doc {

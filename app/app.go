@@ -7,7 +7,6 @@ import (
 	"github.com/buchanae/ink/win"
 )
 
-// App can render a gfx.Layer to a window.
 type App struct {
 	conf     Config
 	win      *win.Window
@@ -16,15 +15,15 @@ type App struct {
 	events   chan win.Event
 }
 
-// NewApp will open a new window.
 func NewApp(conf Config) (*App, error) {
 	return &App{
-		conf:   conf,
-		win:    win.NewWindow(conf.Window),
+		conf: conf,
+		win: win.NewWindow(win.Config{
+			Title:  conf.Window.Title,
+			Width:  conf.Window.Width,
+			Height: conf.Window.Height,
+		}),
 		events: make(chan win.Event, 1000),
-		renderer: render.NewRenderer(
-			conf.Window.Width, conf.Window.Height,
-		),
 	}, nil
 }
 
@@ -40,20 +39,11 @@ func (app *App) Run() {
 				}
 
 				switch ev {
-				case win.QuitEvent:
-					return
-
 				case win.SnapshotEvent:
 					if app.doc != nil {
 						app.win.Do(app.snapshot)
 					}
-
-					//case events.Refresh:
-					//refresh()
 				}
-
-				//case <-assets.Changed():
-				//refresh()
 			}
 		}
 	}()
@@ -64,9 +54,43 @@ func (app *App) Events() <-chan win.Event {
 	return app.events
 }
 
+func (app *App) initRenderer() {
+	if app.renderer != nil {
+		return
+	}
+	app.renderer = render.NewRenderer(
+		app.conf.Window.Width,
+		app.conf.Window.Height,
+	)
+}
+
+func (app *App) updateConfig(b Config) {
+	app.conf.Snapshot = b.Snapshot
+
+	aw := app.conf.Window
+	bw := b.Window
+	if aw.Width != bw.Width || aw.Height != bw.Height {
+		// reset renderer
+		// TODO this is bound to cause some issue
+		//      when rendering multiple docs.
+		//      need a better way to resize a renderer
+		app.renderer = nil
+		app.win.SetSize(bw.Width, bw.Height)
+	}
+	if aw.Title != bw.Title {
+		app.win.SetTitle(bw.Title)
+	}
+
+	app.conf.Window = b.Window
+}
+
 func (app *App) Render(doc *Doc) {
-	app.win.Do(func() {
+	app.updateConfig(doc.Config)
+	app.win.Show()
+
+	app.Do(func() {
 		plan := buildPlan(doc)
+		app.initRenderer()
 		app.renderer.Render(plan)
 		app.renderer.ToScreen(doc.LayerID())
 	})
@@ -75,15 +99,10 @@ func (app *App) Render(doc *Doc) {
 	app.win.Swap()
 }
 
-func (app *App) Swap() {
-	app.win.Swap()
-}
-
-func (app *App) Do(f func(*render.Renderer)) {
-
+func (app *App) Do(f func()) {
 	done := make(chan struct{})
 	app.win.Do(func() {
-		f(app.renderer)
+		f()
 		close(done)
 	})
 	<-done

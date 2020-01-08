@@ -1,8 +1,4 @@
-// +build !sendonly
-
 package app
-
-import "github.com/buchanae/ink/win"
 
 func DefaultConfig() Config {
 	return Config{
@@ -11,10 +7,8 @@ func DefaultConfig() Config {
 			Height: 2400,
 			Dir:    "snapshots",
 		},
-		Window: win.Config{
-			Name:   "ink",
-			X:      10,
-			Y:      10,
+		Window: WindowConfig{
+			Title:  "ink",
 			Width:  800,
 			Height: 800,
 		},
@@ -23,7 +17,12 @@ func DefaultConfig() Config {
 
 type Config struct {
 	Snapshot SnapshotConfig
-	Window   win.Config
+	Window   WindowConfig
+}
+
+type WindowConfig struct {
+	Title         string
+	Width, Height int
 }
 
 type SnapshotConfig struct {
