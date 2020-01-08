@@ -1,6 +1,9 @@
 package color
 
-import "image/color"
+import (
+	"fmt"
+	"image/color"
+)
 
 func NewRGBA(r, g, b, a float32) RGBA {
 	return RGBA{r, g, b, a}
@@ -14,6 +17,29 @@ var zero RGBA
 
 func (r RGBA) IsZero() bool {
 	return r == zero
+}
+
+func Hex(n int) RGBA {
+	return RGBA{
+		R: float32((n&0xff0000)>>16) / 255,
+		G: float32((n&0x00ff00)>>8) / 255,
+		B: float32((n & 0x0000ff)) / 255,
+		A: 1,
+	}
+}
+
+func HexString(s string) RGBA {
+	if len(s) != 7 {
+		return RGBA{}
+	}
+	var r, g, b uint8
+	fmt.Sscanf(s, "#%02x%02x%02x", &r, &g, &b)
+	return RGBA{
+		R: float32(r) / 255,
+		G: float32(g) / 255,
+		B: float32(b) / 255,
+		A: 1,
+	}
 }
 
 func ToGo(c RGBA) color.Color {
