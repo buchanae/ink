@@ -1,6 +1,8 @@
 package dd
 
-import "math"
+import (
+	"math"
+)
 
 type Circle struct {
 	XY
@@ -82,61 +84,41 @@ func (c Circle) IntersectsLine(l Line) bool {
 	return t.Length() < c.Radius
 }
 
-// TODO split segment interpolation into a separate function
-func (c Circle) Mesh() Mesh {
-	segments := c.Segments
-	if segments <= 0 {
-		segments = 10
+func (c Circle) Interpolate(p float32) XY {
+	ang := math.Pi * 2 * p
+	return XY{
+		X: cos(ang)*c.Radius + c.X,
+		Y: sin(ang)*c.Radius + c.Y,
 	}
+}
 
-	faces := make([]Face, 0, segments)
-	verts := make([]XY, 0, segments+1)
-	verts = append(verts, c.XY)
-	inc := (math.Pi * 2) / float32(segments)
-
-	for i := 0; i < segments; i++ {
-		ang := float32(i) * inc
+func (c Circle) Mesh() Mesh {
+	e := Ellipse{
+		c.XY,
+		XY{c.Radius, c.Radius},
+		c.Segments,
+	}
+	return e.Mesh()
+	// TODO normals are never returned
+	/*
+		normals := make([]XY, mesh.Size())
 
 		// the 0 index is the center vertex.
 		// perimeter vertices start at index 1.
-		current := i + 1
-		previous := current - 1
-		if previous == 0 {
-			previous = segments
+		for i := 1; i < len(verts); i++ {
+			prev := i - 1
+			if prev == 0 {
+				prev = len(verts) - 1
+			}
+			next := i + 1
+			if next == len(verts) {
+				next = 1
+			}
+
+			a := Line{verts[prev], verts[i]}
+			b := Line{verts[i], verts[next]}
+			n := a.Normal().Add(b.Normal()).Normalize()
+			normals[i] = n
 		}
-
-		verts = append(verts, XY{
-			X: cos(ang)*c.Radius + c.X,
-			Y: sin(ang)*c.Radius + c.Y,
-		})
-		faces = append(faces, Face{
-			0,
-			current,
-			previous,
-		})
-	}
-
-	mesh := Mesh{Verts: verts, Faces: faces}
-	// TODO
-	normals := make([]XY, mesh.Size())
-
-	// the 0 index is the center vertex.
-	// perimeter vertices start at index 1.
-	for i := 1; i < len(verts); i++ {
-		prev := i - 1
-		if prev == 0 {
-			prev = len(verts) - 1
-		}
-		next := i + 1
-		if next == len(verts) {
-			next = 1
-		}
-
-		a := Line{verts[prev], verts[i]}
-		b := Line{verts[i], verts[next]}
-		n := a.Normal().Add(b.Normal()).Normalize()
-		normals[i] = n
-	}
-
-	return mesh
+	*/
 }

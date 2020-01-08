@@ -10,8 +10,8 @@ type Ellipse struct {
 	Segments int
 }
 
-// TODO interpolate should probably be a percentage?
-func (e Ellipse) Interpolate(t float32) XY {
+func (e Ellipse) Interpolate(p float32) XY {
+	t := math.Pi * 2 * p
 	xy := XY{
 		e.Size.X * math.Cos(t),
 		e.Size.Y * math.Sin(t),
@@ -22,14 +22,12 @@ func (e Ellipse) Interpolate(t float32) XY {
 func (e Ellipse) Mesh() Mesh {
 	segments := e.Segments
 	if segments <= 0 {
-		segments = 40
+		segments = 50
 	}
 
 	faces := make([]Face, 0, segments)
 	verts := make([]XY, 0, segments+1)
 	verts = append(verts, e.XY)
-	inc := (math.Pi * 2) / float32(segments)
-	t := float32(0)
 
 	for i := 0; i < segments; i++ {
 		// the 0 index is the center vertex.
@@ -40,17 +38,12 @@ func (e Ellipse) Mesh() Mesh {
 			previous = segments
 		}
 
-		verts = append(verts, XY{
-			X: e.Size.X*math.Cos(t) + e.X,
-			Y: e.Size.Y*math.Sin(t) + e.Y,
-		})
+		p := float32(i) / float32(segments)
+		xy := e.Interpolate(p)
+		verts = append(verts, xy)
 		faces = append(faces, Face{
-			0,
-			current,
-			previous,
+			0, current, previous,
 		})
-
-		t += inc
 	}
 
 	return Mesh{Verts: verts, Faces: faces}
