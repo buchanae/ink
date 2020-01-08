@@ -20,6 +20,7 @@ func init() {
 	gob.Register(dd.Line{})
 	gob.Register(dd.Triangle{})
 	gob.Register(dd.Circle{})
+	gob.Register(dd.Ellipse{})
 	gob.Register(dd.Triangles{})
 	gob.Register(dd.Stroke{})
 	gob.Register(dd.Quadratic{})
