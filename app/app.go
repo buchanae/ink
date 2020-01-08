@@ -1,44 +1,11 @@
+// +build !sendonly
+
 package app
 
 import (
-	"encoding/gob"
-	"os"
-	"time"
-
-	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/win"
 )
-
-func Run(f func(gfx.Layer)) {
-	a, err := NewApp(DefaultConfig())
-	if err != nil {
-		panic(err)
-	}
-	doc := NewDoc()
-	go func() {
-		f(doc)
-		a.Render(doc)
-	}()
-	a.Run()
-}
-
-type Frame struct {
-	Time time.Time
-}
-
-func Send(f func(gfx.Layer)) {
-
-	doc := NewDoc()
-	f(doc)
-
-	err := gob.NewEncoder(os.Stdout).Encode(doc)
-	if err != nil {
-		os.Stderr.Write([]byte("sending: "))
-		os.Stderr.Write([]byte(err.Error()))
-		os.Stderr.Write([]byte("\n"))
-	}
-}
 
 // App can render a gfx.Layer to a window.
 type App struct {
@@ -120,4 +87,17 @@ func (app *App) Do(f func(*render.Renderer)) {
 		close(done)
 	})
 	<-done
+}
+
+func Run(f func(*Doc)) {
+	a, err := NewApp(DefaultConfig())
+	if err != nil {
+		panic(err)
+	}
+	doc := NewDoc()
+	go func() {
+		f(doc)
+		a.Render(doc)
+	}()
+	a.Run()
 }

@@ -111,7 +111,7 @@ func run(ctx context.Context, a *app.App, path, name string) error {
 		return err
 	}
 
-	cmd := exec.CommandContext(ctx, "go", "run", inkPath, mainPath)
+	cmd := exec.CommandContext(ctx, "go", "run", "-tags=sendonly", inkPath, mainPath)
 	cmd.Dir = sketchDir
 
 	stdout, err := cmd.StdoutPipe()
