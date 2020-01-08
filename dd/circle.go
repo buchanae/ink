@@ -92,13 +92,20 @@ func (c Circle) Interpolate(p float32) XY {
 	}
 }
 
-func (c Circle) Mesh() Mesh {
-	e := Ellipse{
+func (c Circle) Ellipse() Ellipse {
+	return Ellipse{
 		c.XY,
 		XY{c.Radius, c.Radius},
 		c.Segments,
 	}
-	return e.Mesh()
+}
+
+func (c Circle) Stroke() Stroke {
+	return c.Ellipse().Stroke()
+}
+
+func (c Circle) Mesh() Mesh {
+	return c.Ellipse().Mesh()
 	// TODO normals are never returned
 	/*
 		normals := make([]XY, mesh.Size())

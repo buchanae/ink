@@ -19,6 +19,31 @@ func (e Ellipse) Interpolate(p float32) XY {
 	return xy.Add(e.XY)
 }
 
+func (e Ellipse) Stroke() Stroke {
+	segments := e.Segments
+	if segments <= 0 {
+		segments = 50
+	}
+
+	// TODO reimplement with path.ArcTo
+	//      and implement proper curve interpolation
+	path := Path{}
+
+	for i := 0; i < segments; i++ {
+		p := float32(i) / float32(segments)
+		xy := e.Interpolate(p)
+		if i == 0 {
+			path.MoveTo(xy)
+		} else {
+			path.LineTo(xy)
+		}
+	}
+
+	s := path.Stroke()
+	s.Closed = true
+	return s
+}
+
 func (e Ellipse) Mesh() Mesh {
 	segments := e.Segments
 	if segments <= 0 {
