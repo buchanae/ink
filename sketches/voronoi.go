@@ -10,7 +10,7 @@ import (
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
-	doc.Clear(White)
+	Clear(doc, White)
 
 	box := Rect{
 		A: XY{.1, .1},
@@ -64,18 +64,20 @@ func Ink(doc *Doc) {
 	tris := v.Triangulate()
 
 	for _, t := range tris {
-		s := doc.Shader(t)
+		s := NewShader(t)
 		c := rand.Color(colors)
 		c.A = 0.3
 		s.Set("a_color", c)
+		s.Draw(doc)
 	}
 
 	{
 		m := Triangles(tris)
 		stk := m.Stroke()
 		stk.Width = 0.001
-		s := doc.Shader(stk)
+		s := NewShader(stk)
 		s.Set("a_color", White)
+		s.Draw(doc)
 	}
 
 	/*

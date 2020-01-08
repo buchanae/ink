@@ -10,7 +10,7 @@ import (
 )
 
 func Ink(doc *Doc) {
-	fh, err := os.Open("examples/toshiro.png")
+	fh, err := os.Open("toshiro.png")
 	if err != nil {
 		panic(err)
 	}
@@ -32,7 +32,7 @@ func Ink(doc *Doc) {
 		Frag: CopyFrag,
 		Mesh: dd.RectCenter(dd.XY{0.5, 0.5}, dd.XY{rw, rh}),
 		Attrs: Attrs{
-			"u_image": l.LayerID(),
+			"u_image": l,
 		},
 	})
 }

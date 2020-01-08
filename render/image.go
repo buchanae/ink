@@ -12,10 +12,10 @@ type Image struct {
 	tex uint32
 }
 
-func (r *Renderer) NewImage(id int, img image.Image) Image {
+func (r *Renderer) AddImage(id int, img image.Image) {
 
-	if x, ok := r.images[id]; ok {
-		return x
+	if _, ok := r.images[id]; ok {
+		return
 	}
 
 	loaded := Image{id: id}
@@ -56,5 +56,4 @@ func (r *Renderer) NewImage(id int, img image.Image) Image {
 	)
 
 	r.images[id] = loaded
-	return loaded
 }

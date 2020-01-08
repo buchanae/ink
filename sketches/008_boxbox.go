@@ -38,7 +38,7 @@ func Ink(doc *Doc) {
 			}
 
 			r := rect.Shrink(float32(i+1) * Shrink)
-			q := QuadFromRect(r)
+			q := r.Quad()
 			//q = rand.TweakQuad(q, TweakBox)
 			m := q.Stroke()
 			m.Width = LineWidth

@@ -1,5 +1,16 @@
 package gfx
 
+func Copy(dst, src Layer) {
+	dst.AddShader(&Shader{
+		Vert: DefaultVert,
+		Frag: CopyFrag,
+		Mesh: Fullscreen,
+		Attrs: Attrs{
+			"u_image": src.LayerID(),
+		},
+	})
+}
+
 const CopyFrag = `
 #version 330 core
 

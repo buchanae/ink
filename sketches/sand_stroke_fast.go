@@ -63,9 +63,9 @@ func Ink(doc *Doc) {
 				XY{1, y + MaxD},
 			},
 			Attrs: Attrs{
-				"u_heightmap":    heightmap.LayerID(),
+				"u_heightmap":    heightmap,
 				"u_color":        rand.Color(palette),
-				"u_alpha_offset": AlphaOffset,
+				"u_alpha_offset": float32(AlphaOffset),
 			},
 		}
 		s.Draw(doc)

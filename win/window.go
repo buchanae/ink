@@ -4,6 +4,7 @@ import (
 	"log"
 	"runtime"
 	"sync"
+	"time"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/veandco/go-sdl2/sdl"
@@ -26,6 +27,7 @@ type Window struct {
 	conf     Config
 	events   chan Event
 	commands chan func()
+	window   *sdl.Window
 }
 
 // NewWindow opens a new window.
@@ -33,7 +35,7 @@ func NewWindow(conf Config) *Window {
 	win := &Window{
 		conf:     conf,
 		events:   make(chan Event),
-		commands: make(chan func(), 1),
+		commands: make(chan func(), 1000),
 	}
 	return win
 }
@@ -44,48 +46,16 @@ func (win *Window) Events() <-chan Event {
 	return win.events
 }
 
-const (
-	codePopCommand int32 = iota
-	codeSwap
-)
-
 // Do queues a function for execution on the main thread.
 // OS windows typically require that code which accesses
 // windows
 func (win *Window) Do(cmd func()) {
-	/*
-		SDL has its own event queue mechansim, and it's tricky
-		to coordinate that system with Go's scheduler, while
-		also keeping all window/opengl code on a single OS thread.
-
-		This is the only way I've found to work:
-		1. Push "cmd" onto a work queue (buffered channel)
-		2. Push an event onto the SDL queue
-		3. In Window.Run, which runs only on the OpenGL thread,
-		   pop the UserEvent from the SDL queue
-		4. In Window.Run, pop "cmd" from the work queue and run it.
-	*/
 	win.commands <- cmd
-	_, err := sdl.PushEvent(&sdl.UserEvent{
-		Type:      sdl.USEREVENT,
-		Timestamp: sdl.GetTicks(),
-		Code:      codePopCommand,
-	})
-	if err != nil {
-		// TODO I don't know what to do with these errors
-		log.Print(err)
-	}
 }
 
 func (win *Window) Swap() {
-	_, err := sdl.PushEvent(&sdl.UserEvent{
-		Type:      sdl.USEREVENT,
-		Timestamp: sdl.GetTicks(),
-		Code:      codeSwap,
-	})
-	if err != nil {
-		// TODO I don't know what to do with these errors
-		log.Print(err)
+	win.commands <- func() {
+		win.window.GLSwap()
 	}
 }
 
@@ -138,36 +108,42 @@ func (win *Window) Run() {
 		return
 	}
 
+	win.window = window
+	check := time.Tick(20 * time.Millisecond)
+
 	for {
-		ev := sdl.WaitEvent()
-		switch z := ev.(type) {
+		for ev := sdl.PollEvent(); ev != nil; ev = sdl.PollEvent() {
+			switch z := ev.(type) {
 
-		case *sdl.WindowEvent:
+			case *sdl.WindowEvent:
 
-		case *sdl.QuitEvent:
-			win.events <- QuitEvent
-			// TODO figure out how to quit gracefully
-			//      currently not closing events/commands channels
-			return
+			case *sdl.QuitEvent:
+				win.events <- QuitEvent
+				// TODO figure out how to quit gracefully
+				//      currently not closing events/commands channels
+				return
 
-		case *sdl.KeyboardEvent:
-			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_X {
-				win.events <- SnapshotEvent
+			case *sdl.KeyboardEvent:
+				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_X {
+					win.events <- SnapshotEvent
+				}
+				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
+					win.events <- RefreshEvent
+				}
+				if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
+					win.events <- ReturnEvent
+				}
 			}
-			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
-				win.events <- RefreshEvent
-			}
+		}
 
-		case *sdl.UserEvent:
-			switch z.Code {
-			case codePopCommand:
-				// sdl.UserEvent is used to make goroutines
-				// and SDL2 event queues play nice together.
-				// See Window.Do for details.
-				cmd := <-win.commands
+	outer:
+		for {
+			select {
+			case cmd := <-win.commands:
 				cmd()
-			case codeSwap:
-				window.GLSwap()
+				//case <-time.After(20 * time.Millisecond):
+			case <-check:
+				break outer
 			}
 		}
 	}

@@ -25,7 +25,7 @@ func Ink(doc *Doc) {
 	NewShader(m).Draw(doc)
 
 	for _, xy := range xys {
-		d := Dot{XY: xy, Color: Red, Size: 0.005}
+		d := Dot{XY: xy, Color: Red, Radius: 0.005}
 		d.Draw(doc)
 	}
 }

@@ -2,7 +2,6 @@ package render
 
 import (
 	"image"
-	"image/color"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
@@ -97,7 +96,7 @@ func newMsaa(id, w, h, multisamples int) msaa {
 	return m
 }
 
-func (m *msaa) Clear() {
+func (m msaa) Clear() {
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
 	glClearColor(0, 0, 0, 1)
 	glClear(gl.COLOR_BUFFER_BIT)
@@ -107,9 +106,9 @@ func (m *msaa) Clear() {
 	glClear(gl.COLOR_BUFFER_BIT)
 }
 
-// Blit the "write" texture into the anti-aliased "read" texture.
-func (m *msaa) Paint() {
-	// Copy the multisample texture (Write) to the regular texture (Read).
+func (m msaa) Paint() {
+	// Copy the multisample texture (Write)
+	// to the regular texture (Read).
 	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, m.Read.FBO)
 	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Write.FBO)
 
@@ -123,7 +122,7 @@ func (m *msaa) Paint() {
 
 // Blit the anti-aliased "read" texture to the given framebuffer ID.
 // Used during compisiting to copy textures to the screen.
-func (m *msaa) Blit(to uint32) {
+func (m msaa) Blit(to uint32) {
 	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, to)
 	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
 
@@ -135,7 +134,7 @@ func (m *msaa) Blit(to uint32) {
 	)
 }
 
-func (m *msaa) Pixels(x, y, w, h float32) []uint8 {
+func (m msaa) Pixels(x, y, w, h float32) []uint8 {
 
 	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
 	xi := int(x * float32(m.Width))
@@ -160,6 +159,7 @@ func (m *msaa) Pixels(x, y, w, h float32) []uint8 {
 
 	// TODO how to allow flexible querying without complex API?
 	//      e.g. get only red pixels
+	// 			Also, how to allow float texture?
 	glReadPixels(
 		int32(xi),
 		int32(yi),
@@ -171,41 +171,30 @@ func (m *msaa) Pixels(x, y, w, h float32) []uint8 {
 	return pixels
 }
 
-func (m *msaa) Image() image.Image {
+func (m msaa) Image(x, y, w, h float32) image.Image {
 
-	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
+	pixels := m.Pixels(x, y, w, h)
 
-	pixels := make([]uint8, m.Width*m.Height*4)
-	glReadPixels(
-		0, 0,
-		int32(m.Width), int32(m.Height),
-		gl.RGBA, gl.UNSIGNED_BYTE, glPtr(pixels),
-	)
-
-	img := image.NewRGBA(image.Rect(0, 0, m.Width, m.Height))
+	r := image.Rect(0, 0, m.Width, m.Height)
+	img := image.NewRGBA(r)
 	for y := 0; y < m.Height; y++ {
 		for x := 0; x < m.Width; x++ {
+			i := img.PixOffset(x, y)
 			// the orientation of PNG vs OpenGL is upside-down.
-			i := ((m.Height - y - 1) * m.Width * 4) + (x * 4)
-
-			img.SetRGBA(x, y, color.RGBA{
-				R: pixels[i+0],
-				G: pixels[i+1],
-				B: pixels[i+2],
-				// alpha is premultiplied at this point.
-				// TODO difficult to retrieve pixel data where alpha hasn't been premultiplied
-				A: 255,
-			})
+			j := ((m.Height - y - 1) * m.Width * 4) + (x * 4)
+			img.Pix[i+0] = pixels[j+0]
+			img.Pix[i+1] = pixels[j+1]
+			img.Pix[i+2] = pixels[j+2]
+			// TODO difficult to retrieve pixel data where alpha
+			//      hasn't been premultiplied
+			img.Pix[i+3] = 255
 		}
 	}
 
 	return img
 }
 
-func (m *msaa) Destroy() {
-	if m == nil {
-		return
-	}
+func (m msaa) Destroy() {
 	glDeleteTextures(1, &m.Read.Tex)
 	glDeleteTextures(1, &m.Write.Tex)
 	glDeleteFramebuffers(1, &m.Read.FBO)

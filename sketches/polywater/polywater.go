@@ -62,12 +62,12 @@ func Ink(doc *Doc) {
 		}
 
 		doc.AddShader(&Shader{
-			Name:          "Polys",
-			InstanceCount: N,
-			Vert:          loadShader("sketches/polywater/paint.vert"),
-			Frag:          loadShader("sketches/polywater/paint.frag"),
-			Mesh:          rec,
-			Divisors: Divisors{
+			Name:      "Polys",
+			Instances: N,
+			Vert:      loadShader("paint.vert"),
+			Frag:      loadShader("paint.frag"),
+			Mesh:      rec,
+			Divisors: map[string]int{
 				"a_pos":  1,
 				"a_rot":  1,
 				"a_size": 1,

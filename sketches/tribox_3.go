@@ -15,7 +15,7 @@ const (
 func Ink(doc *Doc) {
 	rand.SeedNow()
 
-	doc.Clear(White)
+	Clear(doc, White)
 
 	grid := NewGrid(10, 10)
 	colors := rand.Palette()
@@ -43,8 +43,9 @@ func Ink(doc *Doc) {
 			//f := Fill{t, rnd.Color(colors)}
 			//l2.Draw(f)
 
-			doc.Shader(t).
-				Set("a_color", rand.Color(colors))
+			s := NewShader(t)
+			s.Set("a_color", rand.Color(colors))
+			s.Draw(doc)
 		}
 	}
 }

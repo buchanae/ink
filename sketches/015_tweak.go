@@ -16,7 +16,7 @@ func Ink(doc *Doc) {
 		Segments: 40,
 	}
 	m := c.Mesh()
-	rand.TweakMesh(m, 0.03)
+	m = rand.TweakMesh(m, 0.03)
 
 	Fill{m, color.Red}.Draw(doc)
 }

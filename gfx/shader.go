@@ -1,15 +1,14 @@
 package gfx
 
 type Shader struct {
-	Name             string
-	Vert, Frag, Geom string
-	Mesh             Meshable
-	Attrs            Attrs
-	Divisors         Divisors
-	InstanceCount    int
+	Name       string
+	Vert, Frag string
+	Output     string
+	Mesh       Meshable
+	Attrs      Attrs
+	Divisors   map[string]int
+	Instances  int
 }
-
-type Divisors map[string]int
 
 type Attrs map[string]interface{}
 

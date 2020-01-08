@@ -7,4 +7,5 @@ const (
 	// TODO app events belong in the app package
 	RefreshEvent
 	SnapshotEvent
+	ReturnEvent
 )

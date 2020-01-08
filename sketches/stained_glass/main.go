@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
@@ -16,16 +15,17 @@ const (
 	size = 40
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(doc *Doc) {
+	rand.SeedNow()
 
-	bg := Fill{Fullscreen(), White}
-	doc.Draw(bg)
+	bg := Fill{Fullscreen, White}
+	bg.Draw(doc)
 
 	grid := NewGrid(size, size)
 	boxes := MergedGridQuades(grid, 15, gridTweak)
 	center := XY{0.5, 0.5}
-	colors := color.Monochromatic(color.Blue, 8)
+	// TODO redo monochromatic color picker
+	//colors := rand.Palette()
 
 	for _, b := range boxes {
 		dist := b.Bounds().Center().Distance(center)
@@ -41,16 +41,14 @@ func main() {
 		}
 		c := colors[i]
 
-		if rand.Bool(0.7) {
-			c = color.Lighter(c, rand.Range(0.1, 1.3))
-		}
+		//if rand.Bool(0.7) {
+		//c = color.Lighter(c, rand.Range(0.1, 1.3))
+		//}
 
-		m := NewShader(b.Mesh())
+		m := NewShader(b)
 		//m.Frag = "stained_glass.frag"
-		m.Uniforms = Uniforms{
-			"u_offset": rand.XYRange(0, 200),
-		}
-		m.SetColor(c)
+		m.Set("u_offset", rand.XYRange(0, 200))
+		m.Set("a_color", c)
 		m.Set("a_uv", []XY{
 			{0, 0},
 			{0, 1},
@@ -60,18 +58,16 @@ func main() {
 			{1, 1},
 			{1, 0},
 		})
-		doc.Draw(m)
+		m.Draw(doc)
 	}
 
 	for _, b := range boxes {
 		l := b.Stroke()
 		l.Width = lineWidth
 		s := NewShader(l)
-		s.SetColor(color.Black)
-		doc.Draw(s)
+		s.Set("a_color", color.Black)
+		s.Draw(doc)
 	}
-
-	app.Render(doc)
 }
 
 /*

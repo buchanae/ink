@@ -11,10 +11,8 @@ import (
 type Renderer struct {
 	width, height int
 	multisamples  int
-	shaders       map[Shader]compiled
 	textures      map[int]msaa
 	images        map[int]Image
-	layers        []*Layer
 }
 
 func NewRenderer(width, height int) *Renderer {
@@ -22,60 +20,42 @@ func NewRenderer(width, height int) *Renderer {
 		width:        width,
 		height:       height,
 		multisamples: 4,
-		shaders:      map[Shader]compiled{},
 		textures:     map[int]msaa{},
 		images:       map[int]Image{},
 	}
 }
 
-func (r *Renderer) RenderToScreen() error {
-	main := r.texture(0)
-	main.Clear()
-	r.render(main)
-
-	trace.Log("blit")
-	main.Blit(0)
-
-	trace.Log("done")
-	return nil
+func (r *Renderer) Render(plan Plan) {
+	r.render(plan)
 }
 
-func (r *Renderer) RenderToImage() (image.Image, error) {
-	main := r.texture(0)
-	main.Clear()
-	r.render(main)
-	return main.Image(), nil
+func (r *Renderer) ToScreen(layerID int) {
+	r.texture(layerID).Blit(0)
 }
 
-/*
-TODO
-optimize:
-4. reuse textures. kinda like a compiler would reuse registers.
-   tricky though, because the app could be holding on to a texture ID across frames,
-	 so would require knowing that the app doesn't hold a reference to the texture.
-*/
-func (r *Renderer) render(dst msaa) {
+// TODO want a better capture API that allows flexible capturing
+//      possibly via a single Capture() function
+func (r *Renderer) CapturePixels(layerID int, x, y, w, h float32) []uint8 {
+	return r.texture(layerID).Pixels(x, y, w, h)
+}
+
+func (r *Renderer) CaptureImage(layerID int, x, y, w, h float32) image.Image {
+	return r.texture(layerID).Image(x, y, w, h)
+}
+
+func (r *Renderer) render(plan Plan) {
 	trace.Log("render")
 
-	pb := newPassBuilder()
-	defer pb.Cleanup()
-
-	links := findLinks(r.layers)
-
-	for _, layer := range r.layers {
-
-		output := dst
-		if _, ok := links[layer.id]; ok {
-			output = r.texture(layer.id)
-		}
-
-		pb.AddLayer(layer, output)
+	for id, img := range plan.Images {
+		r.AddImage(id, img)
 	}
 
-	passes := pb.Passes()
-	trace.Log("passes %d", len(passes))
+	pb := plan.build()
+	defer pb.cleanup()
 
-	for _, p := range passes {
+	trace.Log("passes %d", len(pb.passes))
+
+	for _, p := range pb.passes {
 		r.renderPass(p)
 	}
 }
@@ -95,17 +75,18 @@ func (r *Renderer) renderPass(p *pass) {
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
 	trace.Log("render pass %s", p.name)
-	trace.Log("  output to %d", p.output.ID)
+	trace.Log("  output to %d", p.layer)
 
 	// TODO clear existing program entirely
-	// TODO redo instancing
 	count := 1
 	if p.instanceCount > 1 {
 		count = p.instanceCount
 	}
 
 	trace.Log("  gl config")
-	glBindFramebuffer(gl.FRAMEBUFFER, p.output.Write.FBO)
+	output := r.texture(p.layer)
+
+	glBindFramebuffer(gl.FRAMEBUFFER, output.Write.FBO)
 	glUseProgram(p.prog.id)
 	r.bindUniforms(p)
 	glBindVertexArray(p.vao)
@@ -121,7 +102,7 @@ func (r *Renderer) renderPass(p *pass) {
 	)
 
 	trace.Log("  output.Paint")
-	p.output.Paint()
+	output.Paint()
 
 	trace.Log("  pass done")
 }
@@ -136,12 +117,14 @@ func (r *Renderer) renderPass(p *pass) {
 //      execution. might help abstract rendering backends later.
 func (r *Renderer) bindUniforms(p *pass) {
 	for _, uni := range p.prog.uniforms {
+
 		val, ok := p.uniforms[uni.Name]
 		if !ok {
 			// TODO return error list from render
 			log.Printf("  missing uniform: %s", uni.Name)
 			continue
 		}
+
 		if uni.Type == gl.SAMPLER_2D {
 			id, ok := val.(int)
 			if !ok {
@@ -177,25 +160,4 @@ func (r *Renderer) texture(id int) msaa {
 		r.textures[id] = t
 	}
 	return t
-}
-
-func findLinks(layers []*Layer) map[int]struct{} {
-	links := map[int]struct{}{}
-	for _, layer := range layers {
-		for _, uni := range layer.prog.uniforms {
-			val, ok := layer.uniforms[uni.Name]
-			if !ok {
-				continue
-			}
-			if uni.Type != gl.SAMPLER_2D {
-				continue
-			}
-			id, ok := val.(int)
-			if !ok {
-				continue
-			}
-			links[id] = struct{}{}
-		}
-	}
-	return links
 }

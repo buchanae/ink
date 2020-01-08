@@ -9,7 +9,7 @@ import (
 
 func Ink(doc *Doc) {
 	rand.SeedNow()
-	doc.Clear(White)
+	Clear(doc, White)
 
 	// TODO grid size is confusing
 	//      because the grid is actually a point grid, not a rectangle grid
@@ -28,7 +28,7 @@ func Ink(doc *Doc) {
 		}
 		stk := r.Stroke()
 		stk.Width = 0.0005
-		strokes = append(strokes, stk)
+		strokes = append(strokes, stk.Mesh())
 
 		sub := NewGrid(4, 4)
 		for j, sr := range sub.Rects() {
@@ -49,13 +49,14 @@ func Ink(doc *Doc) {
 
 			mask := 1 << j
 			if i&mask == mask {
-				doc.Shader(xr)
+				NewShader(xr).Draw(doc)
 			}
 		}
 	}
 
 	for _, stk := range strokes {
-		shd := doc.Shader(stk)
+		shd := NewShader(stk)
 		shd.Set("a_color", White)
+		shd.Draw(doc)
 	}
 }

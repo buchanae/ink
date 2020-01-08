@@ -9,9 +9,9 @@ import (
 func Ink(doc *Doc) {
 	Clear(doc, color.White)
 
-	xys := rand.BlueNoise(50, 1, 1, 0.02)
+	xys := rand.BlueNoise(250, 1, 1, 0.02)
 
 	for _, xy := range xys {
-		Dot{XY: xy, Radius: 0.002}.Draw(doc)
+		Dot{XY: xy, Radius: 0.003}.Draw(doc)
 	}
 }

@@ -11,11 +11,13 @@ import (
 
 func init() {
 	gob.Register(Shader{})
+	gob.Register(Image{})
 	gob.Register(color.RGBA{})
 	gob.Register(dd.XY{})
 	gob.Register(dd.Mesh{})
 	gob.Register(dd.Rect{})
 	gob.Register(dd.Quad{})
+	gob.Register(dd.Line{})
 	gob.Register(dd.Triangle{})
 	gob.Register(dd.Circle{})
 	gob.Register(dd.Triangles{})
@@ -23,6 +25,6 @@ func init() {
 	gob.Register(dd.Quadratic{})
 	gob.Register([]color.RGBA{})
 	gob.Register([]dd.XY{})
-	gob.Register(image.RGBA{})
-	gob.Register(image.Gray{})
+	gob.Register(&image.RGBA{})
+	gob.Register(&image.Gray{})
 }

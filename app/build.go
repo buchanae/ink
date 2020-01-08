@@ -1,162 +1,157 @@
 package app
 
 import (
-	"fmt"
 	"image"
 	"log"
 
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/glsl"
 	"github.com/buchanae/ink/render"
 )
 
-type builder struct {
-	renderer *render.Renderer
-}
+func buildPlan(doc *gfx.Doc) render.Plan {
 
-func (b *builder) build(nodes []gfx.Node) {
-	for _, node := range nodes {
-		switch z := node.Op.(type) {
-		case *gfx.Shader:
-			err := b.buildShader(node.LayerID, z)
-			if err != nil {
-				log.Printf("error: %v", err)
-			}
-		case gfx.Shader:
-			err := b.buildShader(node.LayerID, &z)
-			if err != nil {
-				log.Printf("error: %v", err)
-			}
-		case image.Gray:
-			b.buildImage(node.LayerID, &z)
-		case image.RGBA:
-			b.buildImage(node.LayerID, &z)
-		case image.Image:
-			b.buildImage(node.LayerID, z)
-		default:
-			log.Printf("error: unknown node type: %T", node.Op)
-		}
-	}
-}
-
-func (b *builder) buildImage(id int, img image.Image) {
-	b.renderer.NewImage(id, img)
-}
-
-func (b *builder) buildShader(id int, shader *gfx.Shader) error {
-
-	if shader.Mesh == nil {
-		return fmt.Errorf("nil mesh")
+	plan := render.Plan{
+		Images: map[int]image.Image{},
 	}
 
-	mesh := shader.Mesh.Mesh()
-	verts := mesh.Verts
-
-	if verts == nil {
-		return fmt.Errorf("empty verts")
+	for k, v := range doc.Images {
+		plan.Images[k] = v
 	}
 
-	rl, err := b.renderer.NewLayer(render.Shader{
-		ID:            id,
-		Name:          shader.Name,
-		Vert:          shader.Vert,
-		Frag:          shader.Frag,
-		VertexCount:   len(verts),
-		InstanceCount: shader.InstanceCount,
-	})
-	if err != nil {
-		return err
-	}
+	for _, op := range doc.Ops {
 
-	rl.SetAttr("a_vert", verts, len(verts)*2*4, 0)
-	rl.SetAttr("a_uv", mesh.UV, len(mesh.UV)*2*4, 0)
-
-	for _, name := range rl.AttrNames() {
-		val, ok := shader.Attrs[name]
-		if !ok {
-			//log.Printf("missing attribute: %s", name)
+		s := op.Shader
+		if s.Mesh == nil {
 			continue
 		}
 
-		divisor := shader.Divisors[name]
+		mesh := s.Mesh.Mesh()
 
-		switch z := val.(type) {
-
-		case []float32:
-			rl.SetAttr(name, z, len(z)*4, divisor)
-
-		case float32:
-			data := make([]float32, len(verts))
-			for i := range data {
-				data[i] = z
-			}
-			size := len(data) * 4
-			rl.SetAttr(name, data, size, divisor)
-
-		case float64:
-			data := make([]float32, len(verts))
-			for i := range data {
-				data[i] = float32(z)
-			}
-			size := len(data) * 4
-			rl.SetAttr(name, data, size, divisor)
-
-		case []dd.XY:
-			size := len(z) * 2 * 4
-			rl.SetAttr(name, z, size, divisor)
-
-		case []color.RGBA:
-			size := len(z) * 4 * 4
-			rl.SetAttr(name, z, size, divisor)
-
-		case color.RGBA:
-			data := make([]color.RGBA, len(verts))
-			for i := range data {
-				data[i] = z
-			}
-			size := len(data) * 4 * 4
-			rl.SetAttr(name, data, size, divisor)
-
-		case dd.XY:
-			data := make([]dd.XY, len(verts))
-			for i := range data {
-				data[i] = z
-			}
-			size := len(data) * 2 * 4
-			rl.SetAttr(name, data, size, divisor)
-
-		default:
-			log.Printf("error: unsupported attribute value type %T: %v", z, z)
-			continue
-		}
-	}
-
-	faces := make([]uint32, 0, len(mesh.Faces))
-	for _, f := range mesh.Faces {
-		faces = append(faces,
-			uint32(f[0]),
-			uint32(f[1]),
-			uint32(f[2]),
-		)
-	}
-	rl.SetFaces(faces)
-
-	for _, name := range rl.UniformNames() {
-		v, ok := shader.Attrs[name]
-		if !ok {
-			log.Printf("missing uniform: %s", name)
-			continue
+		rs := &render.Shader{
+			Name:      s.Name,
+			Vert:      s.Vert,
+			Frag:      s.Frag,
+			Layer:     op.LayerID,
+			Vertices:  len(mesh.Verts),
+			Instances: s.Instances,
+			Faces:     make([]uint32, 0, len(mesh.Faces)*3),
+			Uniforms:  map[string]interface{}{},
+			Attrs: map[string]render.Attr{
+				"a_vert": {
+					Value: mesh.Verts,
+					Size:  len(mesh.Verts) * 2 * 4,
+				},
+				"a_uv": {
+					Value: mesh.UV,
+					Size:  len(mesh.UV) * 2 * 4,
+				},
+			},
 		}
 
-		switch z := v.(type) {
-		case dd.XY:
-			rl.SetUniform(name, [2]float32{z.X, z.Y})
-		case color.RGBA:
-			rl.SetUniform(name, [4]float32{z.R, z.G, z.B, z.A})
-		default:
-			rl.SetUniform(name, v)
+		for _, f := range mesh.Faces {
+			rs.Faces = append(rs.Faces,
+				uint32(f[0]), uint32(f[1]), uint32(f[2]),
+			)
 		}
+
+		meta := glsl.Inspect(s.Vert, s.Frag)
+
+		for _, uni := range meta.Uniforms {
+			val := convertUniform(s.Attrs[uni.Name])
+			rs.Uniforms[uni.Name] = val
+		}
+
+		for _, attr := range meta.Attributes {
+			if _, ok := rs.Attrs[attr.Name]; ok {
+				// skip attrs like a_vert and a_uv
+				// which are set above.
+				continue
+			}
+			val := convertAttr(s, attr.Name, len(mesh.Verts))
+			rs.Attrs[attr.Name] = val
+		}
+
+		plan.Shaders = append(plan.Shaders, rs)
 	}
-	return nil
+
+	return plan
+}
+
+func convertAttr(s *gfx.Shader, name string, verts int) render.Attr {
+	attr := render.Attr{
+		Divisor: s.Divisors[name],
+	}
+
+	val, ok := s.Attrs[name]
+	if !ok {
+		return attr
+	}
+
+	switch z := val.(type) {
+
+	case []float32:
+		attr.Value = z
+		attr.Size = len(z) * 4
+
+	case float32:
+		data := make([]float32, verts)
+		for i := range data {
+			data[i] = z
+		}
+		attr.Value = data
+		attr.Size = len(data) * 4
+
+	case float64:
+		data := make([]float32, verts)
+		for i := range data {
+			data[i] = float32(z)
+		}
+		attr.Value = data
+		attr.Size = len(data) * 4
+
+	case []dd.XY:
+		attr.Value = z
+		attr.Size = len(z) * 2 * 4
+
+	case []color.RGBA:
+		attr.Value = z
+		attr.Size = len(z) * 4 * 4
+
+	case color.RGBA:
+		data := make([]color.RGBA, verts)
+		for i := range data {
+			data[i] = z
+		}
+		attr.Value = data
+		attr.Size = len(data) * 4 * 4
+
+	case dd.XY:
+		data := make([]dd.XY, verts)
+		for i := range data {
+			data[i] = z
+		}
+		attr.Value = data
+		attr.Size = len(data) * 2 * 4
+
+	default:
+		log.Printf("unsupported attribute type %T for %s", z, name)
+	}
+
+	return attr
+}
+
+func convertUniform(v interface{}) interface{} {
+	switch z := v.(type) {
+	case dd.XY:
+		return [2]float32{z.X, z.Y}
+	case color.RGBA:
+		return [4]float32{z.R, z.G, z.B, z.A}
+	case gfx.Image:
+		return z.ID
+	default:
+		return v
+	}
 }

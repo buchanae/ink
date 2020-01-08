@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -15,10 +14,9 @@ const (
 	Shift   = 0.55
 )
 
-func main() {
-	doc := NewDoc()
+func Ink(doc *Doc) {
 
-	doc.Draw(Clear(White))
+	Clear(doc, White)
 
 	//r := rand.New(1)
 	//noise := r.Perlin(2, 2, Octaves)
@@ -33,14 +31,10 @@ func main() {
 		h *= .2
 
 		xy := XY{x, 0.5 + h}
-		c := Circle{xy, 0.001}
-
-		m := c.Mesh(10)
-		s := NewShader(m)
-		doc.Draw(s)
+		c := Circle{xy, 0.001, 10}
+		s := NewShader(c)
+		s.Draw(doc)
 	}
-
-	app.Render(doc)
 }
 
 func octaves(x float32, N int) float32 {

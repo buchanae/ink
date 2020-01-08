@@ -10,7 +10,7 @@ import (
 func Ink(doc *Doc) {
 	Clear(doc, White)
 
-	const N = 3
+	const N = 10000
 
 	pos := make([]XY, N)
 	rot := make([]float32, N)
@@ -24,16 +24,16 @@ func Ink(doc *Doc) {
 	}
 
 	doc.AddShader(&Shader{
-		Vert:          DefaultVert,
-		Frag:          DefaultFrag,
-		InstanceCount: N,
-		Mesh:          RectWH(0.1, 0.15),
+		Vert:      DefaultVert,
+		Frag:      DefaultFrag,
+		Instances: N,
+		Mesh:      RectWH(0.05, 0.05),
 		Attrs: Attrs{
 			"a_pos":   pos,
 			"a_rot":   rot,
 			"a_color": colors,
 		},
-		Divisors: Divisors{
+		Divisors: map[string]int{
 			"a_pos":   1,
 			"a_rot":   1,
 			"a_color": 1,

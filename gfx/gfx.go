@@ -1,8 +1,6 @@
 package gfx
 
 import (
-	"image"
-
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 )
@@ -16,11 +14,4 @@ var Fullscreen = dd.Rect{B: dd.XY{1, 1}}
 
 type Meshable interface {
 	Mesh() dd.Mesh
-}
-
-type Layer interface {
-	LayerID() int
-	NewLayer() Layer
-	NewImage(image.Image) Layer
-	AddShader(*Shader)
 }

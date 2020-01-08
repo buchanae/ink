@@ -23,26 +23,20 @@ func (app *App) snapshot() {
 		height = app.conf.Window.Height
 	}
 
-	log.Printf("snapshot: %v x %v", width, height)
 	renderer := render.NewRenderer(width, height)
 
-	b := builder{renderer: renderer}
-	b.build(app.nodes)
+	plan := buildPlan(app.doc)
+	renderer.Render(plan)
 
-	img, err := renderer.RenderToImage()
-	if err != nil {
-		log.Printf("error: rendering snapshot: %v", err)
-		return
-	}
-
-	dir := app.conf.Snapshot.Dir
-	err = writeSnapshot(dir, img)
+	img := renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
+	err := app.SnapshotImage(img)
 	if err != nil {
 		log.Printf("error: writing snapshot: %v", err)
 	}
 }
 
-func writeSnapshot(dir string, img image.Image) error {
+func (app *App) SnapshotImage(img image.Image) error {
+	dir := app.conf.Snapshot.Dir
 	err := ensureDir(dir)
 	if err != nil {
 		return err
@@ -51,6 +45,8 @@ func writeSnapshot(dir string, img image.Image) error {
 	stamp := time.Now().Format("01-02-2006-15-04-05")
 	name := stamp + ".png"
 	name = filepath.Join(dir, name)
+
+	log.Print(name)
 
 	f, err := os.Create(name)
 	if err != nil {

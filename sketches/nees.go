@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -33,7 +31,6 @@ func Ink(doc *Doc) {
 		row = Height - row - 5
 		dr := float32(row) / Height
 		dr = math.Clamp(dr, 0, 1)
-		log.Print(row, i, Height-row-1, dr)
 
 		t := dr * 0.01
 		r = r.Translate(rand.XYRange(-t, t))

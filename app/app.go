@@ -1,13 +1,8 @@
-// +build !sendonly
-
 package app
 
 import (
-	"log"
-
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
-	"github.com/buchanae/ink/trace"
 	"github.com/buchanae/ink/win"
 )
 
@@ -16,14 +11,16 @@ type App struct {
 	conf     Config
 	win      *win.Window
 	renderer *render.Renderer
-	nodes    []gfx.Node
+	doc      *gfx.Doc
+	events   chan win.Event
 }
 
 // NewApp will open a new window.
 func NewApp(conf Config) (*App, error) {
 	return &App{
-		conf: conf,
-		win:  win.NewWindow(conf.Window),
+		conf:   conf,
+		win:    win.NewWindow(conf.Window),
+		events: make(chan win.Event, 1000),
 		renderer: render.NewRenderer(
 			conf.Window.Width, conf.Window.Height,
 		),
@@ -36,12 +33,17 @@ func (app *App) Run() {
 			select {
 			case ev := <-app.win.Events():
 
+				select {
+				case app.events <- ev:
+				default:
+				}
+
 				switch ev {
 				case win.QuitEvent:
 					return
 
 				case win.SnapshotEvent:
-					if app.nodes != nil {
+					if app.doc != nil {
 						app.win.Do(app.snapshot)
 					}
 
@@ -57,22 +59,31 @@ func (app *App) Run() {
 	app.win.Run()
 }
 
-// Render renders the nodes to the app window.
-func (app *App) Render(nodes []gfx.Node) {
+func (app *App) Events() <-chan win.Event {
+	return app.events
+}
+
+func (app *App) Render(doc *gfx.Doc) {
 	app.win.Do(func() {
-		app.renderer.ClearLayers()
-
-		trace.Log("start build")
-		b := builder{renderer: app.renderer}
-		b.build(nodes)
-		trace.Log("built")
-
-		err := app.renderer.RenderToScreen()
-		if err != nil {
-			log.Printf("error: rendering: %v", err)
-		}
+		plan := buildPlan(doc)
+		app.renderer.Render(plan)
+		app.renderer.ToScreen(doc.LayerID())
 	})
 
-	app.nodes = nodes
+	app.doc = doc
 	app.win.Swap()
+}
+
+func (app *App) Swap() {
+	app.win.Swap()
+}
+
+func (app *App) Do(f func(*render.Renderer)) {
+
+	done := make(chan struct{})
+	app.win.Do(func() {
+		f(app.renderer)
+		close(done)
+	})
+	<-done
 }

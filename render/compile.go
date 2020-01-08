@@ -1,29 +1,38 @@
 package render
 
-import (
-	"fmt"
-)
+import "errors"
 
-func (r *Renderer) compile(s Shader) (compiled, error) {
+// TODO would be better if the cache was per GL context
+var shaderCache map[shaderOpt]compiled
+
+type shaderOpt struct {
+	vert, frag, geom, out string
+}
+
+func init() {
+	shaderCache = map[shaderOpt]compiled{}
+}
+
+func compile(s shaderOpt) (compiled, error) {
 	var prog compiled
 
-	if s.Vert == "" {
-		return prog, fmt.Errorf("empty vert shader")
+	if s.vert == "" {
+		return prog, errors.New("empty vert shader")
 	}
-	if s.Frag == "" {
-		return prog, fmt.Errorf("empty frag shader")
+	if s.frag == "" {
+		return prog, errors.New("empty frag shader")
 	}
 
-	if p, ok := r.shaders[s]; ok {
+	if p, ok := shaderCache[s]; ok {
 		return p, nil
 	}
 
-	out := s.Out
+	out := s.out
 	if out == "" {
 		out = "f_color"
 	}
 
-	id, err := glBuildProgram(s.Vert, s.Frag, s.Geom, out)
+	id, err := glBuildProgram(s.vert, s.frag, s.geom, out)
 	if err != nil {
 		return prog, err
 	}
@@ -33,7 +42,7 @@ func (r *Renderer) compile(s Shader) (compiled, error) {
 		attributes: inspectAttributes(id),
 		uniforms:   inspectUniforms(id),
 	}
-	r.shaders[s] = prog
+	shaderCache[s] = prog
 
 	return prog, nil
 }
@@ -50,43 +59,18 @@ type compiled struct {
 	uniforms []uniform
 }
 
-/* TODO move to app
-if vertFile == "" {
-	vertFile = "!default.vert"
+func (c *compiled) UniformNames() []string {
+	var names []string
+	for _, uni := range c.uniforms {
+		names = append(names, uni.Name)
+	}
+	return names
 }
-if fragFile == "" {
-	fragFile = "!default.frag"
+
+func (c *compiled) AttributeNames() []string {
+	var names []string
+	for _, attr := range c.attributes {
+		names = append(names, attr.Name)
+	}
+	return names
 }
-*/
-
-// TODO caching by full source bytes is too slow,
-//      because it requires processing all the source.
-//      so cache by name, but then need a way to invalidate
-//      when those files change.
-//key := c.hash([]byte(vertFile), []byte(fragFile), nil)
-/*
-	key := cachekey{vertFile, fragFile}
-	if p, ok := c.cache[key]; ok {
-		// Program destruction uses ref counts, due to caching.
-		// See Compiler.Cleanup.
-		p.refs++
-		return p, nil
-	}
-*/
-
-/*
-	vert, err := c.assets.Load(vertFile)
-	if err != nil {
-		return nil, err
-	}
-
-	frag, err := c.assets.Load(fragFile)
-	if err != nil {
-		return nil, err
-	}
-
-	geom, err := c.assets.Load(geomFile)
-	if err != nil {
-		return nil, err
-	}
-*/

@@ -2,6 +2,18 @@ package gfx
 
 import "image"
 
+type Layer interface {
+	LayerID() int
+	NewLayer() Layer
+	NewImage(image.Image) Image
+	AddShader(*Shader)
+}
+
+type Op struct {
+	LayerID int
+	Shader  *Shader
+}
+
 var currentID int
 
 func nextID() int {
@@ -10,57 +22,58 @@ func nextID() int {
 }
 
 type Doc struct {
-	OnFrame func(Frame)
+	ID     int
+	Images map[int]image.Image
+	Ops    []Op
+}
 
-	id    int
-	nodes []Node
+type Image struct {
+	ID int
 }
 
 func NewDoc() *Doc {
-	return &Doc{id: nextID()}
+	return &Doc{ID: nextID()}
 }
 
-type Node struct {
-	LayerID int
-	Op      interface{}
-}
-
-func (d *Doc) Nodes() []Node {
-	return d.nodes
-}
-
-func (d *Doc) NewLayer() Layer {
-	return newLayer(d)
+func (d *Doc) Filter(layerID ...int) *Doc {
+	out := NewDoc()
+	out.Images = d.Images
+	for _, op := range d.Ops {
+		for _, id := range layerID {
+			if op.LayerID == id {
+				out.Ops = append(out.Ops, op)
+				break
+			}
+		}
+	}
+	return out
 }
 
 func (d *Doc) LayerID() int {
-	return d.id
+	return d.ID
 }
 
-func (d *Doc) Clear() {
-	d.nodes = nil
+func (d *Doc) NewLayer() Layer {
+	return &layer{
+		id:  nextID(),
+		doc: d,
+	}
 }
 
-func (d *Doc) NewImage(img image.Image) Layer {
-	l := newLayer(d)
-	d.nodes = append(d.nodes, Node{
-		LayerID: l.id,
-		Op:      img,
-	})
-	return l
+func (d *Doc) NewImage(img image.Image) Image {
+	if d.Images == nil {
+		d.Images = map[int]image.Image{}
+	}
+	id := nextID()
+	d.Images[id] = img
+	return Image{id}
 }
 
 func (d *Doc) AddShader(s *Shader) {
-	d.nodes = append(d.nodes, Node{
-		Op: s,
+	d.Ops = append(d.Ops, Op{
+		LayerID: d.ID,
+		Shader:  s,
 	})
-}
-
-func newLayer(doc *Doc) *layer {
-	return &layer{
-		id:  nextID(),
-		doc: doc,
-	}
 }
 
 type layer struct {
@@ -68,23 +81,23 @@ type layer struct {
 	doc *Doc
 }
 
-func (l *layer) NewLayer() Layer {
-	return newLayer(l.doc)
-}
-
 func (l *layer) LayerID() int {
 	return l.id
 }
 
-func (l *layer) NewImage(img image.Image) Layer {
+func (l *layer) NewLayer() Layer {
+	return l.doc.NewLayer()
+}
+
+func (l *layer) NewImage(img image.Image) Image {
 	return l.doc.NewImage(img)
 }
 
 func (l *layer) AddShader(s *Shader) {
 	// layer writes nodes to the root doc
 	// in order to maintain a flat list of nodes.
-	l.doc.nodes = append(l.doc.nodes, Node{
+	l.doc.Ops = append(l.doc.Ops, Op{
 		LayerID: l.id,
-		Op:      s,
+		Shader:  s,
 	})
 }

@@ -53,7 +53,7 @@ func main() {
 
 			wg.Add(1)
 			go func() {
-				run(ctx, a, path)
+				run(ctx, a, path, args[0])
 				wg.Done()
 			}()
 
@@ -86,10 +86,11 @@ func (fbr *firstByteReader) Read(data []byte) (int, error) {
 	return n, err
 }
 
-func run(ctx context.Context, app *app.App, path string) error {
+func run(ctx context.Context, app *app.App, path, name string) error {
 	trace.Start()
 	trace.Log("run")
 
+	sketchDir := filepath.Dir(path)
 	tempDir, err := ioutil.TempDir("", "ink-run-")
 	if err != nil {
 		return err
@@ -99,7 +100,7 @@ func run(ctx context.Context, app *app.App, path string) error {
 	inkPath := filepath.Join(tempDir, "ink.go")
 
 	trace.Log("copy")
-	err = copyFile(inkPath, path)
+	err = copyFile(inkPath, path, name)
 	if err != nil {
 		return err
 	}
@@ -112,6 +113,7 @@ func run(ctx context.Context, app *app.App, path string) error {
 	}
 
 	cmd := exec.CommandContext(ctx, "go", "run", inkPath, mainPath)
+	cmd.Dir = sketchDir
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -137,9 +139,9 @@ func run(ctx context.Context, app *app.App, path string) error {
 
 	for {
 		trace.Log("decode")
-		nodes := []gfx.Node{}
+		doc := &gfx.Doc{}
 		dec := gob.NewDecoder(reader)
-		err = dec.Decode(&nodes)
+		err = dec.Decode(doc)
 		if err == io.EOF {
 			break
 		}
@@ -148,7 +150,7 @@ func run(ctx context.Context, app *app.App, path string) error {
 		}
 
 		trace.Log("render")
-		app.Render(nodes)
+		app.Render(doc)
 	}
 
 	trace.Log("wait")
@@ -161,7 +163,7 @@ func run(ctx context.Context, app *app.App, path string) error {
 	return nil
 }
 
-func copyFile(dstPath, srcPath string) error {
+func copyFile(dstPath, srcPath, name string) error {
 	dst, err := os.Create(dstPath)
 	if err != nil {
 		return err
@@ -173,7 +175,7 @@ func copyFile(dstPath, srcPath string) error {
 		return err
 	}
 
-	_, err = dst.Write([]byte("//line " + srcPath + ":1\n\n"))
+	_, err = dst.Write([]byte("//line " + name + ":1\n"))
 	if err != nil {
 		return err
 	}
