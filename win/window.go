@@ -55,33 +55,27 @@ func (win *Window) Do(cmd func()) {
 }
 
 func (win *Window) Swap() {
-	win.commands <- func() {
-		win.window.SwapBuffers()
-	}
+	win.window.SwapBuffers()
 }
 
 func (win *Window) SetSize(w, h int) {
-	win.commands <- func() {
-		win.window.SetSize(w, h)
-	}
+	win.window.SetSize(w, h)
 }
 
 func (win *Window) SetPos(x, y int) {
-	win.commands <- func() {
-		win.window.SetPos(x, y)
-	}
+	win.window.SetPos(x, y)
 }
 
 func (win *Window) SetTitle(title string) {
-	win.commands <- func() {
-		win.window.SetTitle(title)
-	}
+	win.window.SetTitle(title)
 }
 
 func (win *Window) Show() {
-	win.commands <- func() {
-		win.window.Show()
-	}
+	win.window.Show()
+}
+
+func (win *Window) GetFramebufferSize() (x, y int) {
+	return win.window.GetFramebufferSize()
 }
 
 func (win *Window) Run() {

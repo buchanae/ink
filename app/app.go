@@ -58,10 +58,8 @@ func (app *App) initRenderer() {
 	if app.renderer != nil {
 		return
 	}
-	app.renderer = render.NewRenderer(
-		app.conf.Window.Width,
-		app.conf.Window.Height,
-	)
+	w, h := app.win.GetFramebufferSize()
+	app.renderer = render.NewRenderer(w, h)
 }
 
 func (app *App) updateConfig(b Config) {
@@ -85,10 +83,9 @@ func (app *App) updateConfig(b Config) {
 }
 
 func (app *App) Render(doc *Doc) {
-	app.updateConfig(doc.Config)
-	app.win.Show()
-
 	app.Do(func() {
+		app.updateConfig(doc.Config)
+		app.win.Show()
 		plan := buildPlan(doc)
 		app.initRenderer()
 		app.renderer.Render(plan)
