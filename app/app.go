@@ -12,7 +12,10 @@ func Run(f func(*gfx.Doc)) {
 		panic(err)
 	}
 	doc := gfx.NewDoc()
-	go f(doc)
+	go func() {
+		f(doc)
+		a.Render(doc)
+	}()
 	a.Run()
 }
 
