@@ -9,7 +9,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	fh, err := os.Open("toshiro.png")
 	if err != nil {
 		panic(err)

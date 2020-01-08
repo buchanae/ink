@@ -10,12 +10,12 @@ import (
 	"github.com/buchanae/ink/win"
 )
 
-func Run(f func(*gfx.Doc)) {
+func Run(f func(gfx.Layer)) {
 	a, err := NewApp(DefaultConfig())
 	if err != nil {
 		panic(err)
 	}
-	doc := gfx.NewDoc()
+	doc := NewDoc()
 	go func() {
 		f(doc)
 		a.Render(doc)
@@ -27,9 +27,9 @@ type Frame struct {
 	Time time.Time
 }
 
-func Send(f func(*gfx.Doc)) {
+func Send(f func(gfx.Layer)) {
 
-	doc := gfx.NewDoc()
+	doc := NewDoc()
 	f(doc)
 
 	err := gob.NewEncoder(os.Stdout).Encode(doc)
@@ -45,7 +45,7 @@ type App struct {
 	conf     Config
 	win      *win.Window
 	renderer *render.Renderer
-	doc      *gfx.Doc
+	doc      *Doc
 	events   chan win.Event
 }
 
@@ -97,7 +97,7 @@ func (app *App) Events() <-chan win.Event {
 	return app.events
 }
 
-func (app *App) Render(doc *gfx.Doc) {
+func (app *App) Render(doc *Doc) {
 	app.win.Do(func() {
 		plan := buildPlan(doc)
 		app.renderer.Render(plan)

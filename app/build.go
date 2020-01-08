@@ -11,7 +11,7 @@ import (
 	"github.com/buchanae/ink/render"
 )
 
-func buildPlan(doc *gfx.Doc) render.Plan {
+func buildPlan(doc *Doc) render.Plan {
 
 	plan := render.Plan{
 		Images: map[int]image.Image{},

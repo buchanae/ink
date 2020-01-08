@@ -6,7 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	Clear(doc, White)
 
 	fills := []Fill{

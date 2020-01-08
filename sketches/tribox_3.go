@@ -8,14 +8,11 @@ import (
 )
 
 const (
-	ShrinkRect   = 0.003
-	RandPoint    = 0.03
-	CircleRadius = 0.05
-	Stroke       = false
-	StrokeWidth  = 0.001
+	ShrinkRect = 0.019
+	RandPoint  = 0.03
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	rand.SeedNow()
 
 	Clear(doc, White)
@@ -23,13 +20,14 @@ func Ink(doc *Doc) {
 	grid := NewGrid(10, 10)
 	colors := rand.Palette()
 
-	l2 := doc.NewLayer()
-	mask := doc.NewLayer()
-
 	for _, r := range grid.Rects() {
 		r = r.Shrink(ShrinkRect)
 		q := r.Quad()
 		p := rand.XYInRect(r.Shrink(RandPoint))
+		p = r.Center()
+
+		//a := q.A.Add(XY{0.009, 0})
+		q = rand.TweakQuad(q, 0.005)
 
 		tris := Triangles{
 			{q.A, q.B, p},
@@ -47,30 +45,7 @@ func Ink(doc *Doc) {
 
 			s := NewShader(t)
 			s.Set("a_color", rand.Color(colors))
-			s.Draw(l2)
+			s.Draw(doc)
 		}
-
-		if Stroke {
-			stk := tris.Stroke()
-			stk.Width = StrokeWidth
-			s := NewShader(stk)
-			s.Set("a_color", White)
-			s.Draw(l2)
-		}
-
-		Fill{
-			Mesh: Circle{
-				XY:       r.Center(),
-				Radius:   CircleRadius,
-				Segments: 40,
-			},
-			Color: Black,
-		}.Draw(mask)
 	}
-
-	Mask{
-		Rect:   Fullscreen,
-		Source: l2,
-		Mask:   mask,
-	}.Draw(doc)
 }

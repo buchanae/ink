@@ -6,7 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 
 	p := Path{}
 	p.MoveTo(XY{0.2, 0.2})

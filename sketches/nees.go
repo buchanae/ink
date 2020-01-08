@@ -13,7 +13,7 @@ const (
 	Height = 30
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	Clear(doc, White)
 
 	box := RectCenter(XY{.5, .5}, XY{.5, .9})

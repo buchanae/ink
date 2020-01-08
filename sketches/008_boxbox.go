@@ -18,7 +18,7 @@ const (
 	Angle          = 0.2
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	rand.SeedNow()
 	Clear(doc, White)
 	grid := NewGrid(GridSize, GridSize)

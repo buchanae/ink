@@ -28,7 +28,7 @@ const (
 	AlphaOffset = -0.3
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	rand.SeedNow()
 	palette := rand.Palette()
 

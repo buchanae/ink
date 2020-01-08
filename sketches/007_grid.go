@@ -7,7 +7,7 @@ import (
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 
 	colors := []RGBA{
 		Red, Blue, Green, Yellow,

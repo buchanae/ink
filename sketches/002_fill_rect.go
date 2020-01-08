@@ -6,9 +6,7 @@ import (
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *Doc) {
-	// TODO blur looks different on black background. why is that?
-	Clear(doc, White)
+func Ink(doc Layer) {
 
 	Fill{
 		Mesh: Rect{
@@ -16,10 +14,5 @@ func Ink(doc *Doc) {
 			XY{0.8, 0.8},
 		},
 		Color: Blue,
-	}.Draw(doc)
-
-	Blur{
-		Passes: 2,
-		Source: doc,
 	}.Draw(doc)
 }

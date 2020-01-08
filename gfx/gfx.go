@@ -1,7 +1,8 @@
-// Package gfx contains types for drawing graphics to an Ink application.
 package gfx
 
 import (
+	"image"
+
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 )
@@ -15,4 +16,15 @@ var Fullscreen = dd.Rect{B: dd.XY{1, 1}}
 
 type Meshable interface {
 	Mesh() dd.Mesh
+}
+
+type Layer interface {
+	LayerID() int
+	NewLayer() Layer
+	NewImage(image.Image) Image
+	AddShader(*Shader)
+}
+
+type Image struct {
+	ID int
 }

@@ -14,7 +14,6 @@ import (
 	"sync"
 
 	"github.com/buchanae/ink/app"
-	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/internal/trace"
 )
 
@@ -86,7 +85,7 @@ func (fbr *firstByteReader) Read(data []byte) (int, error) {
 	return n, err
 }
 
-func run(ctx context.Context, app *app.App, path, name string) error {
+func run(ctx context.Context, a *app.App, path, name string) error {
 	trace.Start()
 	trace.Log("run")
 
@@ -139,7 +138,7 @@ func run(ctx context.Context, app *app.App, path, name string) error {
 
 	for {
 		trace.Log("decode")
-		doc := &gfx.Doc{}
+		doc := &app.Doc{}
 		dec := gob.NewDecoder(reader)
 		err = dec.Decode(doc)
 		if err == io.EOF {
@@ -150,7 +149,7 @@ func run(ctx context.Context, app *app.App, path, name string) error {
 		}
 
 		trace.Log("render")
-		app.Render(doc)
+		a.Render(doc)
 	}
 
 	trace.Log("wait")

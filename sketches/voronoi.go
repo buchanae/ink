@@ -8,7 +8,7 @@ import (
 	"github.com/buchanae/ink/voronoi"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc Layer) {
 	rand.SeedNow()
 	Clear(doc, White)
 
