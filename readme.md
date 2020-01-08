@@ -1,6 +1,6 @@
 <a href="https://godoc.org/github.com/buchanae/ink"><img src="https://godoc.org/github.com/buchanae/ink?status.svg" alt="GoDoc"></a>
 
-Ink is a framework for creative 2D graphics in [Go](https://golang.org), based on OpenGL.
+Ink is a framework for creative 2D graphics in [Go](https://golang.org), based on OpenGL. Visit [buchanae.github.io/ink](https://buchanae.github.io/ink/) for more.
 
 ### Example: a simple triangle
 Install:
