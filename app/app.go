@@ -1,6 +1,10 @@
 package app
 
 import (
+	"encoding/gob"
+	"os"
+	"time"
+
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/win"
@@ -17,6 +21,23 @@ func Run(f func(*gfx.Doc)) {
 		a.Render(doc)
 	}()
 	a.Run()
+}
+
+type Frame struct {
+	Time time.Time
+}
+
+func Send(f func(*gfx.Doc)) {
+
+	doc := gfx.NewDoc()
+	f(doc)
+
+	err := gob.NewEncoder(os.Stdout).Encode(doc)
+	if err != nil {
+		os.Stderr.Write([]byte("sending: "))
+		os.Stderr.Write([]byte(err.Error()))
+		os.Stderr.Write([]byte("\n"))
+	}
 }
 
 // App can render a gfx.Layer to a window.

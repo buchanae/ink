@@ -190,9 +190,9 @@ func copyFile(dstPath, srcPath, name string) error {
 
 const head = `
 package main
-import "github.com/buchanae/ink/gfx"
+import "github.com/buchanae/ink/app"
 
 func main() {
-	gfx.Run(Ink)
+	app.Send(Ink)
 }
 `
