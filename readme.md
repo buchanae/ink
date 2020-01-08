@@ -49,7 +49,7 @@ Ink opens a window and renders your triangle:
 
 ![Triangle example](./_static/ink_example.png)
 
-There are more examples in the [sketches](./_sketches) directory.
+There are more examples in the [sketches](./sketches) directory.
 
 ### Status
 
