@@ -3,6 +3,10 @@
 Ink is a framework for creative 2D graphics in [Go](https://golang.org), based on OpenGL.
 
 # Example: a simple triangle
+Install:
+```
+go install github.com/buchanae/ink
+```
 
 Write:
 ```go
@@ -38,6 +42,7 @@ ink example.go
 
 Ink opens a window and renders your triangle:
 
+![Triangle example](./_static/ink_example.png)
 
 # Status
 
