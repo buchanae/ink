@@ -15,7 +15,7 @@ import (
 
 	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/gfx"
-	"github.com/buchanae/ink/trace"
+	"github.com/buchanae/ink/internal/trace"
 )
 
 func init() {

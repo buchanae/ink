@@ -7,7 +7,7 @@ import (
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
-	"github.com/buchanae/ink/glsl"
+	"github.com/buchanae/ink/internal/glsl"
 	"github.com/buchanae/ink/render"
 )
 

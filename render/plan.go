@@ -4,7 +4,7 @@ import (
 	"image"
 	"log"
 
-	"github.com/buchanae/ink/trace"
+	"github.com/buchanae/ink/internal/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
