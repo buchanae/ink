@@ -90,7 +90,7 @@ func (r Rect) Include(xy XY) Rect {
 	return r
 }
 
-func (r Rect) Interp(xy XY) XY {
+func (r Rect) Interpolate(xy XY) XY {
 	return r.B.Sub(r.A).Mul(xy).Add(r.A)
 }
 

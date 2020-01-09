@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -8,7 +9,7 @@ import (
 	"github.com/buchanae/ink/voronoi"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
 	Clear(doc, White)
 
@@ -18,7 +19,6 @@ func Ink(doc Layer) {
 	}
 
 	var xys []XY
-
 	var initial []XY
 
 	for i := 0; i < 20; i++ {
@@ -76,7 +76,7 @@ func Ink(doc Layer) {
 		stk := m.Stroke()
 		stk.Width = 0.001
 		s := NewShader(stk)
-		s.Set("a_color", White)
+		s.Set("a_color", Black)
 		s.Draw(doc)
 	}
 
