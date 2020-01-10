@@ -11,7 +11,7 @@ var DefaultNoise = Noise{
 	Mult:     0.5,
 	SizeMult: dd.XY{1, 1},
 	Color:    color.Black,
-	Mesh:     Fullscreen,
+	Rect:     Fullscreen,
 }
 
 type Noise struct {

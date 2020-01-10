@@ -32,6 +32,15 @@ func (t Triangle) Mesh() Mesh {
 	}
 }
 
+func (t Triangle) Stroke() Stroke {
+	p := &Path{}
+	p.MoveTo(t.A)
+	p.LineTo(t.B)
+	p.LineTo(t.C)
+	p.LineTo(t.A)
+	return p.Stroke()
+}
+
 func (t Triangle) Edges() []Line {
 	return []Line{
 		{t.A, t.B},
