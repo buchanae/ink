@@ -3,15 +3,28 @@
 package app
 
 import (
+	"runtime"
+
 	"github.com/buchanae/ink/render"
-	"github.com/buchanae/ink/win"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
+func init() {
+	// Code that interacts with the OS window APIs,
+	// (GLFW and OpenGL calls) must run on the main thread.
+	//
+	// This locks the main Go goroutine to the main thread,
+	// i.e. main() will run on the main thread. App.Run must
+	// be called from this main goroutine. After that, all
+	// interaction with OpenGL and GLFW must go through App.Do.
+	runtime.LockOSThread()
+}
+
 type App struct {
 	conf     Config
-	win      *win.Window
+	win      *glfw.Window
 	renderer *render.Renderer
+	commands chan func()
 	doc      *Doc
 	plan     render.Plan
 	shown    bool
@@ -19,23 +32,21 @@ type App struct {
 
 func NewApp(conf Config) (*App, error) {
 	return &App{
-		conf: conf,
-		win: win.NewWindow(win.Config{
-			Title:  conf.Window.Title,
-			Width:  conf.Window.Width,
-			Height: conf.Window.Height,
-		}),
+		conf:     conf,
+		commands: make(chan func()),
 	}, nil
 }
 
-func (app *App) Run() {
-	go app.Do(func() {
-		app.win.SetKeyCallback(app.keyCallback)
-	})
-	app.win.Run()
+func (app *App) Run() error {
+	return app.runWindow()
 }
 
 func (app *App) keyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
+
+	// keyCallback gets called by GLFW, so pretty sure
+	// this function always run on the main thread.
+	//
+	// Be careful not to call out to user code from this function.
 
 	if key == glfw.KeyX && action == glfw.Press {
 		app.snapshot()
@@ -106,16 +117,19 @@ func (app *App) Render(doc *Doc) {
 		app.doc = doc
 		app.plan = plan
 
-		app.win.Swap()
+		app.win.SwapBuffers()
 	})
 }
 
+// Do queues a function for execution on the main thread.
+// OS windows typically require that code which accesses
+// windows
 func (app *App) Do(f func()) {
 	done := make(chan struct{})
-	app.win.Do(func() {
+	app.commands <- func() {
 		f()
 		close(done)
-	})
+	}
 	<-done
 }
 

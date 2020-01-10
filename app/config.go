@@ -23,6 +23,7 @@ type Config struct {
 type WindowConfig struct {
 	Title         string
 	Width, Height int
+	X, Y          int
 }
 
 type SnapshotConfig struct {

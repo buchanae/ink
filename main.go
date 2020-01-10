@@ -61,7 +61,10 @@ func main() {
 	// Most access to the window must be done on a single OS thread,
 	// so this code locks itself to the OS thread and handles all communication
 	// via SDL queues and Go channels.
-	a.Run()
+	err = a.Run()
+	if err != nil {
+		log.Printf("error: %v", err)
+	}
 }
 
 type firstByteReader struct {
