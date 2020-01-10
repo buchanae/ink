@@ -26,7 +26,6 @@ type Config struct {
 // Window holds a handle to an OS window.
 type Window struct {
 	conf     Config
-	events   chan Event
 	commands chan func()
 	window   *glfw.Window
 }
@@ -35,16 +34,9 @@ type Window struct {
 func NewWindow(conf Config) *Window {
 	win := &Window{
 		conf:     conf,
-		events:   make(chan Event),
 		commands: make(chan func(), 1000),
 	}
 	return win
-}
-
-// Events returns a stream of window events,
-// such as quit, keyboard, mouse, etc.
-func (win *Window) Events() <-chan Event {
-	return win.events
 }
 
 // Do queues a function for execution on the main thread.
@@ -76,6 +68,11 @@ func (win *Window) Show() {
 
 func (win *Window) GetFramebufferSize() (x, y int) {
 	return win.window.GetFramebufferSize()
+}
+
+// TODO leaking glfw. leak all of it? or wrap everything?
+func (win *Window) SetKeyCallback(cb glfw.KeyCallback) glfw.KeyCallback {
+	return win.window.SetKeyCallback(cb)
 }
 
 func (win *Window) Run() {
@@ -133,19 +130,6 @@ func (win *Window) Run() {
 	for !window.ShouldClose() {
 
 		glfw.PollEvents()
-		/* TODO redo key events
-
-		case *sdl.KeyboardEvent:
-			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_X {
-				win.events <- SnapshotEvent
-			}
-			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
-				win.events <- RefreshEvent
-			}
-			if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
-				win.events <- ReturnEvent
-			}
-		*/
 
 	outer:
 		for {

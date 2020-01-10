@@ -13,10 +13,10 @@ func (f Fill) Draw(l Layer) {
 	l.AddShader(&Shader{
 		Name: "Fill",
 		Vert: DefaultVert,
-		Frag: FillFrag,
+		Frag: DefaultFrag,
 		Mesh: f.Mesh,
 		Attrs: Attrs{
-			"u_color": f.Color,
+			"a_color": f.Color,
 		},
 	})
 }

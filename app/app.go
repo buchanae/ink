@@ -5,6 +5,7 @@ package app
 import (
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/win"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 type App struct {
@@ -12,7 +13,8 @@ type App struct {
 	win      *win.Window
 	renderer *render.Renderer
 	doc      *Doc
-	events   chan win.Event
+	plan     render.Plan
+	shown    bool
 }
 
 func NewApp(conf Config) (*App, error) {
@@ -23,35 +25,32 @@ func NewApp(conf Config) (*App, error) {
 			Width:  conf.Window.Width,
 			Height: conf.Window.Height,
 		}),
-		events: make(chan win.Event, 1000),
 	}, nil
 }
 
 func (app *App) Run() {
-	go func() {
-		for {
-			select {
-			case ev := <-app.win.Events():
-
-				select {
-				case app.events <- ev:
-				default:
-				}
-
-				switch ev {
-				case win.SnapshotEvent:
-					if app.doc != nil {
-						app.win.Do(app.snapshot)
-					}
-				}
-			}
-		}
-	}()
+	go app.Do(func() {
+		app.win.SetKeyCallback(app.keyCallback)
+	})
 	app.win.Run()
 }
 
-func (app *App) Events() <-chan win.Event {
-	return app.events
+func (app *App) keyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
+
+	if key == glfw.KeyX && action == glfw.Press {
+		app.snapshot()
+	}
+
+	/* TODO redo key events
+
+	case *sdl.KeyboardEvent:
+		if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
+			win.events <- RefreshEvent
+		}
+		if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
+			win.events <- ReturnEvent
+		}
+	*/
 }
 
 func (app *App) initRenderer() {
@@ -84,16 +83,31 @@ func (app *App) updateConfig(b Config) {
 
 func (app *App) Render(doc *Doc) {
 	app.Do(func() {
+
 		app.updateConfig(doc.Config)
-		app.win.Show()
+		if !app.shown {
+			app.win.Show()
+			app.shown = true
+		}
 		plan := buildPlan(doc)
 		app.initRenderer()
+
+		if doc.Trace {
+			app.renderer.StartTrace()
+		}
+
 		app.renderer.Render(plan)
 		app.renderer.ToScreen(doc.LayerID())
-	})
 
-	app.doc = doc
-	app.win.Swap()
+		if doc.Trace {
+			app.renderer.EndTrace()
+		}
+
+		app.doc = doc
+		app.plan = plan
+
+		app.win.Swap()
+	})
 }
 
 func (app *App) Do(f func()) {

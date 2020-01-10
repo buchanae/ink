@@ -25,8 +25,8 @@ func (app *App) snapshot() {
 
 	renderer := render.NewRenderer(width, height)
 
-	plan := buildPlan(app.doc)
-	renderer.Render(plan)
+	//plan := buildPlan(app.doc)
+	renderer.Render(app.plan)
 
 	img := renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
 	err := app.SnapshotImage(img)
@@ -46,7 +46,7 @@ func (app *App) SnapshotImage(img image.Image) error {
 	name := stamp + ".png"
 	name = filepath.Join(dir, name)
 
-	log.Print(name)
+	log.Print("snapshot ", name)
 
 	f, err := os.Create(name)
 	if err != nil {

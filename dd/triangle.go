@@ -32,6 +32,14 @@ func (t Triangle) Mesh() Mesh {
 	}
 }
 
+func (t Triangle) Edges() []Line {
+	return []Line{
+		{t.A, t.B},
+		{t.B, t.C},
+		{t.C, t.A},
+	}
+}
+
 type Triangles []Triangle
 
 func (tris Triangles) Mesh() Mesh {

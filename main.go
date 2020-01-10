@@ -14,12 +14,7 @@ import (
 	"sync"
 
 	"github.com/buchanae/ink/app"
-	"github.com/buchanae/ink/internal/trace"
 )
-
-func init() {
-	flag.BoolVar(&trace.On, "trace", trace.On, "Enable trace output")
-}
 
 func main() {
 	log.SetFlags(0)
@@ -78,7 +73,6 @@ type firstByteReader struct {
 func (fbr *firstByteReader) Read(data []byte) (int, error) {
 	n, err := fbr.r.Read(data)
 	if !fbr.done {
-		trace.Log("first byte")
 		fbr.done = true
 	}
 	fbr.total += n
@@ -86,9 +80,6 @@ func (fbr *firstByteReader) Read(data []byte) (int, error) {
 }
 
 func run(ctx context.Context, a *app.App, path, name string) error {
-	trace.Start()
-	trace.Log("run")
-
 	sketchDir := filepath.Dir(path)
 	tempDir, err := ioutil.TempDir("", "ink-run-")
 	if err != nil {
@@ -98,13 +89,11 @@ func run(ctx context.Context, a *app.App, path, name string) error {
 
 	inkPath := filepath.Join(tempDir, "ink.go")
 
-	trace.Log("copy")
 	err = copyFile(inkPath, path, name)
 	if err != nil {
 		return err
 	}
 
-	trace.Log("write main")
 	mainPath := filepath.Join(tempDir, "main.go")
 	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
 	if err != nil {
@@ -128,7 +117,6 @@ func run(ctx context.Context, a *app.App, path, name string) error {
 		stdout.Close()
 	}()
 
-	trace.Log("start")
 	err = cmd.Start()
 	if err != nil {
 		return fmt.Errorf("starting: %v", err)
@@ -137,7 +125,6 @@ func run(ctx context.Context, a *app.App, path, name string) error {
 	reader := &firstByteReader{r: stdout}
 
 	for {
-		trace.Log("decode")
 		doc := &app.Doc{}
 		dec := gob.NewDecoder(reader)
 		err = dec.Decode(doc)
@@ -148,12 +135,9 @@ func run(ctx context.Context, a *app.App, path, name string) error {
 			return fmt.Errorf("decoding: %v", err)
 		}
 
-		trace.Log("render")
 		a.Render(doc)
 	}
 
-	trace.Log("wait")
-	defer trace.Log("done %d bytes", reader.total)
 	err = cmd.Wait()
 	if err != nil {
 		return fmt.Errorf("cmd: %v", err)

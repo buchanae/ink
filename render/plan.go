@@ -4,7 +4,6 @@ import (
 	"image"
 	"log"
 
-	"github.com/buchanae/ink/internal/trace"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -33,28 +32,9 @@ type Attr struct {
 	Divisor int
 }
 
-func (plan Plan) build() *build {
-
-	pb := &build{
-		passes: make([]*pass, 0, len(plan.Shaders)),
-		faces:  make([]uint32, 0, 500),
-	}
-
-	if len(plan.Shaders) == 0 {
-		return pb
-	}
-
-	for _, s := range plan.Shaders {
-		pb.addShader(s)
-	}
-
-	pb.batch()
-	pb.upload()
-
-	return pb
-}
-
 type build struct {
+	tracer
+
 	passes []*pass
 	faces  []uint32
 	// Total number of bytes needed to store all attributes.
@@ -88,6 +68,27 @@ type binding struct {
 type bindingVal struct {
 	value interface{}
 	size  int
+}
+
+func (pb *build) build(plan Plan) {
+	pb.trace("start build")
+
+	pb.passes = make([]*pass, 0, len(plan.Shaders))
+	pb.faces = make([]uint32, 0, 500)
+
+	if len(plan.Shaders) == 0 {
+		return
+	}
+
+	pb.trace("add shaders")
+	for _, s := range plan.Shaders {
+		pb.addShader(s)
+	}
+
+	pb.batch()
+	pb.upload()
+
+	pb.trace("end build")
 }
 
 func (pb *build) addShader(shader *Shader) {
@@ -170,7 +171,7 @@ func (pb *build) uploadFaces() {
 }
 
 func (pb *build) upload() {
-	trace.Log("upload")
+	pb.trace("upload")
 
 	// upload faces (vertex index)
 	pb.uploadFaces()
@@ -227,7 +228,7 @@ func (pb *build) upload() {
 }
 
 func (pb *build) batch() {
-	trace.Log("batch")
+	pb.trace("batch")
 
 	var batched []*pass
 	var last *pass
@@ -245,21 +246,25 @@ func (pb *build) batch() {
 		}
 	}
 	batched = append(batched, last)
-	trace.Log("  merged passes %d to %d", len(pb.passes), len(batched))
+	pb.trace("  merged passes %d to %d", len(pb.passes), len(batched))
 	pb.passes = batched
 }
 
 func (pb *build) mergeable(a, b *pass) bool {
 	if a.prog.id != b.prog.id {
+		pb.trace("program IDs differ")
 		return false
 	}
 	if len(a.bindings) != len(b.bindings) {
+		pb.trace("bindings differ", len(a.bindings), len(b.bindings))
 		return false
 	}
 	if len(a.uniforms) != len(b.uniforms) {
+		pb.trace("uniforms differ")
 		return false
 	}
 	if a.layer != b.layer {
+		pb.trace("layers differ")
 		return false
 	}
 	for i := range b.bindings {

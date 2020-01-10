@@ -6,14 +6,43 @@ import (
 	"github.com/buchanae/ink/dd"
 )
 
-func (r *Rand) BlueNoise(n int, w, h, d float32) []dd.XY {
-	initial := []dd.XY{{w / 2, h / 2}}
-	return r.BlueNoiseInitial(n, w, h, d, initial)
+type BlueNoise struct {
+	Rect    dd.Rect
+	Spacing float32
+	Limit   int
+	Initial []dd.XY
 }
 
-func (r *Rand) BlueNoiseInitial(n int, w, h, d float32, initial []dd.XY) []dd.XY {
-	// final point that will be returned
-	points := make([]dd.XY, 0, n)
+func (bn BlueNoise) Generate(r *Rand) []dd.XY {
+	n := bn.Limit
+	if n == 0 {
+		n = 100000
+	}
+
+	d := bn.Spacing
+	if d == 0 {
+		d = 0.01
+	}
+
+	bounds := bn.Rect
+	if bounds.IsZero() {
+		bounds = dd.RectWH(1, 1)
+	}
+
+	initial := bn.Initial
+	if initial == nil {
+		initial = []dd.XY{bounds.Center()}
+	}
+
+	// final points that will be returned
+	output := make([]dd.XY, 0, n)
+
+	size := bounds.Size()
+	w := size.X
+	h := size.Y
+	shiftedBounds := dd.Rect{
+		B: bounds.B.Sub(bounds.A),
+	}
 
 	// grid of cells, to track neighbors
 	cellSize := d / sqrt(2)
@@ -27,38 +56,50 @@ func (r *Rand) BlueNoiseInitial(n int, w, h, d float32, initial []dd.XY) []dd.XY
 		return int(x / cellSize), int(y / cellSize)
 	}
 
+	// active points are those that may generate
+	// new neighboring points. when an active point
+	// fails to generate a valid neighbor, it is removed
+	// from the active list.
 	var active []*dd.XY
 
+	// add initial points to the output and active lists
 	for _, pt := range initial {
-		ptv := pt
+		ptv := pt.Sub(bounds.A)
 		ci := cellIndex(ptv)
 		cells[ci] = &ptv
 		active = append(active, &ptv)
-		points = append(points, ptv)
+		output = append(output, ptv)
 	}
 
+	iter := 0
+
 	for {
-		if len(active) == 0 || len(points) >= n+len(initial) {
+		if len(active) == 0 || len(output) >= n+len(initial) {
 			break
 		}
 		ai := Intn(len(active))
 		pt := active[ai]
 
 		var accept *dd.XY
-		randRing := r.makeRandRing(30, d, 2*d)
 
-		for _, rp := range randRing {
-			rp.X += pt.X
-			rp.Y += pt.Y
+		// generate 30 points in a ring around "pt"
+		// check each point and see if it's valid
+		// to add to the output list. if so, break.
+		for ri := 0; ri < 30; ri++ {
+			iter++
+			rp := r.makeRandRing(*pt, d, 2*d)
 
 			cx, cy := cellCoord(rp.X, rp.Y)
 
 			// skip any points that fall out of bounds
+			if !shiftedBounds.Contains(rp) {
+				continue
+			}
 			if cx < 0 || cx >= cellsW || cy < 0 || cy >= cellsH {
 				continue
 			}
 
-			neighbors := [][2]int{
+			neighbors := [9][2]int{
 				{cx - 1, cy - 1},
 				{cx, cy - 1},
 				{cx + 1, cy - 1},
@@ -101,30 +142,32 @@ func (r *Rand) BlueNoiseInitial(n int, w, h, d float32, initial []dd.XY) []dd.XY
 		}
 
 		if accept != nil {
-			points = append(points, *accept)
+			out := *accept
+			out = out.Add(bounds.A)
+			output = append(output, out)
+
 			active = append(active, accept)
 			ci := cellIndex(*accept)
 			cells[ci] = accept
 		} else {
+			// TODO better way to remove an active index?
+			//      copy seems inefficient
 			active = append(active[:ai], active[ai+1:]...)
 		}
 	}
-	return points
+
+	//log.Printf("blue: iter %d", iter)
+	return output
 }
 
 // makeRandRing returns a list of random points in the ring
 // with "minR" inner radius and "maxR" outer radius.
-func (r *Rand) makeRandRing(n int, minR, maxR float32) []dd.XY {
+func (r *Rand) makeRandRing(src dd.XY, minR, maxR float32) dd.XY {
 	A := 2 / (maxR*maxR - minR*minR)
-
-	points := make([]dd.XY, 0, n)
-	for i := 0; i < n; i++ {
-		R := sqrt(2*r.Float()/A + minR*minR)
-		theta := r.Float() * math.Pi * 2
-		points = append(points, dd.XY{
-			X: R * cos(theta),
-			Y: R * sin(theta),
-		})
-	}
-	return points
+	R := sqrt(2*r.Float()/A + minR*minR)
+	theta := r.Float() * math.Pi * 2
+	return dd.XY{
+		X: R * cos(theta),
+		Y: R * sin(theta),
+	}.Add(src)
 }

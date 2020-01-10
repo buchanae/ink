@@ -98,6 +98,7 @@ func (r *Rand) Noise3(x, y, z float32) float32 {
 }
 
 var src = New(1)
+var Default = src
 
 func SeedNow() {
 	src = New(time.Now().Unix())
@@ -141,14 +142,6 @@ func XYInTriangle(t dd.Triangle) dd.XY {
 
 func XYInRect(r dd.Rect) dd.XY {
 	return src.XYInRect(r)
-}
-
-func BlueNoise(n int, w, h, d float32) []dd.XY {
-	return src.BlueNoise(n, w, h, d)
-}
-
-func BlueNoiseInitial(n int, w, h, d float32, initial []dd.XY) []dd.XY {
-	return src.BlueNoiseInitial(n, w, h, d, initial)
 }
 
 func Color(c []color.RGBA) color.RGBA {

@@ -39,6 +39,11 @@ type Rect struct {
 	A, B XY
 }
 
+func (r Rect) IsZero() bool {
+	zero := Rect{}
+	return r == zero
+}
+
 func (r Rect) Center() XY {
 	return r.B.Sub(r.A).MulScalar(0.5).Add(r.A)
 }

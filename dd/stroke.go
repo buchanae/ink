@@ -13,6 +13,7 @@ func (s Stroke) Mesh() Mesh {
 
 // TODO unfinished. need to stroke half width in both directions.
 //      currently stroking full width in one direciton.
+// TODO this can't be used to stroke lots of lines individually
 func (s Stroke) Triangles() []Triangle {
 	lines := s.lines()
 	if len(lines) == 0 {

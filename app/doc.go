@@ -4,6 +4,7 @@ package app
 import (
 	"image"
 
+	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/gfx"
 )
 
@@ -24,14 +25,17 @@ type Doc struct {
 	Images map[int]image.Image
 	Ops    []Op
 	Config Config
+	Trace  bool
 }
 
 func NewDoc() *Doc {
-	return &Doc{
+	doc := &Doc{
 		ID: nextID(),
 		// TODO need to pull this from app
 		Config: DefaultConfig(),
 	}
+	gfx.Clear(doc, color.Black)
+	return doc
 }
 
 func (d *Doc) Filter(layerID ...int) *Doc {

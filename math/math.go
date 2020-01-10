@@ -46,6 +46,6 @@ func Clamp(val, min, max float32) float32 {
 	return val
 }
 
-func Interp(percent, from, to float32) float32 {
+func Interp(from, to, percent float32) float32 {
 	return from + ((to - from) * percent)
 }
