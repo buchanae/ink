@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
@@ -13,7 +14,7 @@ const (
 	Height = 30
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	Clear(doc, White)
 
 	box := RectCenter(XY{.5, .5}, XY{.5, .9})
@@ -22,8 +23,8 @@ func Ink(doc Layer) {
 	for i, r := range grid.Rects() {
 
 		r = Rect{
-			A: box.Interp(r.A),
-			B: box.Interp(r.B),
+			A: box.Interpolate(r.A),
+			B: box.Interpolate(r.B),
 		}
 		r = r.Shrink(0.002)
 
@@ -39,13 +40,10 @@ func Ink(doc Layer) {
 		ang := rand.Range(-dr, dr)
 		q = q.RotateAround(ang, r.Center())
 
-		// TODO two types in a loop doesn't batch
-		//Dot{XY: r.Center()}.Draw(doc)
-
 		stk := q.Stroke()
 		stk.Width = 0.001
+
 		s := NewShader(stk)
-		//s.Set("a_color", Red)
 		s.Draw(doc)
 	}
 }

@@ -20,8 +20,7 @@ type Noise struct {
 	Mult     float32
 	SizeMult dd.XY
 	Color    color.RGBA
-	// TODO should be rect until I figure out UV params
-	Mesh Meshable
+	Rect     dd.Rect
 }
 
 func (n Noise) Draw(out Layer) {
@@ -29,7 +28,7 @@ func (n Noise) Draw(out Layer) {
 		Name: "Noise",
 		Vert: DefaultVert,
 		Frag: NoiseFrag,
-		Mesh: n.Mesh,
+		Mesh: n.Rect,
 		Attrs: Attrs{
 			"u_size":     n.Size,
 			"u_layers":   int32(n.Layers),
