@@ -23,7 +23,7 @@ func main() {
 	args := flag.Args()
 
 	if len(args) != 1 {
-		fmt.Fprint(os.Stderr, "usage: ink file.go")
+		fmt.Fprintln(os.Stderr, "usage: ink file.go")
 		os.Exit(1)
 	}
 
