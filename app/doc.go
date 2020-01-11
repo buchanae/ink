@@ -3,6 +3,8 @@ package app
 
 import (
 	"image"
+	_ "image/png"
+	"os"
 
 	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/gfx"
@@ -73,7 +75,27 @@ func (d *Doc) NewImage(img image.Image) gfx.Image {
 	}
 	id := nextID()
 	d.Images[id] = img
-	return gfx.Image{id}
+
+	w, h := img.Bounds().Dx(), img.Bounds().Dy()
+	win := d.Config.Window
+	rw := float32(w) / float32(win.Width)
+	rh := float32(h) / float32(win.Height)
+	return gfx.Image{id, rw, rh}
+}
+
+func (d *Doc) LoadImage(path string) gfx.Image {
+	fh, err := os.Open(path)
+	if err != nil {
+		panic(err)
+	}
+	defer fh.Close()
+
+	img, _, err := image.Decode(fh)
+	if err != nil {
+		panic(err)
+	}
+
+	return d.NewImage(img)
 }
 
 func (d *Doc) AddShader(s *gfx.Shader) {
