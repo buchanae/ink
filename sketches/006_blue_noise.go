@@ -15,7 +15,7 @@ func Ink(doc *app.Doc) {
 		A: dd.XY{.1, .1},
 		B: dd.XY{.9, .9},
 	}
-	Fill{r, color.Gray}.Draw(doc)
+	Fill{r, color.Lightgray}.Draw(doc)
 
 	bn := rand.BlueNoise{
 		Limit: 5050,
