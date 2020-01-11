@@ -1,16 +1,18 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc Layer) {
-	Clear(doc, White)
+func Ink(doc *app.Doc) {
+	rand.SeedNow()
+	gfx.Clear(doc, White)
 
-	const N = 10000
+	const N = 100000
 
 	pos := make([]XY, N)
 	rot := make([]float32, N)
@@ -23,12 +25,12 @@ func Ink(doc Layer) {
 		colors[i] = rand.Color(palette)
 	}
 
-	doc.AddShader(&Shader{
-		Vert:      DefaultVert,
-		Frag:      DefaultFrag,
+	doc.AddShader(&gfx.Shader{
+		Vert:      gfx.DefaultVert,
+		Frag:      gfx.DefaultFrag,
 		Instances: N,
 		Mesh:      RectWH(0.05, 0.05),
-		Attrs: Attrs{
+		Attrs: gfx.Attrs{
 			"a_pos":   pos,
 			"a_rot":   rot,
 			"a_color": colors,

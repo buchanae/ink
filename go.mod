@@ -10,6 +10,5 @@ require (
 	github.com/ojrac/opensimplex-go v1.0.1
 	github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f
 	github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1
-	github.com/veandco/go-sdl2 v0.4.0-rc.1.0.20191208053522-3d9b5d6d1911
 	golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 // indirect
 )

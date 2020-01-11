@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	"github.com/buchanae/ink/app"
+	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 func main() {
@@ -39,7 +40,14 @@ func main() {
 	watch := newWatcher()
 	watch.Watch(path)
 
+	a.AddKeyCallback(func(ev app.KeyEvent) {
+		if ev.Pressed(glfw.KeyR) {
+			watch.changes <- struct{}{}
+		}
+	})
+
 	go func() {
+
 		wg := sync.WaitGroup{}
 
 		for {

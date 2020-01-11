@@ -12,7 +12,6 @@ import (
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
-	"github.com/buchanae/ink/win"
 )
 
 func main() {

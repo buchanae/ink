@@ -2,17 +2,22 @@
 
 package app
 
-import "github.com/go-gl/glfw/v3.3/glfw"
+import (
+	"github.com/go-gl/glfw/v3.3/glfw"
+)
 
 type KeyCallback func(KeyEvent)
 
 // TODO leaking gflw
 type KeyEvent struct {
-	Win      *glfw.Window
 	Key      glfw.Key
 	Scancode int
 	Action   glfw.Action
 	Mod      glfw.ModifierKey
+}
+
+func (ke KeyEvent) Pressed(key glfw.Key) bool {
+	return ke.Key == key && ke.Action == glfw.Press
 }
 
 func (app *App) defaultKeyCallback(ev KeyEvent) {
@@ -37,7 +42,9 @@ func (app *App) processKeyEvents() {
 }
 
 func (app *App) AddKeyCallback(cb KeyCallback) {
-	app.addKeycb <- cb
+	go func() {
+		app.addKeycb <- cb
+	}()
 }
 
 // keyCallback pipes events from glfw main thread
@@ -47,5 +54,5 @@ func (app *App) keyCallback(win *glfw.Window, key glfw.Key, scancode int, action
 	// this function always runs on the main thread.
 	//
 	// Be careful not to call out to user code from this function.
-	app.keyEvents <- KeyEvent{win, key, scancode, action, mods}
+	app.keyEvents <- KeyEvent{key, scancode, action, mods}
 }

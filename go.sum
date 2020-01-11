@@ -12,7 +12,5 @@ github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f h1:YeUeWAPTrycaikVXiV
 github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f/go.mod h1:T6EcHUIQ7r0Xr1jjOJ7hmpUaqVyqb9WimeNzS9nz4Zo=
 github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1 h1:ayxM9WkC6QRX0QnfrbZa98pfFqrNq1jo+58rWL1qjZs=
 github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1/go.mod h1:xKffaBd7e1YUoLpR2azvJqkxEdUDNGNDMlsUNdv6Bcs=
-github.com/veandco/go-sdl2 v0.4.0-rc.1.0.20191208053522-3d9b5d6d1911 h1:hFAktcDWMt0NOB6hmAXztwREAlADZ4CjOyrBznupl20=
-github.com/veandco/go-sdl2 v0.4.0-rc.1.0.20191208053522-3d9b5d6d1911/go.mod h1:FB+kTpX9YTE+urhYiClnRzpOXbiWgaU3+5F2AB78DPg=
 golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 h1:gSbV7h1NRL2G1xTg/owz62CST1oJBmxy4QpMMregXVQ=
 golang.org/x/sys v0.0.0-20191210023423-ac6580df4449/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

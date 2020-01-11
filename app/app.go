@@ -37,6 +37,7 @@ func NewApp(conf Config) (*App, error) {
 		conf:      conf,
 		commands:  make(chan func()),
 		keyEvents: make(chan KeyEvent, 100),
+		addKeycb:  make(chan KeyCallback),
 	}, nil
 }
 
