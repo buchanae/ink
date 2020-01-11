@@ -44,7 +44,10 @@ func main() {
 	}
 
 	log.Print(wd.path)
-	watch := newWatcher()
+	watch, err := newWatcher()
+	if err != nil {
+		panic(err)
+	}
 	watch.Watch(path)
 
 	a.AddKeyCallback(func(ev app.KeyEvent) {

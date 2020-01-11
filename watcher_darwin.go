@@ -10,10 +10,10 @@ import (
 )
 
 // newWatcher returns a new file watcher.
-func newWatcher() *watcher {
+func newWatcher() (*watcher, error) {
 	return &watcher{
 		changes: make(chan struct{}, 100),
-	}
+	}, nil
 }
 
 // watcher watches files for changes.
