@@ -1,1 +1,373 @@
-Ink
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>Ink</title>
+
+<style>
+body {
+  padding: 10px;
+}
+
+h1, h2, h3, h4 {
+  color: #333;
+  font-weight: normal;
+}
+h1, h2, h3, h4 {
+  text-decoration: underline;
+}
+
+
+.split {
+  display: flex;
+}
+.left, .right {
+  flex-grow: 1;
+  width: 50%;
+}
+.section {
+  margin: 80px 0;
+}
+.right img {
+  display: block;
+  margin: 0 auto;
+}
+.code {
+  font-family: monospace;
+  background-color: #eee;
+  padding: 5px 15px;
+}
+</style>
+</head>
+
+<body>
+<h1>Ink</h1>
+
+
+<div>
+  <p>This is a quick and dirty introduction to Ink: a framework for 2D graphics in Go, focused on creative coding, and based on OpenGL.</p>
+
+  <p><em>Disclaimer:</em> Although I've been working towards Ink for years,
+the project is still very young in many ways. There are many TODOs, bugs, and ugly APIs.
+I will rewrite and break and (hopefully) improve things over time.</p>
+</div>
+
+<div class="section">
+
+  <h2>Usage</h2>
+
+    <div>
+      <p>You'll need <a href="golang.org/">Go</a> installed. These docs assume the reader is familiar with programming in Go.</p>
+
+      <p>Install ink:</p>
+      <p><span class="code">go get github.com/buchanae/ink/...</span></p>
+
+      <p>Use the "ink" CLI to run a sketch file. This will open a window,
+       draw the sketch, and watch for changes.</p>
+
+      <p><span class="code">ink example.go</span></p>
+    </div>
+
+</div>
+
+
+<div class="section">
+<h2>Hello, Triangle</h2>
+<p>The "hello, world" of graphics: a triangle with different colored vertices.</p>
+
+  <div class="split">
+  <div class="left">
+<div class="code"><pre>package main
+
+import (
+    "github.com/buchanae/ink/app"
+    . "github.com/buchanae/ink/color"
+    . "github.com/buchanae/ink/dd"
+    "github.com/buchanae/ink/gfx"
+)
+
+func Ink(doc *app.Doc) {
+
+    t := Triangle{
+        XY{0.2, 0.2},
+        XY{0.8, 0.2},
+        XY{0.5, 0.8},
+    }
+
+    s := gfx.NewShader(t)
+    s.Set("a_color", []RGBA{
+        Red, Green, Blue,
+    })
+    s.Draw(doc)
+}
+</pre></div>
+
+  </div>
+  <div class="right">
+    <img src="_static/hello_triangle.png" width="400" />
+  </div>
+  </div>
+</div>
+
+<div class="section">
+<h2>Basic Shapes</h2>
+
+<p>The "dd" (like "two d") package holds all the 2D geometry types, and the "gfx" package holds things like "Fill".</p>
+
+<div class="split">
+  <div class="left">
+<div class="code"><pre>package main
+
+import (
+    "github.com/buchanae/ink/app"
+    "github.com/buchanae/ink/color"
+    . "github.com/buchanae/ink/dd"
+    "github.com/buchanae/ink/gfx"
+)
+
+func Ink(doc *app.Doc) {
+
+    shapes := []gfx.Meshable{
+
+        Rect{
+            XY{0.1, 0.7},
+            XY{0.3, 0.9},
+        },
+
+        Circle{
+            XY:     XY{0.5, 0.5},
+            Radius: 0.1,
+        },
+
+        Triangle{
+            XY{.7, .1},
+            XY{.8, .3},
+            XY{.9, .1},
+        },
+
+        Ellipse{
+            XY:   XY{.2, .2},
+            Size: XY{.15, .1},
+        },
+
+        Quad{
+            XY{0.65, 0.7},
+            XY{0.9, 0.7},
+            XY{0.85, 0.95},
+            XY{0.7, 0.9},
+        },
+    }
+
+    for _, s := range shapes {
+        gfx.Fill{s, color.Blue}.Draw(doc)
+    }
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="_static/basic_shapes.png" width="400" />
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="section">
+<h2>Grid</h2>
+
+<p>Grids are one of the types I find most useful. This replica of a piece by George Nees demonstrates the Grid utility.</p>
+
+<div class="split">
+  <div class="left">
+<div class="code"><pre>package main
+
+import (
+    "github.com/buchanae/ink/app"
+    . "github.com/buchanae/ink/color"
+    . "github.com/buchanae/ink/dd"
+    "github.com/buchanae/ink/gfx"
+    "github.com/buchanae/ink/math"
+    "github.com/buchanae/ink/rand"
+)
+
+const (
+    Width  = 16
+    Height = 30
+)
+
+func Ink(doc *app.Doc) {
+    gfx.Clear(doc, White)
+
+    center := XY{.5, .5}
+    grid := Grid{
+        Rows: Height,
+        Cols: Width,
+        Rect: RectCenter(center, XY{.5, .9}),
+    }
+
+    for i, cell := range grid.Cells() {
+        r := cell.Rect
+        r = r.Shrink(0.002)
+
+        row := i / Width
+        row = Height - row - 5
+        dr := float32(row) / Height
+        dr = math.Clamp(dr, 0, 1)
+
+        t := dr * 0.01
+        r = r.Translate(rand.XYRange(-t, t))
+
+        q := r.Quad()
+        ang := rand.Range(-dr, dr)
+        q = q.RotateAround(ang, r.Center())
+
+        stk := q.Stroke()
+        stk.Width = 0.001
+
+        s := gfx.NewShader(stk)
+        s.Draw(doc)
+    }
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="_static/nees.png" width="500" />
+  </div>
+</div>
+</div>
+
+<div class="section">
+<h2>Strokes</h2>
+
+<p>Stroke is part of the API that still feels a bit awkward and cumbersome. Here's what it looks like:</p>
+</div>
+
+<div class="section">
+<h2>Paths</h2>
+
+<div class="split">
+  <div class="left">
+<div class="code"><pre>
+// I'll stop including the imports code now
+
+func Ink(doc *app.Doc) {
+    gfx.Clear(doc, color.White)
+
+    p := Path{}
+    p.MoveTo(XY{0.2, 0.2})
+    p.LineTo(XY{0.2, 0.3})
+    p.LineTo(XY{0.3, 0.3})
+    p.LineTo(XY{0.5, 0.7})
+    p.LineTo(XY{0.7, 0.7})
+    p.LineTo(XY{0.7, 0.9})
+    p.LineTo(XY{0.5, 0.9})
+    p.LineTo(XY{0.3, 0.7})
+
+    m := p.Stroke()
+    m.Width = 0.002
+
+    gfx.Fill{m, color.Red}.Draw(doc)
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="_static/basic_shapes.png" width="400" />
+  </div>
+</div>
+</div>
+</div>
+
+
+<div class="section">
+<h2>Palettes</h2>
+
+<div class="split">
+  <div class="left">
+<div class="code"><pre>
+func Ink(doc *app.Doc) {
+
+    grid := Grid{Rows: 20, Cols: 20}
+    palette := rand.Palette()
+
+    for _, cell := range grid.Cells() {
+        r := cell.Rect.Shrink(0.003)
+        c := rand.Color(palette)
+        gfx.Fill{r, c}.Draw(doc)
+    }
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="_static/palettes.png" width="400" />
+  </div>
+</div>
+</div>
+</div>
+
+<div class="section">
+  <h2>Misc Graphics</h2>
+Images
+Gradient
+Clear
+
+Mask
+Blur
+</div>
+
+<div class="section">
+<h2>Randomness</h2>
+Blue noise
+Noise
+</div>
+
+<div class="section">
+<h2>Interpolation</h2>
+</div>
+
+<div class="section">
+<h2>XY</h2>
+
+XY is probably the most core data type in Ink. XY represents an X and Y coordinate pair.
+It may represent a coordinate, or a 2D vector, or a width+height. Because it's so versatile,
+it has lots of methods:
+</div>
+
+<div class="section">
+<h2>Instancing</h2>
+</div>
+
+<div class="section">
+<h2>Triangulation</h2>
+
+(or "tesselation"? Honestly I haven't figured that out yet.)
+</div>
+
+<div class="section">
+<h2>Voronoi</h2>
+</div>
+
+<div class="section">
+<h2>Raster</h2>
+
+Sometimes it's better to rasterize triangles on the CPU. For example, when I started the "primitive"  sketch, I originally was using the GPU to rasterize, and then reading back pixel data from GPU->CPU for every frame. This was incredibly slow, so copied and modified this simple triangle rasterizer from fogleman. This is very useful for tasks like taking the average of colors in a certain area of an image, or anything heavy on analytics.
+</div>
+
+
+<div class="section">
+<h2>Advanced: how it works</h2>
+How shaders work
+- opengl based
+- dd.Mesh
+- attributes
+
+direct render
+
+raster
+</div>
+
+</div>
+</div>
+</body>
+
+</html>
