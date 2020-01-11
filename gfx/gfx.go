@@ -18,6 +18,10 @@ type Meshable interface {
 	Mesh() dd.Mesh
 }
 
+type Strokeable interface {
+	Stroke() dd.Stroke
+}
+
 type Layer interface {
 	LayerID() int
 	NewLayer() Layer

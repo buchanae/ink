@@ -21,47 +21,28 @@ func init() {
 }
 
 type App struct {
-	conf     Config
-	win      *glfw.Window
-	renderer *render.Renderer
-	commands chan func()
-	doc      *Doc
-	plan     render.Plan
-	shown    bool
+	conf      Config
+	win       *glfw.Window
+	renderer  *render.Renderer
+	commands  chan func()
+	doc       *Doc
+	plan      render.Plan
+	shown     bool
+	keyEvents chan KeyEvent
+	addKeycb  chan KeyCallback
 }
 
 func NewApp(conf Config) (*App, error) {
 	return &App{
-		conf:     conf,
-		commands: make(chan func()),
+		conf:      conf,
+		commands:  make(chan func()),
+		keyEvents: make(chan KeyEvent, 100),
 	}, nil
 }
 
 func (app *App) Run() error {
+	go app.processKeyEvents()
 	return app.runWindow()
-}
-
-func (app *App) keyCallback(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods glfw.ModifierKey) {
-
-	// keyCallback gets called by GLFW, so pretty sure
-	// this function always run on the main thread.
-	//
-	// Be careful not to call out to user code from this function.
-
-	if key == glfw.KeyX && action == glfw.Press {
-		app.snapshot()
-	}
-
-	/* TODO redo key events
-
-	case *sdl.KeyboardEvent:
-		if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_R {
-			win.events <- RefreshEvent
-		}
-		if z.State == sdl.PRESSED && z.Keysym.Scancode == sdl.SCANCODE_RETURN {
-			win.events <- ReturnEvent
-		}
-	*/
 }
 
 func (app *App) initRenderer() {

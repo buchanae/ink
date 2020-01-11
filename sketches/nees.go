@@ -4,7 +4,7 @@ import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
 	"github.com/buchanae/ink/rand"
 )
@@ -15,17 +15,17 @@ const (
 )
 
 func Ink(doc *app.Doc) {
-	Clear(doc, White)
+	gfx.Clear(doc, White)
 
-	box := RectCenter(XY{.5, .5}, XY{.5, .9})
+	center := XY{.5, .5}
+	grid := Grid{
+		Rows: Height,
+		Cols: Width,
+		Rect: RectCenter(center, XY{.5, .9}),
+	}
 
-	grid := NewGrid(Height+1, Width+1)
-	for i, r := range grid.Rects() {
-
-		r = Rect{
-			A: box.Interpolate(r.A),
-			B: box.Interpolate(r.B),
-		}
+	for i, cell := range grid.Cells() {
+		r := cell.Rect
 		r = r.Shrink(0.002)
 
 		row := i / Width
@@ -43,7 +43,7 @@ func Ink(doc *app.Doc) {
 		stk := q.Stroke()
 		stk.Width = 0.001
 
-		s := NewShader(stk)
+		s := gfx.NewShader(stk)
 		s.Draw(doc)
 	}
 }

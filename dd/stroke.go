@@ -7,6 +7,10 @@ type Stroke struct {
 	Closed bool
 }
 
+func (s Stroke) Stroke() Stroke {
+	return s
+}
+
 func (s Stroke) Mesh() Mesh {
 	return NewMesh(s.Triangles())
 }

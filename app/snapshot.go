@@ -14,7 +14,7 @@ import (
 	"github.com/buchanae/ink/render"
 )
 
-func (app *App) snapshot() {
+func (app *App) Snapshot() image.Image {
 	width := app.conf.Snapshot.Width
 	height := app.conf.Snapshot.Height
 
@@ -23,19 +23,26 @@ func (app *App) snapshot() {
 		height = app.conf.Window.Height
 	}
 
-	renderer := render.NewRenderer(width, height)
+	var img image.Image
 
-	//plan := buildPlan(app.doc)
-	renderer.Render(app.plan)
+	app.Do(func() {
+		renderer := render.NewRenderer(width, height)
+		renderer.Render(app.plan)
+		img = renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
+	})
 
-	img := renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
-	err := app.SnapshotImage(img)
+	return img
+}
+
+func (app *App) snapshotAndWrite() {
+	img := app.Snapshot()
+	err := app.WriteSnapshot(img)
 	if err != nil {
 		log.Printf("error: writing snapshot: %v", err)
 	}
 }
 
-func (app *App) SnapshotImage(img image.Image) error {
+func (app *App) WriteSnapshot(img image.Image) error {
 	dir := app.conf.Snapshot.Dir
 	err := ensureDir(dir)
 	if err != nil {

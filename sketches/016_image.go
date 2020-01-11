@@ -5,11 +5,12 @@ import (
 	_ "image/png"
 	"os"
 
+	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	fh, err := os.Open("toshiro.png")
 	if err != nil {
 		panic(err)

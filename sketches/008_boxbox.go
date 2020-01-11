@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -14,19 +15,18 @@ const (
 	SkipCellChance = 0.05
 	SkipBoxChance  = 0.20
 	Shrink         = 0.0050
-	TweakBox       = 0.0017
 	Angle          = 0.2
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
-	grid := NewGrid(GridSize, GridSize)
+	gfx.Clear(doc, White)
+	grid := Grid{Rows: GridSize, Cols: GridSize}
 
 	p := rand.Palette()
 
-	for i, rect := range grid.Rects() {
-		cell := grid.Cells[i]
+	for _, cell := range grid.Cells() {
+		rect := cell.Rect
 
 		if rand.Bool(SkipCellChance) {
 			continue
@@ -39,11 +39,10 @@ func Ink(doc Layer) {
 
 			r := rect.Shrink(float32(i+1) * Shrink)
 			q := r.Quad()
-			//q = rand.TweakQuad(q, TweakBox)
 			m := q.Stroke()
 			m.Width = LineWidth
 
-			s := NewShader(m)
+			s := gfx.NewShader(m)
 			s.Set("a_color", rand.Color(p))
 			s.Set("a_pivot", r.Center())
 			s.Draw(doc)

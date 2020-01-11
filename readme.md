@@ -5,12 +5,11 @@ Ink is a framework for creative 2D graphics in [Go](https://golang.org), based o
 ### Example: a simple triangle
 Install:
 ```
-go get github.com/buchanae/ink
+go get github.com/buchanae/ink/...
 ```
 
-Write:
+Write `example.go`:
 ```go
-// example.go
 package main
 
 import (
@@ -19,10 +18,6 @@ import (
 	. "github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/gfx"
 )
-
-func main() {
-	app.Run(Ink)
-}
 
 func Ink(doc *Doc) {
 
@@ -42,7 +37,7 @@ func Ink(doc *Doc) {
 
 Run:
 ```
-go run example.go
+ink example.go
 ```
 
 Ink opens a window and renders your triangle:

@@ -101,6 +101,12 @@ func (l *layer) NewImage(img image.Image) gfx.Image {
 }
 
 func (l *layer) AddShader(s *gfx.Shader) {
+	// TODO this is pretty confusing in some cases.
+	//      the name "Layer" gives the impression of layering
+	//      the entire groups in layer order, not interleaved.
+	//      consider changing the name, or running shaders
+	//      in true layer order.
+	//
 	// layer writes nodes to the root doc
 	// in order to maintain a flat list of nodes.
 	l.doc.Ops = append(l.doc.Ops, Op{

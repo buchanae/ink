@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -12,16 +13,16 @@ const (
 	RandPoint  = 0.03
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
-	Clear(doc, White)
+	gfx.Clear(doc, White)
 
-	grid := NewGrid(10, 10)
+	grid := Grid{Rows: 10, Cols: 10}
 	colors := rand.Palette()
 
-	for _, r := range grid.Rects() {
-		r = r.Shrink(ShrinkRect)
+	for _, cell := range grid.Cells() {
+		r := cell.Rect.Shrink(ShrinkRect)
 		q := r.Quad()
 		p := rand.XYInRect(r.Shrink(RandPoint))
 		p = r.Center()
@@ -37,15 +38,7 @@ func Ink(doc Layer) {
 		}
 
 		for _, t := range tris {
-			// TODO Fill is very common but doesn't
-			//      merge well because of the uniform
-			//      u_color.
-			//f := Fill{t, rnd.Color(colors)}
-			//l2.Draw(f)
-
-			s := NewShader(t)
-			s.Set("a_color", rand.Color(colors))
-			s.Draw(doc)
+			gfx.Fill{t, rand.Color(colors)}.Draw(doc)
 		}
 	}
 }

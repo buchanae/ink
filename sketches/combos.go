@@ -1,44 +1,43 @@
 package main
 
 import (
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
+	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
+	gfx.Clear(doc, color.White)
 
-	// TODO grid size is confusing
-	//      because the grid is actually a point grid, not a rectangle grid
-	grid := NewGrid(17, 33)
-	box := RectCenter(XY{.5, .5}, XY{1, .5})
+	center := XY{0.5, 0.5}
+	grid := Grid{
+		Rows: 32,
+		Cols: 16,
+		Rect: RectCenter(center, XY{.5, .97}),
+	}
+	sub := Grid{Rows: 3, Cols: 3}
 
-	var strokes []Mesh
+	var bold []Stroke
+	var strokes []Stroke
 
-	for i, rect := range grid.Rects() {
+	for i, cell := range grid.Cells() {
+		r := cell.Rect.Shrink(0.003)
+		bold = append(bold, r.Stroke())
 
-		r := rect.Shrink(0.000)
-		//r = r.Rotate(-math.Pi/2, XY{.5, .5})
-		r = Rect{
-			A: box.Interp(r.A),
-			B: box.Interp(r.B),
-		}
-		stk := r.Stroke()
-		stk.Width = 0.0005
-		strokes = append(strokes, stk.Mesh())
+		for j, sc := range sub.Cells() {
+			sr := sc.Rect
 
-		sub := NewGrid(4, 4)
-		for j, sr := range sub.Rects() {
+			xr := Rect{
+				A: r.Interpolate(sr.A),
+				B: r.Interpolate(sr.B),
+			}
 
-			a := r.Interp(sr.A)
-			b := r.Interp(sr.B)
-			xr := Rect{a, b}
-
-			//stk := xr.Stroke(0.0005)
-			//strokes = append(strokes, stk)
+			stk := xr.Stroke()
+			stk.Width = 0.0005
+			strokes = append(strokes, stk)
 
 			// TODO interleaving a stroke
 			//      causes all the batching to fail
@@ -49,14 +48,22 @@ func Ink(doc Layer) {
 
 			mask := 1 << j
 			if i&mask == mask {
-				NewShader(xr).Draw(doc)
+				gfx.NewShader(xr).Draw(doc)
 			}
 		}
 	}
 
 	for _, stk := range strokes {
-		shd := NewShader(stk)
-		shd.Set("a_color", White)
+		stk.Width = 0.0002
+		shd := gfx.NewShader(stk)
+		shd.Set("a_color", color.Black)
+		shd.Draw(doc)
+	}
+
+	for _, stk := range bold {
+		stk.Width = 0.0009
+		shd := gfx.NewShader(stk)
+		shd.Set("a_color", color.Black)
 		shd.Draw(doc)
 	}
 }

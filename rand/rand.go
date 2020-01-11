@@ -7,6 +7,7 @@ TODO:
 	- gamma
 	- exponential
 	- normal
+	- paredo (power law)
 */
 
 import (

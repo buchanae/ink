@@ -1,12 +1,14 @@
 package main
 
 import (
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
+	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
+	gfx.Clear(doc, color.White)
 
 	p := Path{}
 	p.MoveTo(XY{0.2, 0.2})
@@ -20,5 +22,6 @@ func Ink(doc Layer) {
 
 	m := p.Stroke()
 	m.Width = 0.002
-	Fill{m, Red}.Draw(doc)
+
+	gfx.Fill{m, color.Red}.Draw(doc)
 }
