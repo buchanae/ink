@@ -37,6 +37,13 @@ func main() {
 		panic(err)
 	}
 
+	wd, err := newWorkdir()
+	defer wd.cleanup()
+	if err != nil {
+		panic(err)
+	}
+
+	log.Print(wd.path)
 	watch := newWatcher()
 	watch.Watch(path)
 
@@ -47,7 +54,6 @@ func main() {
 	})
 
 	go func() {
-
 		wg := sync.WaitGroup{}
 
 		for {
@@ -55,7 +61,7 @@ func main() {
 
 			wg.Add(1)
 			go func() {
-				run(ctx, a, path, args[0])
+				run(ctx, a, wd, path, args[0])
 				wg.Done()
 			}()
 
@@ -75,44 +81,68 @@ func main() {
 	}
 }
 
-type firstByteReader struct {
-	r     io.Reader
-	total int
-	done  bool
+type workdir struct {
+	path string
 }
 
-func (fbr *firstByteReader) Read(data []byte) (int, error) {
-	n, err := fbr.r.Read(data)
-	if !fbr.done {
-		fbr.done = true
-	}
-	fbr.total += n
-	return n, err
-}
+func newWorkdir() (wd workdir, err error) {
 
-func run(ctx context.Context, a *app.App, path, name string) error {
-	sketchDir := filepath.Dir(path)
-	tempDir, err := ioutil.TempDir("", "ink-run-")
+	wd.path, err = ioutil.TempDir("", "ink-run-")
 	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(tempDir)
-
-	inkPath := filepath.Join(tempDir, "ink.go")
-
-	err = copyFile(inkPath, path, name)
-	if err != nil {
-		return err
+		return
 	}
 
-	mainPath := filepath.Join(tempDir, "main.go")
+	mainPath := filepath.Join(wd.path, "ink_main_wrapper.go")
 	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
 	if err != nil {
+		return
+	}
+
+	modPath := filepath.Join(wd.path, "go.mod")
+	err = ioutil.WriteFile(modPath, []byte(mod), 0644)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (w workdir) cleanup() {
+	if w.path != "" {
+		os.RemoveAll(w.path)
+	}
+}
+
+func build(wd workdir, sketchPath, sketchName string) error {
+
+	inkPath := filepath.Join(wd.path, "ink.go")
+	err := copyFile(inkPath, sketchPath, sketchName)
+	if err != nil {
 		return err
 	}
 
-	cmd := exec.CommandContext(ctx, "go", "run", "-tags=sendonly", inkPath, mainPath)
-	cmd.Dir = sketchDir
+	cmd := exec.Command(
+		"go", "build", "-tags=sendonly", "-o=inkbin", ".",
+	)
+	cmd.Env = []string{}
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	cmd.Env = append(cmd.Env, "GO111MODULE=on")
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
+	cmd.Dir = wd.path
+	return cmd.Run()
+}
+
+func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName string) error {
+
+	err := build(wd, sketchPath, sketchName)
+	if err != nil {
+		return err
+	}
+
+	binPath := filepath.Join(wd.path, "inkbin")
+	cmd := exec.Command(binPath)
+	cmd.Dir = filepath.Dir(sketchPath)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -190,3 +220,22 @@ func main() {
 	app.Send(Ink)
 }
 `
+
+const mod = `
+module temp
+`
+
+type firstByteReader struct {
+	r     io.Reader
+	total int
+	done  bool
+}
+
+func (fbr *firstByteReader) Read(data []byte) (int, error) {
+	n, err := fbr.r.Read(data)
+	if !fbr.done {
+		fbr.done = true
+	}
+	fbr.total += n
+	return n, err
+}
