@@ -4,87 +4,54 @@
 <head>
   <meta charset="utf-8">
   <title>Ink</title>
-
-<style>
-body {
-  padding: 10px;
-}
-
-h1, h2, h3, h4 {
-  color: #333;
-  font-weight: normal;
-}
-h1, h2, h3, h4 {
-  text-decoration: underline;
-}
-
-
-.split {
-  display: flex;
-}
-.left, .right {
-  flex-grow: 1;
-  width: 50%;
-}
-.section {
-  margin: 80px 0;
-}
-.right img {
-  display: block;
-  margin: 0 auto;
-}
-.code {
-  font-family: monospace;
-  background-color: #eee;
-  padding: 5px 15px;
-}
-</style>
+  <link rel="stylesheet" href="./assets/style.css" />
 </head>
 
 <body>
 <h1>Ink</h1>
 
-
 <div>
   <p>This is a quick and dirty introduction to Ink: a framework for 2D graphics in Go, focused on creative coding, and based on OpenGL.</p>
 
-  <p><em>Disclaimer:</em> Although I've been working towards Ink for years,
-the project is still very young in many ways. There are many TODOs, bugs, and ugly APIs.
-I will rewrite and break and (hopefully) improve things over time.</p>
+  <p><em>Disclaimer:</em> Although I've been working towards Ink for years, the project is still very young in many ways. There are many TODOs, bugs, and ugly APIs. I will rewrite and break and (hopefully) improve things over time.</p>
+
+
+  <p>There's more that doesn't have examples here. Check out the <a href="https://godoc.org/github.com/buchanae/ink">docs</a>, the <a href="https://github.com/buchanae/ink/tree/master/sketches">sketches directory</a>, or just browse through <a href="https://github.com/buchanae/ink">the code</a>.</p>
 </div>
 
-<div class="section">
 
+<section>
   <h2>Usage</h2>
 
-    <div>
-      <p>You'll need <a href="golang.org/">Go</a> installed. These docs assume the reader is familiar with programming in Go.</p>
+  <div>
+    <p>You'll need <a href="https://golang.org/">Go</a> installed. These docs assume the reader is familiar with programming in Go.</p>
 
-      <p>Install ink:</p>
-      <p><span class="code">go get github.com/buchanae/ink/...</span></p>
+    <p>Install ink:</p>
+    <p><span class="code">go install github.com/buchanae/ink</span></p>
 
-      <p>Use the "ink" CLI to run a sketch file. This will open a window,
-       draw the sketch, and watch for changes.</p>
+		<p>(I'm <em>pretty</em> that should work for you, but if it doesn't please let me know by filing a github issue. If nothing else, you can clone the code and run <span class="code">go install .</span> from the root.)</p>
 
-      <p><span class="code">ink example.go</span></p>
-    </div>
+    <p>Use the "ink" CLI to run a sketch file. This will open a window,
+     draw the sketch, and watch for changes.</p>
 
-</div>
+    <p><span class="code">ink example.go</span></p>
+  </div>
+</section>
 
 
-<div class="section">
-<h2>Hello, Triangle</h2>
-<p>The "hello, world" of graphics: a triangle with different colored vertices.</p>
+<section>
+  <h2>Hello, Triangle</h2>
+  <p>The "hello, world" of graphics: a triangle with different colored vertices.</p>
 
   <div class="split">
   <div class="left">
-<div class="code"><pre>package main
+    <div class="code"><pre>package main
 
 import (
-    "github.com/buchanae/ink/app"
-    . "github.com/buchanae/ink/color"
-    . "github.com/buchanae/ink/dd"
-    "github.com/buchanae/ink/gfx"
+    &#34;github.com/buchanae/ink/app&#34;
+    . &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
 )
 
 func Ink(doc *app.Doc) {
@@ -96,34 +63,33 @@ func Ink(doc *app.Doc) {
     }
 
     s := gfx.NewShader(t)
-    s.Set("a_color", []RGBA{
+    s.Set(&#34;a_color&#34;, []RGBA{
         Red, Green, Blue,
     })
     s.Draw(doc)
 }
 </pre></div>
-
   </div>
   <div class="right">
-    <img src="https://raw.githubusercontent.com/buchanae/ink/gh-pages/assets/hello_triangle.png" width="400" />
-  </div>
+    <img src="./assets/hello_triangle.png" width="400" />
   </div>
 </div>
 
-<div class="section">
-<h2>Basic Shapes</h2>
+</section>
 
-<p>The "dd" (like "two d") package holds all the 2D geometry types, and the "gfx" package holds things like "Fill".</p>
+<section>
+  <h2>Basic Shapes</h2>
+  <p>The "dd" (like "two d") package holds all the 2D geometry types, and the "gfx" package holds things like "Fill".</p>
 
-<div class="split">
+  <div class="split">
   <div class="left">
-<div class="code"><pre>package main
+    <div class="code"><pre>package main
 
 import (
-    "github.com/buchanae/ink/app"
-    "github.com/buchanae/ink/color"
-    . "github.com/buchanae/ink/dd"
-    "github.com/buchanae/ink/gfx"
+    &#34;github.com/buchanae/ink/app&#34;
+    &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
 )
 
 func Ink(doc *app.Doc) {
@@ -166,29 +132,29 @@ func Ink(doc *app.Doc) {
 </pre></div>
   </div>
   <div class="right">
-    <img src="https://raw.githubusercontent.com/buchanae/ink/gh-pages/assets/basic_shapes.png" width="400" />
+    <img src="./assets/basic_shapes.png" width="400" />
   </div>
 </div>
-</div>
 
-</div>
 
-<div class="section">
-<h2>Grid</h2>
+</section>
 
-<p>Grids are one of the types I find most useful. This replica of a piece by George Nees demonstrates the Grid utility.</p>
+<section>
+  <h2>Grid</h2>
 
-<div class="split">
+  <p>Grids are one of the types I find most useful. This replica of a piece by George Nees demonstrates the Grid utility.</p>
+
+  <div class="split">
   <div class="left">
-<div class="code"><pre>package main
+    <div class="code"><pre>package main
 
 import (
-    "github.com/buchanae/ink/app"
-    . "github.com/buchanae/ink/color"
-    . "github.com/buchanae/ink/dd"
-    "github.com/buchanae/ink/gfx"
-    "github.com/buchanae/ink/math"
-    "github.com/buchanae/ink/rand"
+    &#34;github.com/buchanae/ink/app&#34;
+    . &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
+    &#34;github.com/buchanae/ink/math&#34;
+    &#34;github.com/buchanae/ink/rand&#34;
 )
 
 const (
@@ -232,24 +198,26 @@ func Ink(doc *app.Doc) {
 </pre></div>
   </div>
   <div class="right">
-    <img src="https://raw.githubusercontent.com/buchanae/ink/gh-pages/assets/nees.png" width="500" />
+    <img src="./assets/grid.png" width="400" />
   </div>
 </div>
-</div>
 
-<div class="section">
-<h2>Strokes</h2>
+</section>
 
-<p>Stroke is part of the API that still feels a bit awkward and cumbersome. Here's what it looks like:</p>
-</div>
+<section>
+  <h2>Paths</h2>
+  <p>Paths are a little broken and buggy at the moment.</p>
 
-<div class="section">
-<h2>Paths</h2>
-
-<div class="split">
+  <div class="split">
   <div class="left">
-<div class="code"><pre>
-// I'll stop including the imports code now
+    <div class="code"><pre>package main
+
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+    &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
+)
 
 func Ink(doc *app.Doc) {
     gfx.Clear(doc, color.White)
@@ -272,22 +240,31 @@ func Ink(doc *app.Doc) {
 </pre></div>
   </div>
   <div class="right">
-    <img src="https://raw.githubusercontent.com/buchanae/ink/gh-pages/assets/basic_shapes.png" width="400" />
+    <img src="./assets/paths.png" width="400" />
   </div>
 </div>
-</div>
-</div>
 
 
-<div class="section">
-<h2>Palettes</h2>
+</section>
 
-<div class="split">
+<section>
+  <h2>Palettes</h2>
+  <p>Ink has a bunch of color palettes built in.</p>
+
+  <div class="split">
   <div class="left">
-<div class="code"><pre>
+    <div class="code"><pre>package main
+
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+    &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
+    &#34;github.com/buchanae/ink/rand&#34;
+)
+
 func Ink(doc *app.Doc) {
 
-    grid := Grid{Rows: 20, Cols: 20}
+    grid := dd.Grid{Rows: 20, Cols: 20}
     palette := rand.Palette()
 
     for _, cell := range grid.Cells() {
@@ -299,75 +276,190 @@ func Ink(doc *app.Doc) {
 </pre></div>
   </div>
   <div class="right">
-    <img src="https://raw.githubusercontent.com/buchanae/ink/gh-pages/assets/palettes.png" width="400" />
+    <img src="./assets/palettes.png" width="400" />
   </div>
 </div>
-</div>
-</div>
 
-<div class="section">
-  <h2>Misc Graphics</h2>
-Images
-Gradient
-Clear
 
-Mask
-Blur
-</div>
+</section>
 
-<div class="section">
-<h2>Randomness</h2>
-Blue noise
-Noise
-</div>
+<section>
+  <h2>Image</h2>
+  <div class="split">
+  <div class="left">
+    <div class="code"><pre>package main
 
-<div class="section">
-<h2>Interpolation</h2>
-</div>
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+)
 
-<div class="section">
-<h2>XY</h2>
-
-XY is probably the most core data type in Ink. XY represents an X and Y coordinate pair.
-It may represent a coordinate, or a 2D vector, or a width+height. Because it's so versatile,
-it has lots of methods:
+func Ink(doc *app.Doc) {
+    img := doc.LoadImage(&#34;toshiro.png&#34;)
+    img.Draw(doc)
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="./assets/image.png" width="400" />
+  </div>
 </div>
 
-<div class="section">
-<h2>Instancing</h2>
+</section>
+
+<section>
+  <h2>Instances</h2>
+  <p>Use OpenGL instancing to efficiently repeat the same shape many times.</p>
+  <div class="split">
+  <div class="left">
+    <div class="code"><pre>package main
+
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+    . &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
+    &#34;github.com/buchanae/ink/rand&#34;
+)
+
+func Ink(doc *app.Doc) {
+    rand.SeedNow()
+    gfx.Clear(doc, White)
+
+    const N = 100000
+
+    pos := make([]XY, N)
+    rot := make([]float32, N)
+    colors := make([]RGBA, N)
+    palette := rand.Palette()
+
+    for i := 0; i &lt; N; i++ {
+        pos[i] = rand.XYRange(0.1, 0.9)
+        rot[i] = rand.Angle()
+        colors[i] = rand.Color(palette)
+    }
+
+    doc.AddShader(&amp;gfx.Shader{
+        Vert:      gfx.DefaultVert,
+        Frag:      gfx.DefaultFrag,
+        Instances: N,
+        Mesh:      RectWH(0.05, 0.05),
+        Attrs: gfx.Attrs{
+            &#34;a_pos&#34;:   pos,
+            &#34;a_rot&#34;:   rot,
+            &#34;a_color&#34;: colors,
+        },
+        Divisors: map[string]int{
+            &#34;a_pos&#34;:   1,
+            &#34;a_rot&#34;:   1,
+            &#34;a_color&#34;: 1,
+        },
+    })
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="./assets/instances.png" width="400" />
+  </div>
 </div>
 
-<div class="section">
-<h2>Triangulation</h2>
+</section>
 
-(or "tesselation"? Honestly I haven't figured that out yet.)
+<section>
+  <h2>Blue Noise</h2>
+  <div class="split">
+  <div class="left">
+    <div class="code"><pre>package main
+
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+    &#34;github.com/buchanae/ink/color&#34;
+    &#34;github.com/buchanae/ink/dd&#34;
+    . &#34;github.com/buchanae/ink/gfx&#34;
+    &#34;github.com/buchanae/ink/rand&#34;
+)
+
+func Ink(doc *app.Doc) {
+    Clear(doc, color.White)
+
+    r := dd.Rect{
+        A: dd.XY{.1, .1},
+        B: dd.XY{.9, .9},
+    }
+    Fill{r, color.Lightgray}.Draw(doc)
+
+    bn := rand.BlueNoise{
+        Limit: 5050,
+        Rect:  r,
+    }
+    xys := bn.Generate(rand.Default)
+
+    for _, xy := range xys {
+        Dot{XY: xy, Radius: 0.003}.Draw(doc)
+    }
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="./assets/blue_noise.png" width="400" />
+  </div>
 </div>
 
-<div class="section">
-<h2>Voronoi</h2>
+</section>
+
+<section>
+  <h2>Voronoi</h2>
+  <div class="split">
+  <div class="left">
+    <div class="code"><pre>package main
+
+import (
+    &#34;github.com/buchanae/ink/app&#34;
+    &#34;github.com/buchanae/ink/color&#34;
+    . &#34;github.com/buchanae/ink/dd&#34;
+    &#34;github.com/buchanae/ink/gfx&#34;
+    &#34;github.com/buchanae/ink/rand&#34;
+    &#34;github.com/buchanae/ink/voronoi&#34;
+)
+
+func Ink(doc *app.Doc) {
+    rand.SeedNow()
+    gfx.Clear(doc, color.White)
+
+    rect := Rect{
+        A: XY{.1, .1},
+        B: XY{.9, .9},
+    }
+
+    bn := rand.BlueNoise{
+        Rect:    rect,
+        Spacing: 0.05,
+        Limit:   400,
+    }
+
+    palette := rand.Palette()
+    xys := bn.Generate(rand.Default)
+    v := voronoi.New(xys, rect)
+    tris := v.Triangulate()
+
+    for _, t := range tris {
+        c := rand.Color(palette)
+        f := gfx.Fill{t, c}
+        f.Draw(doc)
+    }
+}
+</pre></div>
+  </div>
+  <div class="right">
+    <img src="./assets/voronoi.png" width="400" />
+  </div>
 </div>
 
-<div class="section">
-<h2>Raster</h2>
+</section>
 
-Sometimes it's better to rasterize triangles on the CPU. For example, when I started the "primitive"  sketch, I originally was using the GPU to rasterize, and then reading back pixel data from GPU->CPU for every frame. This was incredibly slow, so copied and modified this simple triangle rasterizer from fogleman. This is very useful for tasks like taking the average of colors in a certain area of an image, or anything heavy on analytics.
-</div>
+<section>
+  <p>There's more that doesn't have examples here. Check out the <a href="https://godoc.org/github.com/buchanae/ink">docs</a>, the <a href="https://github.com/buchanae/ink/tree/master/sketches">sketches directory</a>, or just browse through <a href="https://github.com/buchanae/ink">the code</a>.</p>
+</section>
 
 
-<div class="section">
-<h2>Advanced: how it works</h2>
-How shaders work
-- opengl based
-- dd.Mesh
-- attributes
-
-direct render
-
-raster
-</div>
-
-</div>
-</div>
 </body>
-
 </html>
