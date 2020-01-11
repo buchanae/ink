@@ -8,6 +8,7 @@ import (
 )
 
 func Ink(doc *app.Doc) {
+	gfx.Clear(doc, color.White)
 
 	shapes := []gfx.Meshable{
 
