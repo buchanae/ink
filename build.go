@@ -11,6 +11,7 @@ import (
 )
 
 const AssetRoot = "./assets"
+const CacheBuster = "?1"
 
 var tpls *template.Template
 
@@ -32,8 +33,8 @@ func main() {
 	out := os.Stdout
 
 	data := Data{
-		"AssetRoot": AssetRoot,
-		"Content":   toString("index.html", nil),
+		"Style":   asset("style.css"),
+		"Content": toString("index.html", nil),
 	}
 	err := tpls.ExecuteTemplate(out, "base.html", data)
 	if err != nil {
@@ -42,7 +43,7 @@ func main() {
 }
 
 func asset(name string) string {
-	return AssetRoot + "/" + name
+	return AssetRoot + "/" + name + CacheBuster
 }
 
 func Example(name string) (string, error) {
