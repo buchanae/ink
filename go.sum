@@ -10,7 +10,5 @@ github.com/ojrac/opensimplex-go v1.0.1 h1:XslvpLP6XqQSATUtsOnGBYtFPw7FQ6h6y0ihjV
 github.com/ojrac/opensimplex-go v1.0.1/go.mod h1:MoSgj04tZpH8U0RefZabnHV2AbLgv/2mo3hLJtWqSEs=
 github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f h1:YeUeWAPTrycaikVXiVoAu1dxIR4+tSsn9IbTkNfRsss=
 github.com/pzsz/voronoi v0.0.0-20130609164533-4314be88c79f/go.mod h1:T6EcHUIQ7r0Xr1jjOJ7hmpUaqVyqb9WimeNzS9nz4Zo=
-github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1 h1:ayxM9WkC6QRX0QnfrbZa98pfFqrNq1jo+58rWL1qjZs=
-github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1/go.mod h1:xKffaBd7e1YUoLpR2azvJqkxEdUDNGNDMlsUNdv6Bcs=
 golang.org/x/sys v0.0.0-20191210023423-ac6580df4449 h1:gSbV7h1NRL2G1xTg/owz62CST1oJBmxy4QpMMregXVQ=
 golang.org/x/sys v0.0.0-20191210023423-ac6580df4449/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
