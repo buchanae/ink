@@ -5,7 +5,7 @@ Ink is a framework for creative 2D graphics in [Go](https://golang.org), based o
 ### Example: a simple triangle
 Install:
 ```
-go install github.com/buchanae/ink
+go get github.com/buchanae/ink
 ```
 
 Write `example.go`:
