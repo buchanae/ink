@@ -43,7 +43,6 @@ func main() {
 		panic(err)
 	}
 
-	log.Print(wd.path)
 	watch, err := newWatcher()
 	if err != nil {
 		panic(err)
