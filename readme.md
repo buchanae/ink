@@ -8,6 +8,8 @@ Install:
 go get github.com/buchanae/ink
 ```
 
+(Building Ink is a little tricky, because it depends on GLFW. You might need to install build-essential, xorg-dev, libgflw3-dev, etc).
+
 Write `example.go`:
 ```go
 package main
