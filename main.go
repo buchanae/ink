@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/buchanae/ink/app"
@@ -100,8 +101,19 @@ func newWorkdir() (wd workdir, err error) {
 		return
 	}
 
+	// TODO should look for an existing go.mod file in the sketch directory
 	modPath := filepath.Join(wd.path, "go.mod")
-	err = ioutil.WriteFile(modPath, []byte(mod), 0644)
+	modContent := mod
+
+	inkCode, err := findInkCode()
+	if err != nil {
+		log.Printf("error: finding ink code: %v", err)
+	}
+	if inkCode != "" {
+		modContent += "\n\nreplace github.com/buchanae/ink => " + inkCode
+	}
+
+	err = ioutil.WriteFile(modPath, []byte(modContent), 0644)
 	if err != nil {
 		return
 	}
@@ -123,6 +135,7 @@ func build(wd workdir, sketchPath, sketchName string) error {
 		return err
 	}
 
+	log.Print(wd.path)
 	cmd := exec.Command(
 		"go", "build", "-tags=sendonly", "-o=inkbin", ".",
 	)
@@ -141,6 +154,7 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 	if err != nil {
 		return err
 	}
+	log.Print("run")
 
 	binPath := filepath.Join(wd.path, "inkbin")
 	cmd := exec.Command(binPath)
@@ -240,4 +254,47 @@ func (fbr *firstByteReader) Read(data []byte) (int, error) {
 	}
 	fbr.total += n
 	return n, err
+}
+
+// search directory tree for a "go.mod" file for the ink module
+// in order to decide if ink should build against a local codebase.
+func findInkCode() (string, error) {
+	if v := os.Getenv("INK_PATH"); v != "" {
+		return v, nil
+	}
+
+	const inkMod = "module github.com/buchanae/ink"
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("getting current directory: %w", err)
+	}
+
+	current := wd
+	for {
+		mod := filepath.Join(current, "go.mod")
+
+		info, err := os.Stat(mod)
+		if err != nil && !os.IsNotExist(err) {
+			return "", fmt.Errorf("getting file info: %w", err)
+		}
+
+		if info != nil && info.Mode().IsRegular() {
+			b, err := ioutil.ReadFile(mod)
+			if err != nil {
+				return "", fmt.Errorf("reading file %q: %w", mod, err)
+			}
+			if strings.HasPrefix(string(b), inkMod) {
+				return current, nil
+			}
+		}
+
+		dir := filepath.Dir(current)
+		base := filepath.Base(current)
+		if dir == base {
+			break
+		}
+		current = dir
+	}
+	return "", nil
 }
