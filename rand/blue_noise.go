@@ -13,7 +13,11 @@ type BlueNoise struct {
 	Initial []dd.XY
 }
 
-func (bn BlueNoise) Generate(r *Rand) []dd.XY {
+func (bn BlueNoise) Generate() []dd.XY {
+	return bn.GenerateWith(Default)
+}
+
+func (bn BlueNoise) GenerateWith(r *Rand) []dd.XY {
 	n := bn.Limit
 	if n == 0 {
 		n = 100000
