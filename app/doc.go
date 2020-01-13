@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
 
@@ -80,7 +81,11 @@ func (d *Doc) NewImage(img image.Image) gfx.Image {
 	win := d.Config.Window
 	rw := float32(w) / float32(win.Width)
 	rh := float32(h) / float32(win.Height)
-	return gfx.Image{id, rw, rh}
+	rect := dd.RectCenter(
+		dd.XY{0.5, 0.5},
+		dd.XY{rw, rh},
+	)
+	return gfx.Image{id, rect}
 }
 
 func (d *Doc) LoadImage(path string) gfx.Image {

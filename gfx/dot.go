@@ -5,6 +5,7 @@ import (
 	"github.com/buchanae/ink/dd"
 )
 
+// TODO Dot doesn't batch
 type Dot struct {
 	XY     dd.XY
 	Color  color.RGBA
