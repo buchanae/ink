@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/buchanae/ink/app"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -178,11 +179,11 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 		return fmt.Errorf("starting: %v", err)
 	}
 
-	reader := &firstByteReader{r: stdout}
+	dec := gob.NewDecoder(stdout)
 
 	for {
+		start := time.Now()
 		doc := &app.Doc{}
-		dec := gob.NewDecoder(reader)
 		err = dec.Decode(doc)
 		if err == io.EOF {
 			break
@@ -191,7 +192,10 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 			return fmt.Errorf("decoding: %v", err)
 		}
 
+		renderStart := time.Now()
 		a.Render(doc)
+		log.Printf("render iter: %s", time.Since(renderStart))
+		log.Printf("iter: %s", time.Since(start))
 	}
 
 	err = cmd.Wait()
@@ -241,21 +245,6 @@ func main() {
 const mod = `
 module temp
 `
-
-type firstByteReader struct {
-	r     io.Reader
-	total int
-	done  bool
-}
-
-func (fbr *firstByteReader) Read(data []byte) (int, error) {
-	n, err := fbr.r.Read(data)
-	if !fbr.done {
-		fbr.done = true
-	}
-	fbr.total += n
-	return n, err
-}
 
 // search directory tree for a "go.mod" file for the ink module
 // in order to decide if ink should build against a local codebase.
