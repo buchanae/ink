@@ -135,7 +135,6 @@ func build(wd workdir, sketchPath, sketchName string) error {
 		return err
 	}
 
-	log.Print(wd.path)
 	cmd := exec.Command(
 		"go", "build", "-tags=sendonly", "-o=inkbin", ".",
 	)
@@ -233,7 +232,9 @@ package main
 import "github.com/buchanae/ink/app"
 
 func main() {
-	app.Send(Ink)
+	doc := app.NewDoc()
+	Ink(doc)
+	app.Send(doc)
 }
 `
 

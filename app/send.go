@@ -10,11 +10,7 @@ type Frame struct {
 	Time time.Time
 }
 
-func Send(f func(*Doc)) {
-
-	doc := NewDoc()
-	f(doc)
-
+func Send(doc *Doc) {
 	err := gob.NewEncoder(os.Stdout).Encode(doc)
 	if err != nil {
 		os.Stderr.Write([]byte("sending: "))
