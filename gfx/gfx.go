@@ -28,22 +28,3 @@ type Layer interface {
 	NewImage(image.Image) Image
 	AddShader(*Shader)
 }
-
-type Image struct {
-	ID            int
-	Width, Height float32
-}
-
-func (img Image) Draw(out Layer) {
-	out.AddShader(&Shader{
-		Vert: DefaultVert,
-		Frag: CopyFrag,
-		Mesh: dd.RectCenter(
-			dd.XY{0.5, 0.5},
-			dd.XY{img.Width, img.Height},
-		),
-		Attrs: Attrs{
-			"u_image": img,
-		},
-	})
-}
