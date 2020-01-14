@@ -18,8 +18,8 @@ type Meshable interface {
 	Mesh() dd.Mesh
 }
 
-type Strokeable interface {
-	Stroke() dd.Stroke
+type Fillable interface {
+	Fill() dd.Mesh
 }
 
 type Layer interface {

@@ -1,49 +1,41 @@
 package dd
 
-func NewPath(xys ...XY) *Path {
-	p := &Path{}
-	if len(xys) == 0 {
-		return p
-	}
-	p.MoveTo(xys[0])
-	for i := 1; i < len(xys); i++ {
-		p.LineTo(xys[i])
-	}
-	return p
+func NewPen() *Pen {
+	return &Pen{}
 }
 
-type Path struct {
+type Pen struct {
 	prev     XY
 	current  *subpath
 	subpaths []*subpath
 }
 
-func (p *Path) MoveTo(xy XY) {
+func (p *Pen) MoveTo(xy XY) {
 	p.prev = xy
 	p.current = nil
 }
 
-func (p *Path) Move(xy XY) {
+func (p *Pen) Move(xy XY) {
 	p.MoveTo(p.prev.Add(xy))
 }
 
-func (p *Path) LineTo(xy XY) {
+func (p *Pen) LineTo(xy XY) {
 	s := Line{p.prev, xy}
 	p.pushSegment(s)
 	p.prev = xy
 }
 
-func (p *Path) Line(xy XY) {
+func (p *Pen) Line(xy XY) {
 	p.LineTo(p.prev.Add(xy))
 }
 
-func (p *Path) CubicTo(xy, a, b XY) {
+func (p *Pen) CubicTo(xy, a, b XY) {
 	s := Cubic{p.prev, xy, a, b}
 	p.pushSegment(s)
 	p.prev = xy
 }
 
-func (p *Path) Cubic(xy, a, b XY) {
+func (p *Pen) Cubic(xy, a, b XY) {
 	p.CubicTo(
 		p.prev.Add(xy),
 		p.prev.Add(a),
@@ -51,20 +43,20 @@ func (p *Path) Cubic(xy, a, b XY) {
 	)
 }
 
-func (p *Path) QuadraticTo(xy, a XY) {
+func (p *Pen) QuadraticTo(xy, a XY) {
 	s := Quadratic{p.prev, xy, a}
 	p.pushSegment(s)
 	p.prev = xy
 }
 
-func (p *Path) Quadratic(xy, a XY) {
+func (p *Pen) Quadratic(xy, a XY) {
 	p.QuadraticTo(
 		p.prev.Add(xy),
 		p.prev.Add(a),
 	)
 }
 
-func (p *Path) Close() {
+func (p *Pen) Close() {
 	// TODO if first line was a curve, would calling close
 	//      draw a straight line? if so, this check could change.
 	if p.current == nil || len(p.current.segments) < 2 {
@@ -74,24 +66,28 @@ func (p *Path) Close() {
 	p.LineTo(first)
 }
 
-func (p *Path) Curves() []Curve {
-	var curves []Curve
+func (p *Pen) Stroke(opt StrokeOpt) Mesh {
+	mesh := Mesh{}
 	for _, sub := range p.subpaths {
-		curves = append(curves, sub.segments...)
+		path := Path(sub.segments)
+		mesh = StrokeTo(path, mesh, opt)
 	}
-	return curves
+	return mesh
 }
 
-// TODO closed path seems to have a glitch at the final miter joint?
-func (p *Path) Stroke() Stroke {
-	return Stroke{Curves: p.Curves()}
+func (p *Pen) Paths() []Path {
+	var paths []Path
+	for _, sub := range p.subpaths {
+		paths = append(paths, Path(sub.segments))
+	}
+	return paths
 }
 
 type subpath struct {
 	segments []Curve
 }
 
-func (p *Path) pushSegment(s Curve) {
+func (p *Pen) pushSegment(s Curve) {
 	if p.current == nil {
 		p.current = &subpath{}
 		p.subpaths = append(p.subpaths, p.current)

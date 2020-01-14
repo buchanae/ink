@@ -4,6 +4,19 @@ func NewLine(a, b XY) Line {
 	return Line{a, b}
 }
 
+func XYsToLines(xys ...XY) []Line {
+	if len(xys) < 2 {
+		return nil
+	}
+
+	var lines []Line
+	for i := 0; i < len(xys)-1; i++ {
+		end := i + 1
+		lines = append(lines, Line{xys[i], xys[end]})
+	}
+	return lines
+}
+
 type Line struct {
 	A, B XY
 }
@@ -55,32 +68,4 @@ func (l Line) RelativeAngle(m Line) float32 {
 	c := l.B.Sub(l.A)
 	d := m.B.Sub(m.A)
 	return atan2(d.Y, d.X) - atan2(c.Y, c.X)
-}
-
-func (l Line) Stroke() Stroke {
-	return Stroke{Curves: []Curve{l}}
-}
-
-// Close the lines by adding a line from the first last point to the first.
-func Close(lines []Line) []Line {
-	if len(lines) < 2 {
-		return lines
-	}
-	first := lines[0]
-	last := lines[len(lines)-1]
-	return append(lines, Line{last.B, first.A})
-}
-
-// Connect points into lines.
-func Connect(points ...XY) []Line {
-	if len(points) < 2 {
-		return nil
-	}
-
-	var lines []Line
-	for i := 0; i < len(points)-1; i++ {
-		end := i + 1
-		lines = append(lines, Line{points[i], points[end]})
-	}
-	return lines
 }

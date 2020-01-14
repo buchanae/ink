@@ -142,15 +142,18 @@ func (r Rect) Mesh() Mesh {
 	}
 }
 
-func (r Rect) Stroke() Stroke {
-	path := NewPath(
+/*
+func (r Rect) Path() *Path {
+	return NewPath(
 		r.A, XY{r.A.X, r.B.Y},
 		r.B, XY{r.B.X, r.A.Y},
 		r.A,
 	)
-	stroke := path.Stroke()
-	stroke.Closed = true
-	return stroke
+}
+*/
+
+func (r Rect) Stroke(opt StrokeOpt) Mesh {
+	return r.Quad().Stroke(opt)
 }
 
 // Bounding box

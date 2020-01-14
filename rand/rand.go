@@ -1,8 +1,7 @@
 package rand
 
 /*
-TODO:
-- distributions:
+TODO: distributions:
   - binomial
 	- gamma
 	- exponential

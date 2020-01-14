@@ -10,18 +10,58 @@ import (
 func Ink(doc *app.Doc) {
 	gfx.Clear(doc, color.White)
 
-	p := Path{}
-	p.MoveTo(XY{0.2, 0.2})
-	p.LineTo(XY{0.2, 0.3})
-	p.LineTo(XY{0.3, 0.3})
-	p.LineTo(XY{0.5, 0.7})
-	p.LineTo(XY{0.7, 0.7})
-	p.LineTo(XY{0.7, 0.9})
-	p.LineTo(XY{0.5, 0.9})
-	p.LineTo(XY{0.3, 0.7})
+	pen := &Pen{}
+	pen.MoveTo(XY{0.2, 0.2})
+	pen.LineTo(XY{0.2, 0.3})
+	pen.LineTo(XY{0.3, 0.3})
+	pen.LineTo(XY{0.3, 0.2})
+	pen.Close()
 
-	m := p.Stroke()
-	m.Width = 0.002
+	pen.MoveTo(XY{0.5, 0.5})
+	pen.LineTo(XY{0.5, 0.6})
+	pen.LineTo(XY{0.6, 0.6})
+	pen.LineTo(XY{0.6, 0.5})
+	pen.Close()
 
-	gfx.Fill{m, color.Red}.Draw(doc)
+	shapes := []gfx.Strokeable{
+		pen,
+
+		Rect{
+			XY{0.1, 0.7},
+			XY{0.3, 0.9},
+		},
+
+		Circle{
+			XY:     XY{0.5, 0.5},
+			Radius: 0.1,
+		},
+
+		Triangle{
+			XY{.7, .1},
+			XY{.8, .3},
+			XY{.9, .1},
+		},
+
+		Ellipse{
+			XY:   XY{.2, .2},
+			Size: XY{.15, .1},
+		},
+
+		Quad{
+			XY{0.65, 0.7},
+			XY{0.9, 0.7},
+			XY{0.85, 0.95},
+			XY{0.7, 0.9},
+		},
+	}
+
+	for _, s := range shapes {
+		gfx.Stroke{
+			Target: s,
+			Color:  color.Red,
+			StrokeOpt: StrokeOpt{
+				Width: 0.002,
+			},
+		}.Draw(doc)
+	}
 }

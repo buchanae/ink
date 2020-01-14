@@ -1,30 +1,45 @@
 package dd
 
+// TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+type StrokeCap int
+
+const (
+	ButtCap = iota
+	RoundCap
+	SquareCap
+)
+
+// TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin
+type StrokeJoin int
+
+const (
+	MiterJoin = iota
+	RoundJoin
+	BevelJoin
+)
+
 // TODO stroke options: miter, cap, etc.
-type Stroke struct {
-	Curves []Curve
-	Width  float32
-	Closed bool
-}
-
-func (s Stroke) Stroke() Stroke {
-	return s
-}
-
-func (s Stroke) Mesh() Mesh {
-	return NewMesh(s.Triangles())
+type StrokeOpt struct {
+	Width float32
+	Cap   StrokeCap
+	Join  StrokeJoin
 }
 
 // TODO unfinished. need to stroke half width in both directions.
 //      currently stroking full width in one direciton.
-// TODO this can't be used to stroke lots of lines individually
-func (s Stroke) Triangles() []Triangle {
-	lines := s.lines()
+
+func Stroke(path Path, opt StrokeOpt) Mesh {
+	mesh := Mesh{}
+	return StrokeTo(path, mesh, opt)
+}
+
+func StrokeTo(path Path, mesh Mesh, opt StrokeOpt) Mesh {
+	lines := pathToLines(path)
 	if len(lines) == 0 {
-		return nil
+		return mesh
 	}
 
-	width := s.Width
+	width := opt.Width
 	if width == 0 {
 		width = 0.001
 	}
@@ -32,12 +47,13 @@ func (s Stroke) Triangles() []Triangle {
 	if len(lines) == 1 {
 		l := lines[0]
 		n := l.Normal().SetLength(width)
-		return []Triangle{
+		return mesh.AddTriangles([]Triangle{
 			{l.A, l.B, l.A.Add(n)},
 			{l.A.Add(n), l.B, l.B.Add(n)},
-		}
+		})
 	}
 
+	closed := path.Start() == path.End()
 	var tris []Triangle
 	var prev [2]XY
 
@@ -47,7 +63,7 @@ func (s Stroke) Triangles() []Triangle {
 
 		// if on the last line, cap the end points
 		if i == len(lines)-1 {
-			if s.Closed {
+			if closed {
 				next = lines[0]
 			} else {
 				tris = append(tris,
@@ -62,7 +78,7 @@ func (s Stroke) Triangles() []Triangle {
 
 		// if on the first line, initialize the start points
 		if i == 0 {
-			if s.Closed {
+			if closed {
 				prev[0] = lines[len(lines)-1].B
 				prev[1] = miterPoint(lines[len(lines)-1], line, width)
 			} else {
@@ -81,23 +97,22 @@ func (s Stroke) Triangles() []Triangle {
 		prev[1] = mp
 	}
 
-	return tris
+	return mesh.AddTriangles(tris)
 }
 
-func (s Stroke) lines() []Line {
-	// TODO dynamic segment count using error margin
-	segments := 50
+func pathToLines(path Path) []Line {
 
-	var lines []Line
-	for _, curve := range s.Curves {
-		if l, ok := curve.(Line); ok {
-			lines = append(lines, l)
-			continue
+	lines := make([]Line, 0, len(path))
+	for _, curve := range path {
+		switch z := curve.(type) {
+		case Line:
+			lines = append(lines, z)
+		default:
+			// TODO dynamic segment count using error margin
+			segments := 50
+			xys := Subdivide(curve, segments)
+			lines = append(lines, XYsToLines(xys...)...)
 		}
-
-		xys := Subdivide(curve, segments)
-		ls := Connect(xys...)
-		lines = append(lines, ls...)
 	}
 	return lines
 }

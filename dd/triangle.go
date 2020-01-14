@@ -32,14 +32,24 @@ func (t Triangle) Mesh() Mesh {
 	}
 }
 
-func (t Triangle) Stroke() Stroke {
+func (t Triangle) Stroke(opt StrokeOpt) Mesh {
+	return Stroke(Path{
+		Line{t.A, t.B},
+		Line{t.B, t.C},
+		Line{t.C, t.A},
+	}, opt)
+}
+
+/*
+func (t Triangle) Path() *Path {
 	p := &Path{}
 	p.MoveTo(t.A)
 	p.LineTo(t.B)
 	p.LineTo(t.C)
 	p.LineTo(t.A)
-	return p.Stroke()
+	return p
 }
+*/
 
 func (t Triangle) Edges() []Line {
 	return []Line{
@@ -62,15 +72,4 @@ func (tris Triangles) Mesh() Mesh {
 		faces = append(faces, Face{l, l + 1, l + 2})
 	}
 	return Mesh{Verts: verts, Faces: faces}
-}
-
-func (tris Triangles) Stroke() Stroke {
-	p := &Path{}
-	for _, t := range tris {
-		p.MoveTo(t.A)
-		p.LineTo(t.B)
-		p.LineTo(t.C)
-		p.LineTo(t.A)
-	}
-	return p.Stroke()
 }

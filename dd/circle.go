@@ -100,32 +100,36 @@ func (c Circle) Ellipse() Ellipse {
 	}
 }
 
-func (c Circle) Stroke() Stroke {
-	return c.Ellipse().Stroke()
-}
-
 func (c Circle) Mesh() Mesh {
 	return c.Ellipse().Mesh()
-	// TODO normals are never returned
-	/*
-		normals := make([]XY, mesh.Size())
+}
 
-		// the 0 index is the center vertex.
-		// perimeter vertices start at index 1.
-		for i := 1; i < len(verts); i++ {
-			prev := i - 1
-			if prev == 0 {
-				prev = len(verts) - 1
-			}
-			next := i + 1
-			if next == len(verts) {
-				next = 1
-			}
+func (c Circle) Normals() []XY {
+	// TODO could every mesh have per-face normals?
+	mesh := c.Mesh()
+	verts := mesh.Verts
+	normals := make([]XY, mesh.Size())
 
-			a := Line{verts[prev], verts[i]}
-			b := Line{verts[i], verts[next]}
-			n := a.Normal().Add(b.Normal()).Normalize()
-			normals[i] = n
+	// the 0 index is the center vertex.
+	// perimeter vertices start at index 1.
+	for i := 1; i < len(verts); i++ {
+		prev := i - 1
+		if prev == 0 {
+			prev = len(verts) - 1
 		}
-	*/
+		next := i + 1
+		if next == len(verts) {
+			next = 1
+		}
+
+		a := Line{verts[prev], verts[i]}
+		b := Line{verts[i], verts[next]}
+		n := a.Normal().Add(b.Normal()).Normalize()
+		normals[i] = n
+	}
+	return normals
+}
+
+func (c Circle) Stroke(opt StrokeOpt) Mesh {
+	return c.Ellipse().Stroke(opt)
 }
