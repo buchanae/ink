@@ -104,11 +104,11 @@ func newMsaa(id, w, h, multisamples int) msaa {
 
 func (m msaa) Clear() {
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
-	glClearColor(0, 0, 0, 1)
+	glClearColor(1, 1, 1, 1)
 	glClear(gl.COLOR_BUFFER_BIT)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
-	glClearColor(0, 0, 0, 1)
+	glClearColor(1, 1, 1, 1)
 	glClear(gl.COLOR_BUFFER_BIT)
 }
 

@@ -58,6 +58,11 @@ func (r *Renderer) render(plan Plan) {
 	defer pb.cleanup()
 
 	r.trace("passes %d", len(pb.passes))
+	r.trace("faces %d", len(pb.faces)/3)
+
+	glViewport(0, 0, int32(r.width), int32(r.height))
+	glEnable(gl.MULTISAMPLE)
+	glEnable(gl.BLEND)
 
 	for _, p := range pb.passes {
 		r.renderPass(p)
@@ -66,17 +71,28 @@ func (r *Renderer) render(plan Plan) {
 
 func (r *Renderer) renderPass(p *pass) {
 
-	glViewport(0, 0, int32(r.width), int32(r.height))
-	glEnable(gl.MULTISAMPLE)
-	glEnable(gl.BLEND)
-
 	/*
 		glBlendFunc(src.factor, dst.factor)
 		src is the new color being added
 		dst is the existing color
 		result = src.color * src.factor + dst.color * dst.factor
 	*/
-	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	switch p.blend {
+	case Normal:
+		// src.RGB * src.A + dst.RGB * (1 - src.A)
+		glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+		glBlendEquation(gl.FUNC_ADD)
+	case Darken:
+		glBlendFunc(gl.ONE, gl.ONE)
+		glBlendEquation(gl.MIN)
+	case Multiply:
+		glBlendFunc(gl.ZERO, gl.SRC_COLOR)
+		glBlendEquation(gl.FUNC_ADD)
+	default:
+		log.Printf("unknown blend %v, falling back to Normal", p.blend)
+		glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+		glBlendEquation(gl.FUNC_ADD)
+	}
 
 	r.trace("render pass %s", p.name)
 	r.trace("  output to %d", p.layer)

@@ -37,6 +37,7 @@ func buildPlan(doc *Doc) render.Plan {
 			Vert:      s.Vert,
 			Frag:      s.Frag,
 			Layer:     op.LayerID,
+			Blend:     render.Blend(s.Blend),
 			Vertices:  len(mesh.Verts),
 			Instances: s.Instances,
 			Faces:     make([]uint32, 0, len(mesh.Faces)*3),

@@ -28,3 +28,11 @@ type Layer interface {
 	NewImage(image.Image) Image
 	AddShader(*Shader)
 }
+
+type Blend int
+
+const (
+	Normal Blend = iota
+	Darken
+	Multiply
+)

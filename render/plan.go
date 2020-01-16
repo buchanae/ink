@@ -21,6 +21,7 @@ type Shader struct {
 	Faces            []uint32
 	Uniforms         map[string]interface{}
 	Attrs            map[string]Attr
+	Blend            Blend
 }
 
 type Attr struct {
@@ -28,3 +29,11 @@ type Attr struct {
 	Size    int
 	Divisor int
 }
+
+type Blend int
+
+const (
+	Normal Blend = iota
+	Darken
+	Multiply
+)

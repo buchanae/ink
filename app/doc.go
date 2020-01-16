@@ -6,7 +6,6 @@ import (
 	_ "image/png"
 	"os"
 
-	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
@@ -24,9 +23,12 @@ func nextID() int {
 }
 
 type Doc struct {
-	ID     int
+	// Layer stuff
+	ID  int
+	Ops []Op
+
+	// app/doc stuff
 	Images map[int]image.Image
-	Ops    []Op
 	Config Config
 }
 
@@ -36,7 +38,8 @@ func NewDoc() *Doc {
 		// TODO need to pull this from app
 		Config: DefaultConfig(),
 	}
-	gfx.Clear(doc, color.Black)
+	// TODO causes problems with blend
+	//gfx.Clear(doc, color.Black)
 	return doc
 }
 

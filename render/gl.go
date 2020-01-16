@@ -270,6 +270,11 @@ func glBlendFunc(sfactor uint32, dfactor uint32) {
 	glLogErr("BlendFunc")
 }
 
+func glBlendEquation(mode uint32) {
+	gl.BlendEquation(mode)
+	glLogErr("BlendEquation")
+}
+
 func glViewport(x int32, y int32, width int32, height int32) {
 	gl.Viewport(x, y, width, height)
 	glLogErr("Viewport")

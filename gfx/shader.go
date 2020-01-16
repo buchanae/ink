@@ -8,6 +8,7 @@ type Shader struct {
 	Attrs      Attrs
 	Divisors   map[string]int
 	Instances  int
+	Blend      Blend
 }
 
 type Attrs map[string]interface{}

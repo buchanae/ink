@@ -31,6 +31,7 @@ type pass struct {
 	faceOffset    int
 	faceCount     int
 	instanceCount int
+	blend         Blend
 }
 
 type binding struct {
@@ -94,6 +95,7 @@ func (pb *build) addShader(shader *Shader) {
 		prog:          prog,
 		layer:         shader.Layer,
 		name:          shader.Name,
+		blend:         shader.Blend,
 		vertexCount:   shader.Vertices,
 		instanceCount: shader.Instances,
 		uniforms:      uniforms,
@@ -227,6 +229,10 @@ func (pb *build) batch() {
 func (pb *build) mergeable(a, b *pass) bool {
 	if a.prog.id != b.prog.id {
 		pb.trace("program IDs differ")
+		return false
+	}
+	if a.blend != b.blend {
+		pb.trace("blends differ")
 		return false
 	}
 	if len(a.bindings) != len(b.bindings) {
