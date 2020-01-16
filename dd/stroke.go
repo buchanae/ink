@@ -1,6 +1,7 @@
 package dd
 
 // TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-miterlimit
+// https://www.w3.org/TR/SVG11/painting.html#StrokeLinecapProperty
 type StrokeCap int
 
 const (
@@ -10,6 +11,7 @@ const (
 )
 
 // TODO https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/stroke-linejoin
+// https://www.w3.org/TR/SVG11/painting.html#StrokeLinejoinProperty
 type StrokeJoin int
 
 const (
@@ -19,6 +21,11 @@ const (
 )
 
 // TODO stroke options: miter, cap, etc.
+// https://www.w3.org/TR/SVG11/painting.html#StrokeMiterlimitProperty
+// https://www.w3.org/TR/SVG11/painting.html#StrokeLinejoinProperty
+// https://www.w3.org/TR/SVG11/painting.html#StrokeDasharrayProperty
+// https://www.w3.org/TR/SVG11/painting.html#FillRuleProperty
+// TODO a zero length curve with a square/round cap should be drawn
 type StrokeOpt struct {
 	Width float32
 	Cap   StrokeCap

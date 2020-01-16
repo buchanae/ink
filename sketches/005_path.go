@@ -11,16 +11,16 @@ func Ink(doc *app.Doc) {
 	gfx.Clear(doc, color.White)
 
 	pen := &Pen{}
-	pen.MoveTo(XY{0.2, 0.2})
-	pen.LineTo(XY{0.2, 0.3})
-	pen.LineTo(XY{0.3, 0.3})
-	pen.LineTo(XY{0.3, 0.2})
+	pen.MoveTo(XY{0.1, 0.4})
+	pen.Line(XY{0.1, 0.2})
+	pen.Line(XY{0.1, -0.2})
+	pen.Line(XY{-0.25, 0.125})
+	pen.Line(XY{0.3, 0.0})
 	pen.Close()
 
-	pen.MoveTo(XY{0.5, 0.5})
-	pen.LineTo(XY{0.5, 0.6})
-	pen.LineTo(XY{0.6, 0.6})
-	pen.LineTo(XY{0.6, 0.5})
+	pen.MoveTo(XY{0.7, 0.5})
+	pen.QuadraticTo(XY{0.9, 0.6}, XY{0.7, 0.6})
+	pen.QuadraticTo(XY{0.8, 0.5}, XY{0.9, 0.5})
 	pen.Close()
 
 	shapes := []gfx.Strokeable{

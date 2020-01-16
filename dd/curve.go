@@ -7,14 +7,10 @@ type Curve interface {
 	Interpolate(p float32) XY
 }
 
-type Curveable interface {
-	Curve() Curve
-}
-
 type Path []Curve
 
-func (c Path) Curve() Curve {
-	return c
+func (p Path) Stroke(opt StrokeOpt) Mesh {
+	return Stroke(p, opt)
 }
 
 func (c Path) Start() XY {
