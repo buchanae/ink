@@ -22,6 +22,7 @@ type msaa struct {
 		FBO, Tex uint32
 	}
 	Width, Height, Multisamples int
+	DisableMultisample          bool
 }
 
 func newMsaa(id, w, h, multisamples int) msaa {
@@ -72,25 +73,30 @@ func newMsaa(id, w, h, multisamples int) msaa {
 	)
 
 	// Initialize the Write texture
-	glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
+	if m.DisableMultisample {
+		m.Write.FBO = m.Read.FBO
+		m.Write.Tex = m.Read.Tex
+	} else {
+		glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
 
-	glBindTexture(gl.TEXTURE_2D_MULTISAMPLE, m.Write.Tex)
-	glTexImage2DMultisample(
-		gl.TEXTURE_2D_MULTISAMPLE,
-		int32(m.Multisamples),
-		gl.RGBA,
-		int32(m.Width),
-		int32(m.Height),
-		false,
-	)
+		glBindTexture(gl.TEXTURE_2D_MULTISAMPLE, m.Write.Tex)
+		glTexImage2DMultisample(
+			gl.TEXTURE_2D_MULTISAMPLE,
+			int32(m.Multisamples),
+			gl.RGBA,
+			int32(m.Width),
+			int32(m.Height),
+			false,
+		)
 
-	glFramebufferTexture2D(
-		gl.FRAMEBUFFER,
-		gl.COLOR_ATTACHMENT0,
-		gl.TEXTURE_2D_MULTISAMPLE,
-		m.Write.Tex,
-		0,
-	)
+		glFramebufferTexture2D(
+			gl.FRAMEBUFFER,
+			gl.COLOR_ATTACHMENT0,
+			gl.TEXTURE_2D_MULTISAMPLE,
+			m.Write.Tex,
+			0,
+		)
+	}
 
 	m.Clear()
 	return m
@@ -107,6 +113,9 @@ func (m msaa) Clear() {
 }
 
 func (m msaa) Paint() {
+	if m.DisableMultisample {
+		return
+	}
 	// Copy the multisample texture (Write)
 	// to the regular texture (Read).
 	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, m.Read.FBO)
