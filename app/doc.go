@@ -28,7 +28,6 @@ type Doc struct {
 	Images map[int]image.Image
 	Ops    []Op
 	Config Config
-	Trace  bool
 }
 
 func NewDoc() *Doc {
@@ -46,7 +45,6 @@ func (d *Doc) Filter(layerID ...int) *Doc {
 		ID:     nextID(),
 		Images: d.Images,
 		Config: d.Config,
-		Trace:  d.Trace,
 	}
 	for _, op := range d.Ops {
 		for _, id := range layerID {

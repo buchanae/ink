@@ -85,14 +85,14 @@ func (app *App) Render(doc *Doc) {
 		plan := buildPlan(doc)
 		app.initRenderer()
 
-		if doc.Trace {
+		if doc.Config.Trace {
 			app.renderer.StartTrace()
 		}
 
 		app.renderer.Render(plan)
 		app.renderer.ToScreen(doc.LayerID())
 
-		if doc.Trace {
+		if doc.Config.Trace {
 			app.renderer.EndTrace()
 		}
 

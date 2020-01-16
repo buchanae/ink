@@ -18,6 +18,7 @@ func DefaultConfig() Config {
 type Config struct {
 	Snapshot SnapshotConfig
 	Window   WindowConfig
+	Trace    bool
 }
 
 type WindowConfig struct {
