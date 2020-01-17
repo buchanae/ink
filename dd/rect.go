@@ -116,6 +116,15 @@ func (r Rect) Quad() Quad {
 	}
 }
 
+// "sub" is percentage based
+// TODO make percentage vs offset consistent
+func (r Rect) SubRect(sub Rect) Rect {
+	return Rect{
+		A: r.Interpolate(sub.A),
+		B: r.Interpolate(sub.B),
+	}
+}
+
 func (r Rect) Grow(amount float32) Rect {
 	return Rect{
 		A: XY{r.A.X - amount, r.A.Y - amount},
