@@ -69,3 +69,7 @@ func (l Line) RelativeAngle(m Line) float32 {
 	d := m.B.Sub(m.A)
 	return atan2(d.Y, d.X) - atan2(c.Y, c.X)
 }
+
+func (l Line) Stroke(opt StrokeOpt) Mesh {
+	return Stroke(Path{l}, opt)
+}

@@ -34,6 +34,8 @@ type StrokeOpt struct {
 
 // TODO unfinished. need to stroke half width in both directions.
 //      currently stroking full width in one direciton.
+// http://tavmjong.free.fr/SVG/LINEJOIN_STUDY/
+// http://tavmjong.free.fr/SVG/LINEJOIN/index.html
 
 func Stroke(path Path, opt StrokeOpt) Mesh {
 	mesh := Mesh{}

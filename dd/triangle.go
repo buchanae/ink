@@ -5,6 +5,7 @@ type Triangle struct {
 }
 
 // TODO http://jwilson.coe.uga.edu/EMAT6680/Dunbar/Assignment4/Assignment4_KD.htm
+// https://www.eurekasparks.org/2019/07/centers-of-triangle.html<Paste>
 func (t Triangle) Centroid() XY {
 	return t.A.Add(t.B).Add(t.C).DivScalar(3)
 }

@@ -29,17 +29,17 @@ func Hex(n int) RGBA {
 }
 
 func HexString(s string) RGBA {
-	if len(s) != 7 {
-		return RGBA{}
+	if len(s) == 7 {
+		var r, g, b uint8
+		fmt.Sscanf(s, "#%02x%02x%02x", &r, &g, &b)
+		return RGBA{
+			R: float32(r) / 255,
+			G: float32(g) / 255,
+			B: float32(b) / 255,
+			A: 1,
+		}
 	}
-	var r, g, b uint8
-	fmt.Sscanf(s, "#%02x%02x%02x", &r, &g, &b)
-	return RGBA{
-		R: float32(r) / 255,
-		G: float32(g) / 255,
-		B: float32(b) / 255,
-		A: 1,
-	}
+	return RGBA{}
 }
 
 func ToGo(c RGBA) color.Color {
