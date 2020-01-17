@@ -1,13 +1,13 @@
 package dd
 
-type Cell struct {
-	Rect
-	Row, Col int
-}
-
 type Grid struct {
 	Rect
 	Rows, Cols int
+}
+
+type Cell struct {
+	Rect
+	Row, Col int
 }
 
 func (g Grid) Cells() []Cell {
