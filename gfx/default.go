@@ -1,8 +1,6 @@
 package gfx
 
 const DefaultVert = `
-precision mediump float;
-
 in vec2 a_vert;
 in vec2 a_uv;
 in vec2 a_pivot;
@@ -38,11 +36,11 @@ void main() {
 `
 
 const DefaultFrag = `
-precision mediump float;
-
 in vec4 v_color;
 
+out vec4 f_color;
+
 void main() {
-  gl_FragColor = v_color;
+  f_color = v_color;
 }
 `

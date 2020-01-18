@@ -14,7 +14,6 @@ type Plan struct {
 type Shader struct {
 	Name             string
 	Vert, Frag, Geom string
-	Output           string
 	Layer            int
 	Vertices         int
 	Instances        int

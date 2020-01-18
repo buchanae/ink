@@ -5,6 +5,7 @@ package render
 import (
 	"fmt"
 	"log"
+	"regexp"
 	"unsafe"
 
 	"github.com/go-gl/gl/v3.3-core/gl"
@@ -91,7 +92,7 @@ func glCreateVAO() glVAO {
 	return glVAO(id)
 }
 
-func glBindVertexArray(vao glVAO) {
+func glBindVAO(vao glVAO) {
 	gl.BindVertexArray(uint32(vao))
 	glLogErr("BindVertexArray")
 }
@@ -342,63 +343,11 @@ func glCheckErr(name string) error {
 	}
 }
 
-func glGetProgramInfoLog(id uint32) string {
-	var logLength int32
-	gl.GetProgramiv(id, gl.INFO_LOG_LENGTH, &logLength)
-	if logLength == 0 {
-		return ""
-	}
-
-	logBuffer := make([]uint8, logLength)
-
-	gl.GetProgramInfoLog(id, logLength, nil, &logBuffer[0])
-	glLogErr("GetProgramInfoLog")
-
-	return gl.GoStr(&logBuffer[0])
-}
-
-func glGetShaderInfoLog(id uint32) string {
-
-	var logLength int32
-	gl.GetShaderiv(id, gl.INFO_LOG_LENGTH, &logLength)
-	glLogErr("GetShaderiv")
-	if logLength == 0 {
-		return ""
-	}
-
-	logBuffer := make([]uint8, logLength)
-	gl.GetShaderInfoLog(id, logLength, nil, &logBuffer[0])
-	glLogErr("GetShaderInfoLog")
-
-	return gl.GoStr(&logBuffer[0])
-}
-
-func glBuildShader(src string, shaderType uint32) (uint32, error) {
-	id := gl.CreateShader(shaderType)
-	glLogErr("CreateShader")
-
-	src = "#version 330 core\n\n" + src
-	source, free := gl.Strs(src + "\000")
-	defer free()
-
-	gl.ShaderSource(id, 1, source, nil)
-	glLogErr("ShaderSource")
-
-	gl.CompileShader(id)
-	glLogErr("CompileShader")
-
-	var status int32
-	gl.GetShaderiv(id, gl.COMPILE_STATUS, &status)
-	glLogErr("GetShaderiv")
-
-	if status != 1 {
-		return 0, fmt.Errorf("compiling shader: %s", glGetShaderInfoLog(id))
-	}
-	return id, nil
-}
-
-func glBuildProgram(vert, frag, geom, out string) (program, error) {
+func glBuildProgram(vert, frag, geom string) (program, error) {
 	prog := program{}
+
+	vert = "#version 330 core\n\n" + vert
+	frag = "#version 330 core\n\n" + frag
 
 	// VERTEX SHADER
 	vs, err := glBuildShader(vert, gl.VERTEX_SHADER)
@@ -430,7 +379,7 @@ func glBuildProgram(vert, frag, geom, out string) (program, error) {
 		glLogErr("AttachShader")
 	}
 
-	gl.BindFragDataLocation(programID, 0, gl.Str(out+"\000"))
+	gl.BindFragDataLocation(programID, 0, gl.Str("f_color\000"))
 	glLogErr("BindFragDataLocation")
 	gl.LinkProgram(programID)
 	glLogErr("LinkProgram")
@@ -449,6 +398,93 @@ func glBuildProgram(vert, frag, geom, out string) (program, error) {
 		attributes: inspectAttributes(programID),
 		uniforms:   inspectUniforms(programID),
 	}, nil
+}
+
+func glBuildShader(src string, shaderType uint32) (uint32, error) {
+	id := gl.CreateShader(shaderType)
+	glLogErr("CreateShader")
+
+	source, free := gl.Strs(src + "\000")
+	defer free()
+
+	gl.ShaderSource(id, 1, source, nil)
+	glLogErr("ShaderSource")
+
+	gl.CompileShader(id)
+	glLogErr("CompileShader")
+
+	var status int32
+	gl.GetShaderiv(id, gl.COMPILE_STATUS, &status)
+	glLogErr("GetShaderiv")
+
+	if status != 1 {
+		return 0, glGetShaderError(id, src)
+	}
+	return id, nil
+}
+
+func glGetShaderError(id uint32, src string) error {
+
+	var logLength int32
+	gl.GetShaderiv(id, gl.INFO_LOG_LENGTH, &logLength)
+	glLogErr("GetShaderiv")
+	if logLength == 0 {
+		return fmt.Errorf("empty error log")
+	}
+
+	logBuffer := make([]uint8, logLength)
+	gl.GetShaderInfoLog(id, logLength, nil, &logBuffer[0])
+	glLogErr("GetShaderInfoLog")
+
+	msg := gl.GoStr(&logBuffer[0])
+	return parseShaderInfoLog(msg, src)
+}
+
+type shaderCompileError struct {
+	line    string
+	message string
+	src     string
+}
+
+func (sce shaderCompileError) Error() string {
+	if sce.line == "" {
+		return sce.message
+	}
+	return "\nline " + sce.line + ": " + sce.message + "\n" + sce.src + "\n"
+}
+
+func parseShaderInfoLog(raw, src string) error {
+	//ERROR: 0:6: 'in' : syntax error: syntax error
+	var rx = regexp.MustCompile(`^ERROR: \d:(\d)+: (.*)`)
+
+	matches := rx.FindStringSubmatch(raw)
+	if matches == nil {
+		return shaderCompileError{
+			message: raw,
+			src:     src,
+		}
+	}
+
+	return shaderCompileError{
+		line:    matches[1],
+		message: matches[2],
+		src:     src,
+	}
+}
+
+func glGetProgramInfoLog(id uint32) string {
+	var logLength int32
+	gl.GetProgramiv(id, gl.INFO_LOG_LENGTH, &logLength)
+	if logLength == 0 {
+		return ""
+	}
+
+	logBuffer := make([]uint8, logLength)
+
+	gl.GetProgramInfoLog(id, logLength, nil, &logBuffer[0])
+	glLogErr("GetProgramInfoLog")
+
+	return gl.GoStr(&logBuffer[0])
 }
 
 // inspectProgramAttribs queries OpenGL for information on the vertex attributes

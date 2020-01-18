@@ -59,10 +59,10 @@ func (pb *build) build(plan Plan) {
 func (pb *build) addShader(shader *Shader) {
 
 	prog, err := compile(shaderOpt{
-		shader.Vert, shader.Frag, shader.Geom, shader.Output,
+		shader.Vert, shader.Frag, shader.Geom,
 	})
 	if err != nil {
-		log.Printf("error: compiling shader: %v", err)
+		log.Printf("error: %v", err)
 		return
 	}
 
@@ -121,14 +121,19 @@ func (pb *build) batch() {
 			last = p
 			continue
 		}
+
 		if pb.mergeable(last, p) {
 			pb.merge(last, p)
-		} else {
+		} else if last != nil {
 			batched = append(batched, last)
+			last = p
+		} else {
 			last = p
 		}
 	}
-	batched = append(batched, last)
+	if last != nil {
+		batched = append(batched, last)
+	}
 	pb.trace("  merged passes %d to %d", len(pb.passes), len(batched))
 	pb.passes = batched
 }

@@ -4,7 +4,6 @@ package render
 
 import (
 	"fmt"
-	"log"
 	"regexp"
 	"syscall/js"
 )
@@ -15,11 +14,12 @@ var outrx = regexp.MustCompile(`(?m)^\s*(out )`)
 func glBuildProgram(vert, frag, geom, out string) (program, error) {
 	var prog program
 
+	vert = "precision mediump float;\n\n" + vert
+	frag = "precision mediump float;\n\n" + frag
+
 	vert = inrx.ReplaceAllString(vert, "attribute ")
 	vert = outrx.ReplaceAllString(vert, "varying ")
 	frag = inrx.ReplaceAllString(frag, "varying ")
-
-	log.Print("VERT", vert)
 
 	// VERTEX SHADER
 	vs, err := glBuildShader(vert, gl_VERTEX_SHADER)

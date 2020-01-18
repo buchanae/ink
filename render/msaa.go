@@ -2,7 +2,6 @@ package render
 
 import (
 	"image"
-	"log"
 )
 
 // msaa represents a multisample anti-aliased OpenGL texture.
@@ -42,10 +41,10 @@ func newMsaa(id, w, h, multisamples int) msaa {
 	m.Write.Tex = glCreateTexture()
 
 	// ...and two framebuffers, one for each texture.
-	//m.Read.FBO = glCreateFramebuffer()
-	//m.Write.FBO = glCreateFramebuffer()
-	m.Read.FBO = gl_SCREEN
-	m.Write.FBO = gl_SCREEN
+	m.Read.FBO = glCreateFramebuffer()
+	m.Write.FBO = glCreateFramebuffer()
+	//m.Read.FBO = gl_SCREEN
+	//m.Write.FBO = gl_SCREEN
 
 	// Initialize the Read texture
 	glBindFramebuffer(gl_FRAMEBUFFER, m.Read.FBO)
@@ -67,17 +66,15 @@ func newMsaa(id, w, h, multisamples int) msaa {
 	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_S, gl_REPEAT)
 	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_T, gl_REPEAT)
 
-	/*
-		glFramebufferTexture2D(
-			gl_FRAMEBUFFER,
-			gl_COLOR_ATTACHMENT0,
-			gl_TEXTURE_2D,
-			m.Read.Tex,
-			0,
-		)
-	*/
+	glFramebufferTexture2D(
+		gl_FRAMEBUFFER,
+		gl_COLOR_ATTACHMENT0,
+		gl_TEXTURE_2D,
+		m.Read.Tex,
+		0,
+	)
 
-	m.DisableMultisample = true
+	//m.DisableMultisample = true
 
 	// Initialize the Write texture
 	if m.DisableMultisample {
@@ -139,8 +136,6 @@ func (m msaa) Paint() {
 // Blit the anti-aliased "read" texture to the given framebuffer ID.
 // Used during compisiting to copy textures to the screen.
 func (m msaa) Blit(to glFramebuffer) {
-	log.Printf("BLIT: %#v", to)
-	return
 	glBindFramebuffer(gl_DRAW_FRAMEBUFFER, to)
 	glBindFramebuffer(gl_READ_FRAMEBUFFER, m.Read.FBO)
 

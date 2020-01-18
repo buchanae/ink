@@ -1,7 +1,5 @@
 package render
 
-import "log"
-
 type uploaded struct {
 	// opengl buffer IDs
 	attrBuf glBuffer
@@ -20,14 +18,14 @@ func uploadBuild(pb *build) uploaded {
 	up.faceBuf = glCreateBuffer()
 	glBindBuffer(gl_ELEMENT_ARRAY_BUFFER, up.faceBuf)
 
-	log.Print("faces", len(pb.faces), pb.faces)
-	glBufferData(
-		gl_ELEMENT_ARRAY_BUFFER,
-		len(pb.faces)*4, // 4 bytes per index (uint32)
-		pb.faces,
-		gl_STATIC_DRAW,
-	)
-	log.Print("after faces")
+	if len(pb.faces) > 0 {
+		glBufferData(
+			gl_ELEMENT_ARRAY_BUFFER,
+			len(pb.faces)*4, // 4 bytes per index (uint32)
+			pb.faces,
+			gl_STATIC_DRAW,
+		)
+	}
 
 	pb.trace("upload attributes")
 
@@ -36,7 +34,6 @@ func uploadBuild(pb *build) uploaded {
 	// for a single attribute.
 	up.attrBuf = glCreateBuffer()
 	glBindBuffer(gl_ARRAY_BUFFER, up.attrBuf)
-	log.Print("buffer init ", pb.attrBytes)
 	glBufferData(gl_ARRAY_BUFFER, pb.attrBytes, nil, gl_STATIC_DRAW)
 
 	// Each pass has one VAO, which stores the configuration of all its
@@ -73,7 +70,6 @@ func uploadBuild(pb *build) uploaded {
 				}
 
 				// Copy the attribute data to the GPU memory buffer.
-				log.Print("buffer sub ", b.attr.Name)
 				glBufferSubData(
 					gl_ARRAY_BUFFER,
 					offset,
