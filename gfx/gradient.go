@@ -24,8 +24,6 @@ func (g Gradient) Draw(l Layer) {
 }
 
 const GradientFrag = `
-#version 330 core
-
 uniform vec4 u_color_a;
 uniform vec4 u_color_b;
 in vec2 v_uv;

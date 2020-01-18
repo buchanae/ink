@@ -9,8 +9,6 @@ func (cut Cut) Draw(out Layer) {
 	out.AddShader(&Shader{
 		Vert: DefaultVert,
 		Frag: `
-			#version 330 core
-
 			uniform sampler2D u_image;
 			in vec2 v_vert;
 			out vec4 color;

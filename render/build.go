@@ -2,8 +2,6 @@ package render
 
 import (
 	"log"
-
-	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type build struct {
@@ -13,19 +11,14 @@ type build struct {
 	faces  []uint32
 	// Total number of bytes needed to store all attributes.
 	attrBytes int
-
-	// opengl buffer IDs
-	attrBufID uint32
-	faceBufID uint32
-	vaos      []uint32
 }
 
 type pass struct {
 	name          string
-	prog          compiled
+	prog          program
 	uniforms      map[string]interface{}
 	layer         int
-	vao           uint32
+	vao           glVAO
 	bindings      []binding
 	vertexCount   int
 	faceOffset    int
@@ -60,8 +53,6 @@ func (pb *build) build(plan Plan) {
 	}
 
 	pb.batch()
-	pb.upload()
-
 	pb.trace("end build")
 }
 
@@ -116,88 +107,6 @@ func (pb *build) addShader(shader *Shader) {
 			divisor: desc.Divisor,
 		})
 		pb.attrBytes += desc.Size
-	}
-}
-
-func (pb *build) cleanup() {
-	if pb.attrBufID != 0 {
-		glDeleteBuffers(1, &pb.attrBufID)
-	}
-	if pb.faceBufID != 0 {
-		glDeleteBuffers(1, &pb.faceBufID)
-	}
-	if len(pb.vaos) > 0 {
-		glDeleteVertexArrays(int32(len(pb.vaos)), &pb.vaos[0])
-	}
-}
-
-func (pb *build) uploadFaces() {
-	// Element buffers are used for indexed rendering.
-	glGenBuffers(1, &pb.faceBufID)
-	glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, pb.faceBufID)
-
-	glBufferData(
-		gl.ELEMENT_ARRAY_BUFFER,
-		len(pb.faces)*4, // 4 bytes per index (uint32)
-		glPtr(pb.faces),
-		gl.STATIC_DRAW,
-	)
-}
-
-func (pb *build) upload() {
-	pb.trace("upload")
-
-	// upload faces (vertex index)
-	pb.uploadFaces()
-
-	// The data from all attributes is stored in one large buffer.
-	// A "binding" describes the slice of the buffer that holds data
-	// for a single attribute.
-	glGenBuffers(1, &pb.attrBufID)
-	glBindBuffer(gl.ARRAY_BUFFER, pb.attrBufID)
-	glBufferData(gl.ARRAY_BUFFER, pb.attrBytes, nil, gl.STATIC_DRAW)
-
-	// Each pass has one VAO, which stores the configuration of all its
-	// attributes: location of the data in the buffer, enabled/disable,
-	// types, divisors, etc.
-	pb.vaos = make([]uint32, len(pb.passes))
-	glGenVertexArrays(int32(len(pb.passes)), &pb.vaos[0])
-
-	offset := 0
-	for i, p := range pb.passes {
-		p.vao = pb.vaos[i]
-		glBindVertexArray(p.vao)
-		glBindBuffer(gl.ELEMENT_ARRAY_BUFFER, pb.faceBufID)
-
-		for _, b := range p.bindings {
-
-			glEnableVertexAttribArray(b.attr.Loc)
-			glVertexAttribPointer(
-				b.attr.Loc,
-				b.attr.Components,
-				b.attr.Datatype,
-				false, // normalized
-				0,     // stride
-				glPtrOffset(offset),
-			)
-			glVertexAttribDivisor(b.attr.Loc, uint32(b.divisor))
-
-			for _, val := range b.values {
-				if val.size == 0 {
-					// opengl will panic if it tries to read zero bytes
-					continue
-				}
-
-				// Copy the attribute data to the GPU memory buffer.
-				glBufferSubData(
-					gl.ARRAY_BUFFER,
-					offset,
-					val.size,
-					glPtr(val.value),
-				)
-				offset += val.size
-			}
-		}
 	}
 }
 

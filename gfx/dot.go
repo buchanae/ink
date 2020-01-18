@@ -34,8 +34,6 @@ func (dot Dot) Draw(l Layer) {
 }
 
 const DotVert = `
-#version 330 core
-
 in vec2 a_vert;
 in vec2 a_uv;
 
@@ -55,8 +53,6 @@ void main() {
 `
 
 const DotFrag = `
-#version 330 core
-
 uniform vec4 u_color;
 in vec2 v_uv;
 out vec4 color;

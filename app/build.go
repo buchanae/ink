@@ -13,7 +13,7 @@ import (
 	"github.com/buchanae/ink/render"
 )
 
-func buildPlan(doc *Doc) render.Plan {
+func BuildPlan(doc *Doc) render.Plan {
 
 	plan := render.Plan{
 		Images: map[int]image.Image{},

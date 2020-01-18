@@ -2,14 +2,12 @@ package render
 
 import (
 	"image"
-
-	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type Image struct {
 	id int
 	// OpenGL texture handle.
-	tex uint32
+	tex glTexture
 }
 
 func (r *Renderer) AddImage(id int, img image.Image) {
@@ -18,14 +16,16 @@ func (r *Renderer) AddImage(id int, img image.Image) {
 		return
 	}
 
-	loaded := Image{id: id}
+	loaded := Image{
+		id:  id,
+		tex: glCreateTexture(),
+	}
 
-	glGenTextures(1, &loaded.tex)
-	glBindTexture(gl.TEXTURE_2D, loaded.tex)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+	glBindTexture(gl_TEXTURE_2D, loaded.tex)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_MAG_FILTER, gl_LINEAR)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_MIN_FILTER, gl_LINEAR)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_S, gl_REPEAT)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_T, gl_REPEAT)
 
 	w := img.Bounds().Dx()
 	h := img.Bounds().Dy()
@@ -44,15 +44,15 @@ func (r *Renderer) AddImage(id int, img image.Image) {
 	}
 
 	glTexImage2D(
-		gl.TEXTURE_2D,
+		gl_TEXTURE_2D,
 		0,
-		gl.RGBA,
+		gl_RGBA,
 		int32(w),
 		int32(h),
 		0,
-		gl.RGBA,
-		gl.UNSIGNED_BYTE,
-		glPtr(pixels),
+		gl_RGBA,
+		gl_UNSIGNED_BYTE,
+		pixels,
 	)
 
 	r.images[id] = loaded

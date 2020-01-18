@@ -1,3 +1,5 @@
+// +build !js
+
 package render
 
 import (
@@ -7,6 +9,16 @@ import (
 
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
+
+type glEnum uint32
+type glTexture uint32
+type glBuffer uint32
+type glFramebuffer uint32
+type glProgram uint32
+type glUniform uint32
+type glAttribute uint32
+type glTextureUnit uint32
+type glVAO uint32
 
 func glEnable(flag uint32) {
 	gl.Enable(flag)
@@ -18,149 +30,17 @@ func glDisable(flag uint32) {
 	glLogErr("Disable")
 }
 
-func glGetProgramiv(program uint32, pname uint32, params *int32) {
-	gl.GetProgramiv(program, pname, params)
-	glLogErr("GetProgramiv")
+func glBlendFunc(sfactor glEnum, dfactor glEnum) {
+	gl.BlendFunc(uint32(sfactor), uint32(dfactor))
+	glLogErr("BlendFunc")
 }
 
-func glCreateShader(xtype uint32) uint32 {
-	return gl.CreateShader(xtype)
+func glViewport(x, y, width, height int32) {
+	gl.Viewport(x, y, width, height)
+	glLogErr("Viewport")
 }
 
-func glShaderSource(shader uint32, count int32, xstring **uint8, length *int32) {
-	gl.ShaderSource(shader, count, xstring, length)
-	glLogErr("ShaderSource")
-}
-
-func glGetShaderiv(shader uint32, pname uint32, params *int32) {
-	gl.GetShaderiv(shader, pname, params)
-	glLogErr("GetShaderiv")
-}
-
-func glCompileShader(shader uint32) {
-	gl.CompileShader(shader)
-	glLogErr("CompileShader")
-}
-
-func glAttachShader(program uint32, shader uint32) {
-	gl.AttachShader(program, shader)
-	glLogErr("AttachShader")
-}
-
-func glCreateProgram() uint32 {
-	return gl.CreateProgram()
-}
-
-func glBindFragDataLocation(program uint32, color uint32, name *uint8) {
-	gl.BindFragDataLocation(program, color, name)
-	glLogErr("BindFragDataLocation")
-}
-
-func glLinkProgram(program uint32) {
-	gl.LinkProgram(program)
-	glLogErr("LinkProgram")
-}
-
-func glGenVertexArrays(n int32, arrays *uint32) {
-	gl.GenVertexArrays(n, arrays)
-	glLogErr("GenVertexArrays")
-}
-
-func glBindVertexArray(array uint32) {
-	gl.BindVertexArray(array)
-	glLogErr("BindVertexArray")
-}
-
-func glDeleteVertexArrays(n int32, arrays *uint32) {
-	gl.DeleteVertexArrays(n, arrays)
-	glLogErr("DeleteVertexArrays")
-}
-
-func glDeleteBuffers(n int32, buffers *uint32) {
-	gl.DeleteBuffers(n, buffers)
-	glLogErr("DeleteBuffers")
-}
-
-func glGenBuffers(n int32, buffers *uint32) {
-	gl.GenBuffers(n, buffers)
-	glLogErr("GenBuffers")
-}
-
-func glBindBuffer(target uint32, buffer uint32) {
-	gl.BindBuffer(target, buffer)
-	glLogErr("BindBuffer")
-}
-
-func glEnableVertexArrayAttrib(vaobj uint32, index uint32) {
-	gl.EnableVertexArrayAttrib(vaobj, index)
-	glLogErr("EnableVertexArrayAttrib")
-}
-
-func glVertexAttribPointer(index uint32, size int32, xtype uint32, normalized bool, stride int32, pointer unsafe.Pointer) {
-	gl.VertexAttribPointer(index, size, xtype, normalized, stride, pointer)
-	glLogErr("VertexAttribPointer")
-}
-
-func glVertexAttribDivisor(index uint32, divisor uint32) {
-	gl.VertexAttribDivisor(index, divisor)
-	glLogErr("VertexAttribDivisor")
-}
-
-func glUseProgram(program uint32) {
-	gl.UseProgram(program)
-	glLogErr("UseProgram")
-}
-
-func glGetActiveAttrib(program uint32, index uint32, bufSize int32, length *int32, size *int32, xtype *uint32, name *uint8) {
-	gl.GetActiveAttrib(program, index, bufSize, length, size, xtype, name)
-	glLogErr("GetActiveAttrib")
-}
-
-func glGetAttribLocation(program uint32, name *uint8) int32 {
-	return gl.GetAttribLocation(program, name)
-}
-
-func glDeleteProgram(program uint32) {
-	gl.DeleteProgram(program)
-	glLogErr("DeleteProgram")
-}
-
-func glGenTextures(n int32, textures *uint32) {
-	gl.GenTextures(n, textures)
-	glLogErr("GenTextures")
-}
-
-func glGenFramebuffers(n int32, framebuffers *uint32) {
-	gl.GenFramebuffers(n, framebuffers)
-	glLogErr("GenFramebuffers")
-}
-
-func glBindTexture(target uint32, texture uint32) {
-	gl.BindTexture(target, texture)
-	glLogErr("BindTexture")
-}
-
-func glBindFramebuffer(target uint32, framebuffer uint32) {
-	gl.BindFramebuffer(target, framebuffer)
-	glLogErr("BindFramebuffer")
-}
-
-func glTexParameteri(target uint32, pname uint32, param int32) {
-	gl.TexParameteri(target, pname, param)
-	glLogErr("TexParameteri")
-}
-
-func glFramebufferTexture2D(target uint32, attachment uint32, textarget uint32, texture uint32, level int32) {
-	gl.FramebufferTexture2D(target, attachment, textarget, texture, level)
-	glLogErr("FramebufferTexture2D")
-}
-
-func glTexImage2DMultisample(target uint32, samples int32, internalformat uint32, width int32, height int32, fixedsamplelocations bool) {
-	gl.TexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations)
-	glLogErr("TexImage2DMultisample")
-}
-
-func glClearColor(red float32, green float32, blue float32, alpha float32) {
+func glClearColor(red, green, blue, alpha float32) {
 	gl.ClearColor(red, green, blue, alpha)
 	glLogErr("ClearColor")
 }
@@ -170,148 +50,266 @@ func glClear(mask uint32) {
 	glLogErr("Clear")
 }
 
-func glBlitFramebuffer(srcX0 int32, srcY0 int32, srcX1 int32, srcY1 int32, dstX0 int32, dstY0 int32, dstX1 int32, dstY1 int32, mask uint32, filter uint32) {
+/*
+
+Create, Delete, Bind
+
+
+
+
+
+
+
+
+*/
+
+func glCreateBuffer() glBuffer {
+	var id uint32
+	gl.GenBuffers(1, &id)
+	glLogErr("GenBuffers")
+	return glBuffer(id)
+}
+
+func glCreateTexture() glTexture {
+	var id uint32
+	gl.GenTextures(1, &id)
+	glLogErr("GenTextures")
+	return glTexture(id)
+}
+
+func glCreateFramebuffer() glFramebuffer {
+	var id uint32
+	gl.GenFramebuffers(1, &id)
+	glLogErr("GenFramebuffers")
+	return glFramebuffer(id)
+}
+
+func glCreateVAO() glVAO {
+	var id uint32
+	gl.GenVertexArrays(1, &id)
+	glLogErr("GenVertexArrays")
+	return glVAO(id)
+}
+
+func glBindVertexArray(vao glVAO) {
+	gl.BindVertexArray(uint32(vao))
+	glLogErr("BindVertexArray")
+}
+
+func glDeleteTexture(tex glTexture) {
+	id := uint32(tex)
+	gl.DeleteTextures(1, &id)
+	glLogErr("DeleteTextures")
+}
+
+func glDeleteFramebuffer(fbo glFramebuffer) {
+	id := uint32(fbo)
+	gl.DeleteFramebuffers(1, &id)
+	glLogErr("DeleteFramebuffers")
+}
+
+func glDeleteVAO(vao glVAO) {
+	id := uint32(vao)
+	gl.DeleteVertexArrays(1, &id)
+	glLogErr("DeleteVertexArrays")
+}
+
+func glDeleteBuffer(buf glBuffer) {
+	id := uint32(buf)
+	gl.DeleteBuffers(1, &id)
+	glLogErr("DeleteBuffers")
+}
+
+func glDeleteProgram(program glProgram) {
+	gl.DeleteProgram(uint32(program))
+	glLogErr("DeleteProgram")
+}
+
+func glBindBuffer(target glEnum, buffer glBuffer) {
+	gl.BindBuffer(uint32(target), uint32(buffer))
+	glLogErr("BindBuffer")
+}
+
+func glBindTexture(target glEnum, texture glTexture) {
+	gl.BindTexture(uint32(target), uint32(texture))
+	glLogErr("BindTexture")
+}
+
+func glBindFramebuffer(target glEnum, framebuffer glFramebuffer) {
+	gl.BindFramebuffer(uint32(target), uint32(framebuffer))
+	glLogErr("BindFramebuffer")
+}
+
+func glVertexAttribPointer(
+	index glAttribute,
+	size int32,
+	xtype glEnum,
+	normalized bool,
+	stride int32,
+	offset int) {
+	ptr := gl.PtrOffset(offset)
+	gl.VertexAttribPointer(uint32(index), size, uint32(xtype), normalized, stride, ptr)
+	glLogErr("VertexAttribPointer")
+}
+
+func glVertexAttribDivisor(index glAttribute, divisor uint32) {
+	gl.VertexAttribDivisor(uint32(index), divisor)
+	glLogErr("VertexAttribDivisor")
+}
+
+func glEnableVertexAttribArray(index glAttribute) {
+	gl.EnableVertexAttribArray(uint32(index))
+	glLogErr("EnableVertexAttribArray")
+}
+
+func glUseProgram(program glProgram) {
+	gl.UseProgram(uint32(program))
+	glLogErr("UseProgram")
+}
+
+func glTexParameteri(target, pname glEnum, param int32) {
+	gl.TexParameteri(uint32(target), uint32(pname), param)
+	glLogErr("TexParameteri")
+}
+
+func glBufferData(target uint32, size int, data interface{}, usage uint32) {
+	ptr := gl.Ptr(data)
+	gl.BufferData(target, size, ptr, usage)
+	glLogErr("BufferData")
+}
+
+func glBufferSubData(target uint32, offset int, size int, data interface{}) {
+	ptr := gl.Ptr(data)
+	gl.BufferSubData(target, offset, size, ptr)
+	glLogErr("BufferSubData")
+}
+
+func glDrawElementsInstanced(mode uint32, count int32, xtype uint32, offset int, instancecount int32) {
+	ptr := gl.PtrOffset(offset)
+	gl.DrawElementsInstanced(mode, count, xtype, ptr, instancecount)
+	glLogErr("DrawElementsInstanced")
+}
+
+/*
+
+Uniform binding
+
+
+
+
+
+
+*/
+
+func glUniform1f(location glUniform, v0 float32) {
+	gl.Uniform1f(int32(location), v0)
+	glLogErr("Uniform1f")
+}
+
+func glUniform2f(location glUniform, v0 float32, v1 float32) {
+	gl.Uniform2f(int32(location), v0, v1)
+	glLogErr("Uniform2f")
+}
+
+func glUniform3f(location glUniform, v0 float32, v1 float32, v2 float32) {
+	gl.Uniform3f(int32(location), v0, v1, v2)
+	glLogErr("Uniform3f")
+}
+
+func glUniform4f(location glUniform, v0 float32, v1 float32, v2 float32, v3 float32) {
+	gl.Uniform4f(int32(location), v0, v1, v2, v3)
+	glLogErr("Uniform4f")
+}
+
+func glUniform1i(location glUniform, v0 int32) {
+	gl.Uniform1i(int32(location), v0)
+	glLogErr("Uniform1i")
+}
+
+func glUniform1ui(location glUniform, v0 uint32) {
+	gl.Uniform1ui(int32(location), v0)
+	glLogErr("Uniform1ui")
+}
+
+func glActiveTexture(texture glTextureUnit) {
+	gl.ActiveTexture(uint32(texture))
+	glLogErr("ActiveTexture")
+}
+
+/*
+
+Textures
+
+
+
+
+
+*/
+
+func glFramebufferTexture2D(
+	target,
+	attachment,
+	textarget glEnum,
+	texture glTexture,
+	level int32) {
+	gl.FramebufferTexture2D(uint32(target), uint32(attachment), uint32(textarget), uint32(texture), level)
+	glLogErr("FramebufferTexture2D")
+}
+
+func glTexImage2DMultisample(
+	target uint32,
+	samples int32,
+	internalformat uint32,
+	width int32, height int32,
+	fixedsamplelocations bool) {
+	gl.TexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations)
+	glLogErr("TexImage2DMultisample")
+}
+
+func glBlitFramebuffer(
+	srcX0, srcY0, srcX1, srcY1 int32,
+	dstX0, dstY0, dstX1, dstY1 int32,
+	mask uint32, filter uint32) {
 	gl.BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter)
 	glLogErr("BlitFramebuffer")
 }
 
-func glDeleteTextures(n int32, textures *uint32) {
-	gl.DeleteTextures(n, textures)
-	glLogErr("DeleteTextures")
-}
+func glTexImage2D(
+	target uint32,
+	level int32,
+	internalformat int32,
+	width int32, height int32,
+	border int32,
+	format glEnum,
+	xtype glEnum,
+	pixels []uint8) {
 
-func glDeleteFramebuffers(n int32, framebuffers *uint32) {
-	gl.DeleteFramebuffers(n, framebuffers)
-	glLogErr("DeleteFramebuffers")
-}
-
-func glUniform1f(location int32, v0 float32) {
-	gl.Uniform1f(location, v0)
-	glLogErr("Uniform1f")
-}
-
-func glUniform2f(location int32, v0 float32, v1 float32) {
-	gl.Uniform2f(location, v0, v1)
-	glLogErr("Uniform2f")
-}
-
-func glUniform3f(location int32, v0 float32, v1 float32, v2 float32) {
-	gl.Uniform3f(location, v0, v1, v2)
-	glLogErr("Uniform3f")
-}
-
-func glUniform4f(location int32, v0 float32, v1 float32, v2 float32, v3 float32) {
-	gl.Uniform4f(location, v0, v1, v2, v3)
-	glLogErr("Uniform4f")
-}
-
-func glUniform1i(location int32, v0 int32) {
-	gl.Uniform1i(location, v0)
-	glLogErr("Uniform1i")
-}
-
-func glUniform1ui(location int32, v0 uint32) {
-	gl.Uniform1ui(location, v0)
-	glLogErr("Uniform1ui")
-}
-
-func glActiveTexture(texture uint32) {
-	gl.ActiveTexture(texture)
-	glLogErr("ActiveTexture")
-}
-
-func glGetActiveUniform(program uint32, index uint32, bufSize int32, length *int32, size *int32, xtype *uint32, name *uint8) {
-	gl.GetActiveUniform(program, index, bufSize, length, size, xtype, name)
-	glLogErr("GetActiveUniform")
-}
-
-func glGetUniformLocation(program uint32, name *uint8) int32 {
-	return gl.GetUniformLocation(program, name)
-}
-
-func glBufferData(target uint32, size int, data unsafe.Pointer, usage uint32) {
-	gl.BufferData(target, size, data, usage)
-	glLogErr("BufferData")
-}
-
-func glBufferSubData(target uint32, offset int, size int, data unsafe.Pointer) {
-	gl.BufferSubData(target, offset, size, data)
-	glLogErr("BufferSubData")
-}
-
-func glEnableVertexAttribArray(index uint32) {
-	gl.EnableVertexAttribArray(index)
-	glLogErr("EnableVertexAttribArray")
-}
-
-func glPtr(data interface{}) unsafe.Pointer {
-	return gl.Ptr(data)
-}
-
-func glPtrOffset(offset int) unsafe.Pointer {
-	return gl.PtrOffset(offset)
-}
-
-func glFinish() {
-	gl.Finish()
-}
-
-func glStr(str string) *uint8 {
-	return gl.Str(str)
-}
-
-func glTexImage2D(target uint32, level int32, internalformat int32, width int32, height int32, border int32, format uint32, xtype uint32, pixels unsafe.Pointer) {
-	gl.TexImage2D(target, level, internalformat, width, height, border, format, xtype, pixels)
+	var ptr unsafe.Pointer
+	if pixels == nil {
+		ptr = gl.Ptr(nil)
+	} else {
+		ptr = gl.Ptr(pixels)
+	}
+	gl.TexImage2D(target, level, internalformat, width, height, border, uint32(format), uint32(xtype), ptr)
 	glLogErr("TexImage2D")
 }
 
-func glBlendFunc(sfactor uint32, dfactor uint32) {
-	gl.BlendFunc(sfactor, dfactor)
-	glLogErr("BlendFunc")
-}
-
-func glViewport(x int32, y int32, width int32, height int32) {
-	gl.Viewport(x, y, width, height)
-	glLogErr("Viewport")
-}
-
-func glDrawArrays(mode uint32, first int32, count int32) {
-	gl.DrawArrays(mode, first, count)
-	glLogErr("DrawArrays")
-}
-
-func glDrawElements(mode uint32, count int32, xtype uint32, indices unsafe.Pointer) {
-	gl.DrawElements(mode, count, xtype, indices)
-	glLogErr("DrawElements")
-}
-
-func glDrawElementsInstanced(mode uint32, count int32, xtype uint32, indices unsafe.Pointer, instancecount int32) {
-	gl.DrawElementsInstanced(mode, count, xtype, indices, instancecount)
-	glLogErr("DrawElementsInstanced")
-}
-
-func glLineWidth(width float32) {
-	gl.LineWidth(width)
-	glLogErr("LineWidth")
-}
-
-func glDrawArraysInstanced(mode uint32, first int32, count int32, instancecount int32) {
-	gl.DrawArraysInstanced(mode, first, count, instancecount)
-	glLogErr("DrawArraysInstanced")
-}
-
-func glReadPixels(x int32, y int32, width int32, height int32, format uint32, xtype uint32, pixels unsafe.Pointer) {
-	gl.ReadPixels(x, y, width, height, format, xtype, pixels)
+func glReadPixels(x int32, y int32, width int32, height int32, format uint32, xtype uint32, pixels []uint8) {
+	ptr := gl.Ptr(pixels)
+	gl.ReadPixels(x, y, width, height, format, xtype, ptr)
 	glLogErr("ReadPixels")
 }
 
-func glGoStr(cstr *uint8) string {
-	return gl.GoStr(cstr)
-}
+/*
 
-func glStrs(strs ...string) (cstrs **uint8, free func()) {
-	return gl.Strs(strs...)
-}
+Error log
+
+
+
+
+
+
+*/
 
 func glLogErr(name string) {
 	err := glCheckErr(name)
@@ -346,7 +344,7 @@ func glCheckErr(name string) error {
 
 func glGetProgramInfoLog(id uint32) string {
 	var logLength int32
-	glGetProgramiv(id, gl.INFO_LOG_LENGTH, &logLength)
+	gl.GetProgramiv(id, gl.INFO_LOG_LENGTH, &logLength)
 	if logLength == 0 {
 		return ""
 	}
@@ -356,13 +354,14 @@ func glGetProgramInfoLog(id uint32) string {
 	gl.GetProgramInfoLog(id, logLength, nil, &logBuffer[0])
 	glLogErr("GetProgramInfoLog")
 
-	return glGoStr(&logBuffer[0])
+	return gl.GoStr(&logBuffer[0])
 }
 
 func glGetShaderInfoLog(id uint32) string {
-	var logLength int32
 
-	glGetShaderiv(id, gl.INFO_LOG_LENGTH, &logLength)
+	var logLength int32
+	gl.GetShaderiv(id, gl.INFO_LOG_LENGTH, &logLength)
+	glLogErr("GetShaderiv")
 	if logLength == 0 {
 		return ""
 	}
@@ -371,19 +370,26 @@ func glGetShaderInfoLog(id uint32) string {
 	gl.GetShaderInfoLog(id, logLength, nil, &logBuffer[0])
 	glLogErr("GetShaderInfoLog")
 
-	return glGoStr(&logBuffer[0])
+	return gl.GoStr(&logBuffer[0])
 }
 
 func glBuildShader(src string, shaderType uint32) (uint32, error) {
-	id := glCreateShader(shaderType)
+	id := gl.CreateShader(shaderType)
+	glLogErr("CreateShader")
+
+	src = "#version 330 core\n\n" + src
 	source, free := gl.Strs(src + "\000")
 	defer free()
 
-	glShaderSource(id, 1, source, nil)
-	glCompileShader(id)
+	gl.ShaderSource(id, 1, source, nil)
+	glLogErr("ShaderSource")
+
+	gl.CompileShader(id)
+	glLogErr("CompileShader")
 
 	var status int32
-	glGetShaderiv(id, gl.COMPILE_STATUS, &status)
+	gl.GetShaderiv(id, gl.COMPILE_STATUS, &status)
+	glLogErr("GetShaderiv")
 
 	if status != 1 {
 		return 0, fmt.Errorf("compiling shader: %s", glGetShaderInfoLog(id))
@@ -391,41 +397,163 @@ func glBuildShader(src string, shaderType uint32) (uint32, error) {
 	return id, nil
 }
 
-func glBuildProgram(vert, frag, geom, out string) (uint32, error) {
+func glBuildProgram(vert, frag, geom, out string) (program, error) {
+	prog := program{}
+
 	// VERTEX SHADER
 	vs, err := glBuildShader(vert, gl.VERTEX_SHADER)
 	if err != nil {
-		return 0, fmt.Errorf("creating vert shader: %s", err)
+		return prog, fmt.Errorf("creating vert shader: %s", err)
 	}
 
 	// FRAGMENT SHADER
 	fs, err := glBuildShader(frag, gl.FRAGMENT_SHADER)
 	if err != nil {
-		return 0, fmt.Errorf("creating frag shader: %s", err)
+		return prog, fmt.Errorf("creating frag shader: %s", err)
 	}
 
 	// CREATE PROGRAM
-	programID := glCreateProgram()
-	glAttachShader(programID, vs)
-	glAttachShader(programID, fs)
+	programID := gl.CreateProgram()
+	glLogErr("CreateProgram")
+	gl.AttachShader(programID, vs)
+	glLogErr("AttachShader")
+	gl.AttachShader(programID, fs)
+	glLogErr("AttachShader")
 
 	// GEOMETRY SHADER
 	if geom != "" {
 		gs, err := glBuildShader(geom, gl.GEOMETRY_SHADER)
 		if err != nil {
-			return 0, fmt.Errorf("creating geo shader: %s", err)
+			return prog, fmt.Errorf("creating geo shader: %s", err)
 		}
-		glAttachShader(programID, gs)
+		gl.AttachShader(programID, gs)
+		glLogErr("AttachShader")
 	}
 
-	glBindFragDataLocation(programID, 0, glStr(out+"\000"))
-	glLinkProgram(programID)
+	gl.BindFragDataLocation(programID, 0, gl.Str(out+"\000"))
+	glLogErr("BindFragDataLocation")
+	gl.LinkProgram(programID)
+	glLogErr("LinkProgram")
 
 	var linkstatus int32
-	glGetProgramiv(programID, gl.LINK_STATUS, &linkstatus)
+	gl.GetProgramiv(programID, gl.LINK_STATUS, &linkstatus)
 	if linkstatus != 1 {
-		return 0, fmt.Errorf("linking program: %s", glGetProgramInfoLog(programID))
+		return prog, fmt.Errorf("linking program: %s", glGetProgramInfoLog(programID))
 	}
 
-	return programID, nil
+	gl.UseProgram(programID)
+	glLogErr("UseProgram")
+
+	return program{
+		id:         glProgram(programID),
+		attributes: inspectAttributes(programID),
+		uniforms:   inspectUniforms(programID),
+	}, nil
+}
+
+// inspectProgramAttribs queries OpenGL for information on the vertex attributes
+// of a compiled GLSL program. "id" is the ID of the compiled program to inspect.
+func inspectAttributes(id uint32) []attribute {
+
+	// Get the number of active uniforms.
+	var numAttribs int32
+	gl.GetProgramiv(id, gl.ACTIVE_ATTRIBUTES, &numAttribs)
+
+	// Get maximum uniform name length.
+	var maxnamelen int32
+	gl.GetProgramiv(id, gl.ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxnamelen)
+
+	attribs := make([]attribute, 0, numAttribs)
+	for i := int32(0); i < numAttribs; i++ {
+
+		var xtype uint32
+		var size, namelen int32
+		namebytes := make([]byte, maxnamelen)
+		gl.GetActiveAttrib(id, uint32(i), maxnamelen,
+			&namelen, &size, &xtype, &namebytes[0])
+
+		name := string(namebytes[:namelen])
+		loc := gl.GetAttribLocation(id, gl.Str(name+"\x00"))
+
+		var bytesize int
+		var components int32
+		var datatype uint32
+
+		// TODO missing int attribute types?
+		switch xtype {
+		case gl_FLOAT:
+			bytesize = 4
+			components = 1
+			datatype = gl_FLOAT
+		case gl_FLOAT_VEC2:
+			bytesize = 4
+			components = 2
+			datatype = gl_FLOAT
+		case gl_FLOAT_VEC3:
+			bytesize = 4
+			components = 3
+			datatype = gl_FLOAT
+		case gl_FLOAT_VEC4:
+			bytesize = 4
+			components = 4
+			datatype = gl_FLOAT
+		}
+
+		attribs = append(attribs, attribute{
+			Name:       name,
+			Size:       size,
+			Type:       glEnum(xtype),
+			Loc:        glAttribute(loc),
+			Idx:        i,
+			ByteSize:   bytesize,
+			Components: components,
+			DataType:   glEnum(datatype),
+		})
+	}
+	return attribs
+}
+
+// inspectUniforms queries OpenGL for information on the uniforms
+// of a compiled GLSL program. "id" is the OpenGL handle of the program
+// to inspect.
+func inspectUniforms(id uint32) []uniform {
+
+	// Get the number of active uniforms.
+	var numUnis int32
+	gl.GetProgramiv(id, gl_ACTIVE_UNIFORMS, &numUnis)
+
+	// Get maximum uniform name length.
+	var maxnamelen int32
+	gl.GetProgramiv(id, gl.ACTIVE_UNIFORM_MAX_LENGTH, &maxnamelen)
+
+	texOffset := gl_TEXTURE0
+
+	unis := make([]uniform, 0, numUnis)
+	for i := int32(0); i < numUnis; i++ {
+
+		var xtype uint32
+		var size, namelen int32
+		namebytes := make([]byte, maxnamelen)
+		gl.GetActiveUniform(id, uint32(i), maxnamelen,
+			&namelen, &size, &xtype, &namebytes[0])
+
+		name := string(namebytes[:namelen])
+		loc := gl.GetUniformLocation(id, gl.Str(name+"\x00"))
+
+		var texUnit glTextureUnit
+		if xtype == gl_SAMPLER_2D {
+			texUnit = glTextureUnit(texOffset)
+			texOffset++
+		}
+
+		unis = append(unis, uniform{
+			Name:        name,
+			Size:        size,
+			Type:        glEnum(xtype),
+			Loc:         glUniform(loc),
+			Idx:         i,
+			TextureUnit: texUnit,
+		})
+	}
+	return unis
 }

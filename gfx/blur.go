@@ -37,8 +37,6 @@ func (b Blur) Draw(out Layer) {
 }
 
 const BlurFrag = `
-#version 330 core
-
 uniform bool horizontal;
 uniform sampler2D source;
 

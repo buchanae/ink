@@ -3,8 +3,6 @@ package render
 import (
 	"image"
 	"log"
-
-	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type Renderer struct {
@@ -31,7 +29,7 @@ func (r *Renderer) Render(plan Plan) {
 }
 
 func (r *Renderer) ToScreen(layerID int) {
-	r.texture(layerID).Blit(0)
+	r.texture(layerID).Blit(gl_SCREEN)
 }
 
 // TODO want a better capture API that allows flexible capturing
@@ -55,20 +53,23 @@ func (r *Renderer) render(plan Plan) {
 		tracer: r.tracer,
 	}
 	pb.build(plan)
-	defer pb.cleanup()
 
 	r.trace("passes %d", len(pb.passes))
 
+	up := uploadBuild(pb)
+	defer up.cleanup()
+
+	glViewport(0, 0, int32(r.width), int32(r.height))
+	//glEnable(gl_MULTISAMPLE)
+	glEnable(gl_BLEND)
+
 	for _, p := range pb.passes {
 		r.renderPass(p)
+		glLogErr("pass")
 	}
 }
 
 func (r *Renderer) renderPass(p *pass) {
-
-	glViewport(0, 0, int32(r.width), int32(r.height))
-	glEnable(gl.MULTISAMPLE)
-	glEnable(gl.BLEND)
 
 	/*
 		glBlendFunc(src.factor, dst.factor)
@@ -76,7 +77,7 @@ func (r *Renderer) renderPass(p *pass) {
 		dst is the existing color
 		result = src.color * src.factor + dst.color * dst.factor
 	*/
-	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+	glBlendFunc(gl_SRC_ALPHA, gl_ONE_MINUS_SRC_ALPHA)
 
 	r.trace("render pass %s", p.name)
 	r.trace("  output to %d", p.layer)
@@ -90,18 +91,18 @@ func (r *Renderer) renderPass(p *pass) {
 	r.trace("  gl config")
 	output := r.texture(p.layer)
 
-	glBindFramebuffer(gl.FRAMEBUFFER, output.Write.FBO)
+	glBindFramebuffer(gl_FRAMEBUFFER, output.Write.FBO)
 	glUseProgram(p.prog.id)
 	r.bindUniforms(p)
-	glBindVertexArray(p.vao)
+	glBindVAO(p.vao)
 
 	r.trace("  draw elements")
 	glDrawElementsInstanced(
-		gl.TRIANGLES,
+		gl_TRIANGLES,
 		int32(p.faceCount),
-		gl.UNSIGNED_INT,
+		gl_UNSIGNED_INT,
 		// 4 bytes in each uint32 face index
-		glPtrOffset(p.faceOffset*4),
+		p.faceOffset*4,
 		int32(count),
 	)
 
@@ -128,7 +129,7 @@ func (r *Renderer) bindUniforms(p *pass) {
 			continue
 		}
 
-		if uni.Type == gl.SAMPLER_2D {
+		if uni.Type == gl_SAMPLER_2D {
 			id, ok := val.(int)
 			if !ok {
 				log.Printf("  invalid type for texture ID: %T", val)

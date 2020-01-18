@@ -1,4 +1,4 @@
-// +build !sendonly
+// +build !sendonly,!js
 
 package app
 

@@ -27,8 +27,6 @@ func (m Mask) Draw(l Layer) {
 }
 
 const MaskFrag = `
-#version 330 core
-
 uniform sampler2D u_source;
 uniform sampler2D u_mask;
 in vec2 v_uv;

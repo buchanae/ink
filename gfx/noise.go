@@ -40,8 +40,6 @@ func (n Noise) Draw(out Layer) {
 }
 
 const NoiseFrag = `
-#version 330 core
-
 uniform vec4 u_color;
 uniform float u_size;
 uniform int u_layers;

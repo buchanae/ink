@@ -1,4 +1,4 @@
-// +build !sendonly
+// +build !sendonly,!js
 
 package app
 
@@ -82,7 +82,7 @@ func (app *App) Render(doc *Doc) {
 			app.win.Show()
 			app.shown = true
 		}
-		plan := buildPlan(doc)
+		plan := BuildPlan(doc)
 		app.initRenderer()
 
 		if doc.Config.Trace {

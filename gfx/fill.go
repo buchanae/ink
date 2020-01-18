@@ -22,8 +22,6 @@ func (f Fill) Draw(l Layer) {
 }
 
 const FillFrag = `
-#version 330 core
-
 uniform vec4 u_color;
 out vec4 f_color;
 

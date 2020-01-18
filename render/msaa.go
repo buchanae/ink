@@ -2,8 +2,7 @@ package render
 
 import (
 	"image"
-
-	"github.com/go-gl/gl/v3.3-core/gl"
+	"log"
 )
 
 // msaa represents a multisample anti-aliased OpenGL texture.
@@ -16,10 +15,12 @@ import (
 type msaa struct {
 	ID   int
 	Read struct {
-		FBO, Tex uint32
+		FBO glFramebuffer
+		Tex glTexture
 	}
 	Write struct {
-		FBO, Tex uint32
+		FBO glFramebuffer
+		Tex glTexture
 	}
 	Width, Height, Multisamples int
 	DisableMultisample          bool
@@ -37,62 +38,68 @@ func newMsaa(id, w, h, multisamples int) msaa {
 	// Create two textures:
 	// 1. a multisampled texture which will be written to.
 	// 2. a normal texture which will be read from.
-	glGenTextures(1, &m.Read.Tex)
-	glGenTextures(1, &m.Write.Tex)
+	m.Read.Tex = glCreateTexture()
+	m.Write.Tex = glCreateTexture()
 
 	// ...and two framebuffers, one for each texture.
-	glGenFramebuffers(1, &m.Read.FBO)
-	glGenFramebuffers(1, &m.Write.FBO)
+	//m.Read.FBO = glCreateFramebuffer()
+	//m.Write.FBO = glCreateFramebuffer()
+	m.Read.FBO = gl_SCREEN
+	m.Write.FBO = gl_SCREEN
 
 	// Initialize the Read texture
-	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
+	glBindFramebuffer(gl_FRAMEBUFFER, m.Read.FBO)
 
-	glBindTexture(gl.TEXTURE_2D, m.Read.Tex)
+	glBindTexture(gl_TEXTURE_2D, m.Read.Tex)
 	glTexImage2D(
-		gl.TEXTURE_2D,
+		gl_TEXTURE_2D,
 		0,
-		gl.RGBA,
+		gl_RGBA,
 		int32(m.Width),
 		int32(m.Height),
 		0,
-		gl.RGBA,
-		gl.UNSIGNED_BYTE,
+		gl_RGBA,
+		gl_UNSIGNED_BYTE,
 		nil)
 
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT)
-	glTexParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_MAG_FILTER, gl_LINEAR)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_MIN_FILTER, gl_LINEAR)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_S, gl_REPEAT)
+	glTexParameteri(gl_TEXTURE_2D, gl_TEXTURE_WRAP_T, gl_REPEAT)
 
-	glFramebufferTexture2D(
-		gl.FRAMEBUFFER,
-		gl.COLOR_ATTACHMENT0,
-		gl.TEXTURE_2D,
-		m.Read.Tex,
-		0,
-	)
+	/*
+		glFramebufferTexture2D(
+			gl_FRAMEBUFFER,
+			gl_COLOR_ATTACHMENT0,
+			gl_TEXTURE_2D,
+			m.Read.Tex,
+			0,
+		)
+	*/
+
+	m.DisableMultisample = true
 
 	// Initialize the Write texture
 	if m.DisableMultisample {
 		m.Write.FBO = m.Read.FBO
 		m.Write.Tex = m.Read.Tex
 	} else {
-		glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
+		glBindFramebuffer(gl_FRAMEBUFFER, m.Write.FBO)
+		glBindTexture(gl_TEXTURE_2D_MULTISAMPLE, m.Write.Tex)
 
-		glBindTexture(gl.TEXTURE_2D_MULTISAMPLE, m.Write.Tex)
 		glTexImage2DMultisample(
-			gl.TEXTURE_2D_MULTISAMPLE,
+			gl_TEXTURE_2D_MULTISAMPLE,
 			int32(m.Multisamples),
-			gl.RGBA,
+			gl_RGBA,
 			int32(m.Width),
 			int32(m.Height),
 			false,
 		)
 
 		glFramebufferTexture2D(
-			gl.FRAMEBUFFER,
-			gl.COLOR_ATTACHMENT0,
-			gl.TEXTURE_2D_MULTISAMPLE,
+			gl_FRAMEBUFFER,
+			gl_COLOR_ATTACHMENT0,
+			gl_TEXTURE_2D_MULTISAMPLE,
 			m.Write.Tex,
 			0,
 		)
@@ -103,13 +110,13 @@ func newMsaa(id, w, h, multisamples int) msaa {
 }
 
 func (m msaa) Clear() {
-	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
+	glBindFramebuffer(gl_FRAMEBUFFER, m.Read.FBO)
 	glClearColor(0, 0, 0, 1)
-	glClear(gl.COLOR_BUFFER_BIT)
+	glClear(gl_COLOR_BUFFER_BIT)
 
-	glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
+	glBindFramebuffer(gl_FRAMEBUFFER, m.Write.FBO)
 	glClearColor(0, 0, 0, 1)
-	glClear(gl.COLOR_BUFFER_BIT)
+	glClear(gl_COLOR_BUFFER_BIT)
 }
 
 func (m msaa) Paint() {
@@ -118,34 +125,36 @@ func (m msaa) Paint() {
 	}
 	// Copy the multisample texture (Write)
 	// to the regular texture (Read).
-	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, m.Read.FBO)
-	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Write.FBO)
+	glBindFramebuffer(gl_DRAW_FRAMEBUFFER, m.Read.FBO)
+	glBindFramebuffer(gl_READ_FRAMEBUFFER, m.Write.FBO)
 
 	glBlitFramebuffer(
 		0, 0, int32(m.Width), int32(m.Height),
 		0, 0, int32(m.Width), int32(m.Height),
-		gl.COLOR_BUFFER_BIT,
-		gl.LINEAR,
+		gl_COLOR_BUFFER_BIT,
+		gl_LINEAR,
 	)
 }
 
 // Blit the anti-aliased "read" texture to the given framebuffer ID.
 // Used during compisiting to copy textures to the screen.
-func (m msaa) Blit(to uint32) {
-	glBindFramebuffer(gl.DRAW_FRAMEBUFFER, to)
-	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
+func (m msaa) Blit(to glFramebuffer) {
+	log.Printf("BLIT: %#v", to)
+	return
+	glBindFramebuffer(gl_DRAW_FRAMEBUFFER, to)
+	glBindFramebuffer(gl_READ_FRAMEBUFFER, m.Read.FBO)
 
 	glBlitFramebuffer(
 		0, 0, int32(m.Width), int32(m.Height),
 		0, 0, int32(m.Width), int32(m.Height),
-		gl.COLOR_BUFFER_BIT,
-		gl.LINEAR,
+		gl_COLOR_BUFFER_BIT,
+		gl_LINEAR,
 	)
 }
 
 func (m msaa) Pixels(x, y, w, h float32) []uint8 {
 
-	glBindFramebuffer(gl.READ_FRAMEBUFFER, m.Read.FBO)
+	glBindFramebuffer(gl_READ_FRAMEBUFFER, m.Read.FBO)
 	xi := int(x * float32(m.Width))
 	yi := int(y * float32(m.Height))
 	wi := int(w * float32(m.Width))
@@ -174,7 +183,7 @@ func (m msaa) Pixels(x, y, w, h float32) []uint8 {
 		int32(yi),
 		int32(wi),
 		int32(hi),
-		gl.RGBA, gl.UNSIGNED_BYTE, glPtr(pixels),
+		gl_RGBA, gl_UNSIGNED_BYTE, pixels,
 	)
 
 	return pixels
@@ -204,8 +213,8 @@ func (m msaa) Image(x, y, w, h float32) image.Image {
 }
 
 func (m msaa) Destroy() {
-	glDeleteTextures(1, &m.Read.Tex)
-	glDeleteTextures(1, &m.Write.Tex)
-	glDeleteFramebuffers(1, &m.Read.FBO)
-	glDeleteFramebuffers(1, &m.Write.FBO)
+	glDeleteTexture(m.Read.Tex)
+	glDeleteTexture(m.Write.Tex)
+	glDeleteFramebuffer(m.Read.FBO)
+	glDeleteFramebuffer(m.Write.FBO)
 }
