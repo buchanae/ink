@@ -18,6 +18,12 @@ func Sin(x float32) float32 {
 	return float32(z)
 }
 
+func Asin(x float32) float32 {
+	y := float64(x)
+	z := math.Asin(y)
+	return float32(z)
+}
+
 func Cos(x float32) float32 {
 	y := float64(x)
 	z := math.Cos(y)
@@ -44,6 +50,24 @@ func Clamp(val, min, max float32) float32 {
 		return min
 	}
 	return val
+}
+
+func Mod(x, y float32) float32 {
+	return float32(math.Mod(float64(x), float64(y)))
+}
+
+func Min(a, b float32) float32 {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func Max(a, b float32) float32 {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func Interp(from, to, percent float32) float32 {

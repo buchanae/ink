@@ -86,6 +86,14 @@ func (c Circle) IntersectsLine(l Line) bool {
 
 func (c Circle) Interpolate(p float32) XY {
 	ang := math.Pi * 2 * p
+	return c.XYFromAngle(ang)
+}
+
+func (c Circle) Circumference() float32 {
+	return 2 * math.Pi * c.Radius
+}
+
+func (c Circle) XYFromAngle(ang float32) XY {
 	return XY{
 		X: cos(ang)*c.Radius + c.X,
 		Y: sin(ang)*c.Radius + c.Y,
