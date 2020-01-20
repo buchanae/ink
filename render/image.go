@@ -12,6 +12,10 @@ type Image struct {
 	tex uint32
 }
 
+func (img Image) Destroy() {
+	glDeleteTextures(1, &img.tex)
+}
+
 func (r *Renderer) AddImage(id int, img image.Image) {
 
 	if _, ok := r.images[id]; ok {

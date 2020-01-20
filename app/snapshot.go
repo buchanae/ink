@@ -27,6 +27,8 @@ func (app *App) Snapshot() image.Image {
 
 	app.Do(func() {
 		renderer := render.NewRenderer(width, height)
+		defer renderer.Cleanup()
+
 		renderer.Render(app.plan)
 		img = renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
 	})

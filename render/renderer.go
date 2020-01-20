@@ -26,6 +26,19 @@ func NewRenderer(width, height int) *Renderer {
 	}
 }
 
+func (r *Renderer) Cleanup() {
+	for _, tex := range r.textures {
+		tex.Destroy()
+	}
+
+	for _, img := range r.images {
+		img.Destroy()
+	}
+
+	r.textures = map[int]msaa{}
+	r.images = map[int]Image{}
+}
+
 func (r *Renderer) Render(plan Plan) {
 	r.render(plan)
 }
