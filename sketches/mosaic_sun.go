@@ -12,22 +12,34 @@ import (
 const (
 	Gap   = 0.001
 	Space = 0.0045
-	Count = 20
+	Count = 25
 
 	Start = 0.01
 	Width = (0.5 - Start) / Count
 
 	MinChord = 0.005
 	MaxChord = 0.008
+
+	JumpChance    = 0.2
+	LightenChance = 0.4
+	LightenAmt    = 0.2
+	TweakChance   = 0.3
+	TweakAmt      = -0.001
 )
 
 func Ink(doc *app.Doc) {
-	bg := color.HexString("#260d05")
-	gfx.Clear(doc, bg)
 	rand.SeedNow()
 
+	bg := color.HexString("#260d05")
+	bg = color.White
+	gfx.Clear(doc, bg)
+
 	A := color.HexString("#ebc334")
-	B := color.HexString("#348feb")
+	B := color.HexString("#0c79e8")
+
+	//palette := rand.Palette()
+	//A = rand.Color(palette)
+	//B = rand.Color(palette)
 
 	gfx.Fill{
 		Mesh: Circle{
@@ -47,42 +59,44 @@ func Ink(doc *app.Doc) {
 			Gap:    Gap,
 		}
 
-		/*
-			min := C * MinChord
-			max := C * MaxChord
-		*/
 		var min float32 = MinChord
 		var max float32 = MaxChord
 
 		min += i * 0.001
-		max += i * 0.004
+		max += i * 0.003
+		max = math.Min(max, 0.05)
 
 		chords := GenChords(rings.Inner, min, max)
-		col := InterpColor(A, B, (i*0.85)/Count)
-		//C := CircleCircumference(rings.Inner)
+		// TODO interpcolor isn't based on visual interpolation
+		//      going form orange to blue goes through green
+		col := InterpColor(A, B, i/Count)
 
 		for _, in := range chords {
-			rings.From = in.From
-			rings.To = in.To
-			rings.Color = col
+			rx := rings
+			rx.From = in.From
+			rx.To = in.To
+			rx.Gap += rand.Range(0, 0.002)
+			rx.Color = col
 
-			if rand.Bool(0.5) {
-				rings.Color = Lighten(
-					col, rand.Range(-0.2, 0.2),
+			if rand.Bool(JumpChance) {
+				rx.Color = InterpColor(A, B,
+					rand.Range(0, Count)/Count,
 				)
 			}
-			if rand.Bool(0.1) {
-				rings.Color = InterpColor(A, B,
-					(rand.Range(0, Count)*0.85)/Count,
+
+			if rand.Bool(LightenChance) {
+				rx.Color = Lighten(
+					rx.Color, rand.Range(-LightenAmt, LightenAmt),
 				)
 			}
-			rings.Draw(doc)
+			rx.Draw(doc)
 		}
 	}
 }
 
 func Lighten(c color.RGBA, amt float32) color.RGBA {
 	h, s, v := RGBToHSV(c.R, c.G, c.B)
+	// TODO broken?
 	v += amt
 	r, g, b := HSVToRGB(h, s, v)
 	return color.RGBA{r, g, b, c.A}
@@ -165,6 +179,9 @@ func (r Rings) Draw(doc gfx.Layer) {
 		inner.XYFromAngle(to - innerGap),
 		outer.XYFromAngle(to - outerGap),
 		outer.XYFromAngle(from + outerGap),
+	}
+	if rand.Bool(TweakChance) {
+		quad = rand.TweakQuad(quad, TweakAmt)
 	}
 	fill := gfx.Fill{quad, r.Color}
 	fill.Draw(doc)
