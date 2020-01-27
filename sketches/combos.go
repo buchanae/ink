@@ -20,12 +20,12 @@ func Ink(doc *app.Doc) {
 	}
 	sub := Grid{Rows: 3, Cols: 3}
 
-	var bold []Stroke
-	var strokes []Stroke
+	var bold []gfx.Strokeable
+	var strokes []gfx.Strokeable
 
 	for i, cell := range grid.Cells() {
 		r := cell.Rect.Shrink(0.003)
-		bold = append(bold, r.Stroke())
+		bold = append(bold, r)
 
 		for j, sc := range sub.Cells() {
 			sr := sc.Rect
@@ -35,9 +35,7 @@ func Ink(doc *app.Doc) {
 				B: r.Interpolate(sr.B),
 			}
 
-			stk := xr.Stroke()
-			stk.Width = 0.0005
-			strokes = append(strokes, stk)
+			strokes = append(strokes, xr)
 
 			// TODO interleaving a stroke
 			//      causes all the batching to fail
@@ -54,16 +52,18 @@ func Ink(doc *app.Doc) {
 	}
 
 	for _, stk := range strokes {
-		stk.Width = 0.0002
-		shd := gfx.NewShader(stk)
-		shd.Set("a_color", color.Black)
-		shd.Draw(doc)
+		gfx.Stroke{
+			Target: stk,
+			Width:  0.0002,
+			Color:  color.Black,
+		}.Draw(doc)
 	}
 
 	for _, stk := range bold {
-		stk.Width = 0.0009
-		shd := gfx.NewShader(stk)
-		shd.Set("a_color", color.Black)
-		shd.Draw(doc)
+		gfx.Stroke{
+			Target: stk,
+			Width:  0.0009,
+			Color:  color.Black,
+		}.Draw(doc)
 	}
 }

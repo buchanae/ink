@@ -10,7 +10,6 @@ import (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	gfx.Clear(doc, White)
 
 	const N = 100000
 

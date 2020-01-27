@@ -15,7 +15,6 @@ const (
 )
 
 func Ink(doc *app.Doc) {
-	gfx.Clear(doc, White)
 
 	center := XY{.5, .5}
 	grid := Grid{
@@ -40,10 +39,10 @@ func Ink(doc *app.Doc) {
 		ang := rand.Range(-dr, dr)
 		q = q.RotateAround(ang, r.Center())
 
-		stk := q.Stroke()
-		stk.Width = 0.001
-
-		s := gfx.NewShader(stk)
-		s.Draw(doc)
+		gfx.Stroke{
+			Target: q,
+			Width:  0.001,
+			Color:  Black,
+		}.Draw(doc)
 	}
 }

@@ -74,3 +74,11 @@ func (tris Triangles) Mesh() Mesh {
 	}
 	return Mesh{Verts: verts, Faces: faces}
 }
+
+func (tris Triangles) Stroke(opt StrokeOpt) Mesh {
+	mesh := Mesh{}
+	for _, t := range tris {
+		mesh = Merge(mesh, t.Stroke(opt))
+	}
+	return mesh
+}

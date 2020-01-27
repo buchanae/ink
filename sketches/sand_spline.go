@@ -1,9 +1,10 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -20,17 +21,16 @@ const (
 	LineWidth = 0.003
 )
 
-func Ink(doc *Doc) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
-	redDot := Dot{Color: Red, Radius: 0.003}
+	redDot := gfx.Dot{Color: Red, Radius: 0.003}
 
 	for k := 0; k < Lines; k++ {
 		y := 0.1 + float32(k)*0.05
 
 		for j := 0; j < Passes; j++ {
-			var curves []Curve
+			var curves Path
 
 			pt := XY{0.05, y}
 			inc := XY{0.90 / N, 0}
@@ -72,15 +72,14 @@ func Ink(doc *Doc) {
 				pt = pt.Add(inc)
 			}
 
-			m := Stroke{
-				Curves: curves,
-				Width:  LineWidth,
-			}
-
 			c := Teal
 			c.A = 0.3
 
-			Fill{m, c}.Draw(doc)
+			gfx.Stroke{
+				Target: curves,
+				Width:  LineWidth,
+				Color:  c,
+			}.Draw(doc)
 		}
 	}
 }

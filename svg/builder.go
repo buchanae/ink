@@ -9,15 +9,15 @@ import (
 type builder struct {
 	width, height float32
 	stack         []float32
-	path          dd.Path
+	pen           dd.Pen
 }
 
 func (p *builder) MoveTo(abs bool) {
 	for _, xy := range p.pop() {
 		if abs {
-			p.path.MoveTo(xy)
+			p.pen.MoveTo(xy)
 		} else {
-			p.path.Move(xy)
+			p.pen.Move(xy)
 		}
 	}
 }
@@ -25,9 +25,9 @@ func (p *builder) MoveTo(abs bool) {
 func (p *builder) LineTo(abs bool) {
 	for _, xy := range p.pop() {
 		if abs {
-			p.path.LineTo(xy)
+			p.pen.LineTo(xy)
 		} else {
-			p.path.Line(xy)
+			p.pen.Line(xy)
 		}
 	}
 }
@@ -39,9 +39,9 @@ func (p *builder) CubicTo(abs bool) {
 		b := xys[i+1]
 		c := xys[i+2]
 		if abs {
-			p.path.CubicTo(c, a, b)
+			p.pen.CubicTo(c, a, b)
 		} else {
-			p.path.Cubic(c, a, b)
+			p.pen.Cubic(c, a, b)
 		}
 	}
 }
@@ -52,15 +52,15 @@ func (p *builder) QuadraticTo(abs bool) {
 		a := xys[i]
 		b := xys[i+1]
 		if abs {
-			p.path.QuadraticTo(b, a)
+			p.pen.QuadraticTo(b, a)
 		} else {
-			p.path.Quadratic(b, a)
+			p.pen.Quadratic(b, a)
 		}
 	}
 }
 
 func (p *builder) ClosePath() {
-	p.path.Close()
+	p.pen.Close()
 }
 
 func (p *builder) pop() []dd.XY {

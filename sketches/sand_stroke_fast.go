@@ -4,9 +4,9 @@ import (
 	"image"
 	colorlib "image/color"
 
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
 	"github.com/buchanae/ink/rand"
 )
@@ -28,11 +28,9 @@ const (
 	AlphaOffset = -0.3
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
 	palette := rand.Palette()
-
-	Clear(doc, White)
 
 	lines := make([]float32, Lines)
 	for i := range lines {
@@ -54,15 +52,15 @@ func Ink(doc Layer) {
 		img := makeHeightMap(heights)
 		heightmap := doc.NewImage(img)
 
-		s := &Shader{
+		s := &gfx.Shader{
 			Name: "Stroke",
-			Vert: DefaultVert,
+			Vert: gfx.DefaultVert,
 			Frag: Frag,
 			Mesh: Rect{
 				XY{0, y - MaxD},
 				XY{1, y + MaxD},
 			},
-			Attrs: Attrs{
+			Attrs: gfx.Attrs{
 				"u_heightmap":    heightmap,
 				"u_color":        rand.Color(palette),
 				"u_alpha_offset": float32(AlphaOffset),

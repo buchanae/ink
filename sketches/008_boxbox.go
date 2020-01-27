@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
@@ -20,7 +21,7 @@ const (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	gfx.Clear(doc, White)
+
 	grid := Grid{Rows: GridSize, Cols: GridSize}
 
 	p := rand.Palette()
@@ -39,8 +40,9 @@ func Ink(doc *app.Doc) {
 
 			r := rect.Shrink(float32(i+1) * Shrink)
 			q := r.Quad()
-			m := q.Stroke()
-			m.Width = LineWidth
+			m := q.Stroke(dd.StrokeOpt{
+				Width: LineWidth,
+			})
 
 			s := gfx.NewShader(m)
 			s.Set("a_color", rand.Color(p))

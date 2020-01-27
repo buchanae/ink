@@ -4,42 +4,38 @@ import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/voronoi"
 )
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
 	box := Rect{
 		A: XY{.1, .1},
 		B: XY{.9, .9},
 	}
 
-	var xys []XY
 	var initial []XY
 
 	for i := 0; i < 20; i++ {
 		p := float32(i) / 20
-		xy := box.Interp(XY{p, p})
+		xy := box.Interpolate(XY{p, p})
 		initial = append(initial, xy)
 	}
 
-	noise := rand.BlueNoiseInitial(450, 1, 1, 0.050, initial)
-
-	for _, xy := range noise {
-		if !box.Contains(xy) {
-			continue
-		}
-		xys = append(xys, xy)
-	}
+	noise := rand.BlueNoise{
+		Limit:   450,
+		Spacing: 0.05,
+		Initial: initial,
+		Rect:    box,
+	}.Generate()
 
 	//m := box.Stroke(0.001)
 	//doc.Shader(m)
 
-	v := voronoi.New(xys, box)
+	v := voronoi.New(noise, box)
 
 	colors := []RGBA{
 		Blue, Yellow, Green, Black, Purple,
@@ -64,29 +60,17 @@ func Ink(doc *app.Doc) {
 	tris := v.Triangulate()
 
 	for _, t := range tris {
-		s := NewShader(t)
 		c := rand.Color(colors)
 		c.A = 0.3
-		s.Set("a_color", c)
-		s.Draw(doc)
+		gfx.Fill{
+			Mesh:  t,
+			Color: c,
+		}.Draw(doc)
 	}
 
-	{
-		m := Triangles(tris)
-		stk := m.Stroke()
-		stk.Width = 0.001
-		s := NewShader(stk)
-		s.Set("a_color", Black)
-		s.Draw(doc)
-	}
-
-	/*
-			for _, xy := range xys {
-				doc.Dot(xy, Red)
-			}
-
-		for _, xy := range initial {
-			doc.Dot(xy, Blue)
-		}
-	*/
+	gfx.Stroke{
+		Target: Triangles(tris),
+		Width:  0.001,
+		Color:  Black,
+	}.Draw(doc)
 }

@@ -36,7 +36,7 @@ func NewDoc() *Doc {
 		// TODO need to pull this from app
 		Config: DefaultConfig(),
 	}
-	gfx.Clear(doc, color.Black)
+	gfx.Clear(doc, color.White)
 	return doc
 }
 

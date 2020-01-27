@@ -16,9 +16,6 @@ func Ink(doc *app.Doc) {
 		Cols: 40,
 		Rect: RectCenter(XY{.5, .5}, XY{.95, .95}),
 	}
-	opt := StrokeOpt{
-		Width: 0.0025,
-	}
 	col := Blue
 	col.A = 0.7
 
@@ -37,9 +34,9 @@ func Ink(doc *app.Doc) {
 		rot := rand.Angle()
 		l := Line{a.Rotate(rot, center), b.Rotate(rot, center)}
 		gfx.Stroke{
-			Target:    l,
-			Color:     col,
-			StrokeOpt: opt,
+			Target: l,
+			Color:  col,
+			Width:  0.0025,
 		}.Draw(doc)
 	}
 }

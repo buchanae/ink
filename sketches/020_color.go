@@ -4,7 +4,7 @@ import (
 	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 )
 
 func Ink(doc *app.Doc) {
@@ -19,7 +19,7 @@ func Ink(doc *app.Doc) {
 	green := color.Hex(0x00ff00)
 	blue := color.Hex(0x0000ff)
 
-	s := NewShader(t)
+	s := gfx.NewShader(t)
 	s.Set("a_color", []color.RGBA{
 		red, green, blue,
 	})

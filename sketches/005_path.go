@@ -8,7 +8,6 @@ import (
 )
 
 func Ink(doc *app.Doc) {
-	gfx.Clear(doc, color.White)
 
 	pen := &Pen{}
 	pen.MoveTo(XY{0.1, 0.4})
@@ -59,9 +58,7 @@ func Ink(doc *app.Doc) {
 		gfx.Stroke{
 			Target: s,
 			Color:  color.Red,
-			StrokeOpt: StrokeOpt{
-				Width: 0.002,
-			},
+			Width:  0.002,
 		}.Draw(doc)
 	}
 }

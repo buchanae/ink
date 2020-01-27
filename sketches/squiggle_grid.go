@@ -10,7 +10,6 @@ import (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	gfx.Clear(doc, color.White)
 
 	grid := Grid{Rows: 10, Cols: 10}
 	//p := rand.Palette()
@@ -27,11 +26,11 @@ func Ink(doc *app.Doc) {
 		*/
 
 		current := bnd.Interpolate(rand.XYRange(0.1, 0.9))
-		path := Path{}
+		pen := &Pen{}
 		i := 0
 		horizontal := false
 
-		path.MoveTo(current)
+		pen.MoveTo(current)
 
 		for i < 20 {
 			var add XY
@@ -48,21 +47,18 @@ func Ink(doc *app.Doc) {
 				continue
 			}
 
-			path.LineTo(next)
+			pen.LineTo(next)
 			current = next
 			horizontal = !horizontal
 			i++
 		}
 
-		path.Close()
+		pen.Close()
 
 		gfx.Stroke{
-			Shape: &path,
-			Width: 0.001,
-			Color: color.Black,
+			Target: pen,
+			Width:  0.001,
+			Color:  color.Black,
 		}.Draw(doc)
-		//stk := path.Stroke()
-		//stk.Width = 0.001
-		//Fill{stk, color.Black}.Draw(doc)
 	}
 }

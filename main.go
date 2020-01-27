@@ -13,7 +13,6 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/buchanae/ink/app"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -154,7 +153,6 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 	if err != nil {
 		return err
 	}
-	log.Print("run")
 
 	binPath := filepath.Join(wd.path, "inkbin")
 	cmd := exec.Command(binPath)
@@ -182,7 +180,6 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 	dec := gob.NewDecoder(stdout)
 
 	for {
-		start := time.Now()
 		doc := &app.Doc{}
 		err = dec.Decode(doc)
 		if err == io.EOF {
@@ -192,10 +189,7 @@ func run(ctx context.Context, a *app.App, wd workdir, sketchPath, sketchName str
 			return fmt.Errorf("decoding: %v", err)
 		}
 
-		renderStart := time.Now()
 		a.Render(doc)
-		log.Printf("render iter: %s", time.Since(renderStart))
-		log.Printf("iter: %s", time.Since(start))
 	}
 
 	err = cmd.Wait()

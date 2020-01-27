@@ -21,10 +21,12 @@ func Ink(doc *app.Doc) {
 	grid := HexGrid{Size}
 	cells := grid.Cells()
 
-	for i := range cells {
-		c := cells[i].Center
-		cells[i].Center = c.Add(rand.XYRange(-Z, Z))
-	}
+	/*
+		for i := range cells {
+			c := cells[i].Center
+			cells[i].Center = c.Add(rand.XYRange(-Z, Z))
+		}
+	*/
 
 	for _, cell := range cells {
 		col := rand.Color(palette)
@@ -35,9 +37,7 @@ func Ink(doc *app.Doc) {
 		gfx.Stroke{
 			Target: cell,
 			Color:  Black,
-			StrokeOpt: StrokeOpt{
-				Width: 0.004,
-			},
+			Width:  0.004,
 		}.Draw(doc)
 	}
 }

@@ -4,9 +4,9 @@ import (
 	"log"
 	"time"
 
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
 	"github.com/buchanae/ink/rand"
 )
@@ -30,9 +30,8 @@ const (
 	M    = 0.4
 )
 
-func Ink(doc *Doc) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 	palette := rand.Palette()
 
 	start := time.Now()
@@ -57,7 +56,7 @@ func Ink(doc *Doc) {
 			wh := XY{W, dy}
 			r := RectCenter(xy, wh)
 
-			s := NewShader(r)
+			s := gfx.NewShader(r)
 			sc := color
 			sc.A = 1 - dy/B - M
 			s.Set("a_color", sc)

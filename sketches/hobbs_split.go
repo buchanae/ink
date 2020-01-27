@@ -4,13 +4,12 @@ import (
 	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, color.White)
 
 	a := Triangle{
 		B: XY{1, 0},
@@ -28,15 +27,16 @@ func Ink(doc *app.Doc) {
 
 	layer := doc.NewLayer()
 
-	var strokes []Stroke
 	for _, t := range tris {
-		Fill{t, rand.Color(p)}.Draw(layer)
-		strokes = append(strokes, t.Stroke())
+		gfx.Fill{t, rand.Color(p)}.Draw(layer)
 	}
 
-	for _, stk := range strokes {
-		stk.Width = 0.0005
-		Fill{stk, color.Black}.Draw(layer)
+	for _, t := range tris {
+		gfx.Stroke{
+			Target: t,
+			Width:  0.0005,
+			Color:  color.Black,
+		}.Draw(layer)
 	}
 
 	cir := Circle{
@@ -44,14 +44,16 @@ func Ink(doc *app.Doc) {
 		Radius:   0.4,
 		Segments: 100,
 	}
-	Cut{
+	gfx.Cut{
 		Shape:  cir,
 		Source: layer,
 	}.Draw(doc)
 
-	cs := cir.Stroke()
-	cs.Width = 0.005
-	Fill{cs, color.Black}.Draw(doc)
+	gfx.Stroke{
+		Target: cir,
+		Width:  0.005,
+		Color:  color.Black,
+	}.Draw(doc)
 
 }
 

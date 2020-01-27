@@ -7,8 +7,8 @@ import (
 
 type Stroke struct {
 	Target Strokeable
-	dd.StrokeOpt
-	Color color.RGBA
+	Width  float32
+	Color  color.RGBA
 }
 
 type Strokeable interface {
@@ -20,7 +20,9 @@ func (s Stroke) Draw(out Layer) {
 		Name: "Stroke",
 		Vert: DefaultVert,
 		Frag: DefaultFrag,
-		Mesh: s.Target.Stroke(s.StrokeOpt),
+		Mesh: s.Target.Stroke(dd.StrokeOpt{
+			Width: s.Width,
+		}),
 		Attrs: Attrs{
 			"a_color": s.Color,
 		},

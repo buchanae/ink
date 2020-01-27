@@ -1,14 +1,14 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/tess"
 )
 
-func Ink(doc Layer) {
-	Clear(doc, White)
+func Ink(doc *app.Doc) {
 
 	xys := []XY{
 		{0.2, 0.2},
@@ -22,10 +22,10 @@ func Ink(doc Layer) {
 
 	tris := tess.Tesselate(xys)
 	m := Triangles(tris)
-	NewShader(m).Draw(doc)
+	gfx.NewShader(m).Draw(doc)
 
 	for _, xy := range xys {
-		d := Dot{XY: xy, Color: Red, Radius: 0.005}
+		d := gfx.Dot{XY: xy, Color: Red, Radius: 0.005}
 		d.Draw(doc)
 	}
 }

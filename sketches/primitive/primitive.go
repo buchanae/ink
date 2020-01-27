@@ -29,7 +29,7 @@ func main() {
 	}
 
 	res := make(chan *Attempt, 100)
-	doc := gfx.NewDoc()
+	doc := app.NewDoc()
 
 	go run(res)
 	go func() {
@@ -73,7 +73,7 @@ func main() {
 
 func run(output chan *Attempt) {
 
-	target := LoadImage("sketches/primitive/monalisa_256.png")
+	target := LoadImage("monalisa_256.png")
 	palette := colors(target)
 	avg := avgcolors(target)
 

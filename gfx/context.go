@@ -27,3 +27,11 @@ func (ctx Context) Fill(m Meshable) {
 func (ctx Context) Clear(c color.RGBA) {
 	Clear(ctx.Output, c)
 }
+
+func (ctx Context) Stroke(s Strokeable) {
+	Stroke{
+		Target: s,
+		Width:  ctx.StrokeWidth,
+		Color:  ctx.StrokeColor,
+	}.Draw(ctx.Output)
+}

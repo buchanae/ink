@@ -3,19 +3,19 @@ package main
 import (
 	"log"
 
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/svg"
 	"github.com/buchanae/ink/tess"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
-	p, err := svg.Parse(oregon, 800, 800)
+	paths, err := svg.Parse(oregon, 800, 800)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func Ink(doc Layer) {
 		}
 	}
 	tm := Triangles(tris)
-	ts := NewShader(tm)
+	ts := gfx.NewShader(tm)
 	ts.Draw(doc)
 
 	pal := rand.Palette()
@@ -61,11 +61,11 @@ func Ink(doc Layer) {
 		xy = XY{xy.X, 1 - xy.Y}
 		m.Verts[i] = xy
 	}
-	NewShader(m).Draw(doc)
+	gfx.NewShader(m).Draw(doc)
 
 	for _, xy := range xys {
 		xy = XY{xy.X, 1 - xy.Y}
-		Dot{XY: xy}.Draw(doc)
+		gfx.Dot{XY: xy}.Draw(doc)
 	}
 }
 

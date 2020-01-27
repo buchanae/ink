@@ -3,9 +3,10 @@ package main
 import (
 	"io/ioutil"
 
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -20,8 +21,7 @@ const (
 	S          float32 = .3
 )
 
-func Ink(doc *Doc) {
-	Clear(doc, White)
+func Ink(doc *app.Doc) {
 
 	/*
 			noiseLayer := doc.NewLayer()
@@ -61,7 +61,7 @@ func Ink(doc *Doc) {
 			rot[i] = rand.Angle()
 		}
 
-		doc.AddShader(&Shader{
+		doc.AddShader(&gfx.Shader{
 			Name:      "Polys",
 			Instances: N,
 			Vert:      loadShader("paint.vert"),
@@ -72,7 +72,7 @@ func Ink(doc *Doc) {
 				"a_rot":  1,
 				"a_size": 1,
 			},
-			Attrs: Attrs{
+			Attrs: gfx.Attrs{
 				"a_pos":        pos,
 				"a_rot":        rot,
 				"a_size":       size,

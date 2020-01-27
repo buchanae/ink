@@ -1,14 +1,15 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc Layer) {
+func Ink(doc *app.Doc) {
 
-	Gradient{
+	gfx.Gradient{
 		Rect: Rect{
 			XY{0.2, 0.2},
 			XY{0.8, 0.8},

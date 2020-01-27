@@ -316,7 +316,7 @@ func glStrs(strs ...string) (cstrs **uint8, free func()) {
 func glLogErr(name string) {
 	err := glCheckErr(name)
 	if err != nil {
-		log.Printf("%v", err)
+		log.Printf("gl error: %v", err)
 	}
 }
 

@@ -12,7 +12,7 @@ const (
 	ShrinkRect   = 0.003
 	RandPoint    = 0.03
 	CircleRadius = 0.05
-	Stroke       = false
+	ShouldStroke = false
 	StrokeWidth  = 0.001
 )
 
@@ -51,12 +51,12 @@ func Ink(doc *app.Doc) {
 			s.Draw(l2)
 		}
 
-		if Stroke {
-			stk := tris.Stroke()
-			stk.Width = StrokeWidth
-			s := gfx.NewShader(stk)
-			s.Set("a_color", White)
-			s.Draw(l2)
+		if ShouldStroke {
+			gfx.Stroke{
+				Target: tris,
+				Width:  StrokeWidth,
+				Color:  White,
+			}.Draw(l2)
 		}
 
 		gfx.Fill{

@@ -1,9 +1,9 @@
 package main
 
 import (
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -14,9 +14,7 @@ const (
 	Shift   = 0.55
 )
 
-func Ink(doc *Doc) {
-
-	Clear(doc, White)
+func Ink(doc *app.Doc) {
 
 	//r := rand.New(1)
 	//noise := r.Perlin(2, 2, Octaves)
@@ -32,7 +30,7 @@ func Ink(doc *Doc) {
 
 		xy := XY{x, 0.5 + h}
 		c := Circle{xy, 0.001, 10}
-		s := NewShader(c)
+		s := gfx.NewShader(c)
 		s.Draw(doc)
 	}
 }

@@ -1,22 +1,22 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
-	"github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	. "github.com/buchanae/ink/dd"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc Layer) {
-	Clear(doc, color.White)
+func Ink(doc *app.Doc) {
 
-	c := dd.Circle{
-		XY:       dd.XY{0.5, 0.5},
+	c := Circle{
+		XY:       XY{0.5, 0.5},
 		Radius:   0.3,
 		Segments: 40,
 	}
 	m := c.Mesh()
 	m = rand.TweakMesh(m, 0.03)
 
-	Fill{m, color.Red}.Draw(doc)
+	gfx.Fill{m, color.Red}.Draw(doc)
 }

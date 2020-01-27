@@ -9,7 +9,7 @@ import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/raster"
 	"github.com/buchanae/ink/voronoi"
@@ -17,13 +17,12 @@ import (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, Black)
+	gfx.Clear(doc, Black)
 
-	box := Fullscreen
+	box := gfx.Fullscreen
 	img := LoadImage("flower.png")
 	//l := doc.NewImage(img)
 
-	var xys []XY
 	var initial []XY
 
 	var i float32
@@ -33,14 +32,11 @@ func Ink(doc *app.Doc) {
 		initial = append(initial, xy)
 	}
 
-	noise := rand.BlueNoiseInitial(1000, 1, 1, 0.030, initial)
-
-	for _, xy := range noise {
-		if !box.Contains(xy) {
-			continue
-		}
-		xys = append(xys, xy)
-	}
+	xys := rand.BlueNoise{
+		Limit:   1000,
+		Spacing: 0.03,
+		Initial: initial,
+	}.Generate()
 
 	v := voronoi.New(xys, box)
 
@@ -104,7 +100,7 @@ func Ink(doc *app.Doc) {
 		mesh = mesh.AddTriangles(tris)
 	}
 
-	s := NewShader(mesh)
+	s := gfx.NewShader(mesh)
 	s.Set("a_color", colors)
 	s.Draw(doc)
 

@@ -19,8 +19,6 @@ func Ink(doc *app.Doc) {
 	midin := midi.NewMidi()
 	go midin.Run()
 
-	gfx.Clear(doc, color.White)
-
 	fh, err := os.Open("toshiro_copy.png")
 	if err != nil {
 		panic(err)
@@ -162,9 +160,10 @@ func (vm VoronoiMesh) Mesh() dd.Mesh {
 			}
 			seen[e] = struct{}{}
 
-			stk := e.Stroke()
-			stk.Width = 0.0005
-			meshes = append(meshes, stk.Mesh())
+			stk := e.Stroke(dd.StrokeOpt{
+				Width: 0.0005,
+			})
+			meshes = append(meshes, stk)
 		}
 	}
 

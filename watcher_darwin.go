@@ -27,7 +27,7 @@ type watcher struct {
 func (w *watcher) init(path string) {
 	dev, err := fsevents.DeviceForPath("/")
 	if err != nil {
-		log.Print(err)
+		log.Printf("watcher init error: %v", err)
 		return
 	}
 

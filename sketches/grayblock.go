@@ -4,7 +4,7 @@ import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/voronoi"
@@ -26,7 +26,6 @@ const (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
 	for i := float32(0); i < N; i++ {
 		split := rand.Range(.3, .7)
@@ -59,12 +58,12 @@ func Ink(doc *app.Doc) {
 			Spacing: math.Interp(0.003, 0.03, i/N),
 		}
 
-		Fill{
+		gfx.Fill{
 			Mesh:  ca.Mesh(),
 			Color: c,
 		}.Draw(doc)
 
-		Fill{
+		gfx.Fill{
 			Color: c,
 			Mesh:  rb,
 		}.Draw(doc)
@@ -90,7 +89,7 @@ func (vm VoronoiMesh) Mesh() Mesh {
 		Rect:    vm.Rect,
 		Spacing: vm.Spacing,
 	}
-	noise := bn.Generate(rand.Default)
+	noise := bn.Generate()
 	v := voronoi.New(noise, vm.Rect)
 
 	// voronoi generates triangles that share edges,
@@ -113,8 +112,9 @@ func (vm VoronoiMesh) Mesh() Mesh {
 			}
 			seen[e] = struct{}{}
 
-			stk := e.Stroke()
-			stk.Width = 0.0005
+			stk := e.Stroke(StrokeOpt{
+				Width: 0.0005,
+			})
 			meshes = append(meshes, stk.Mesh())
 		}
 	}
@@ -132,23 +132,23 @@ func (vc VoronoiCells) Mesh() Mesh {
 		Rect:    vc.Rect,
 		Spacing: vc.Spacing,
 	}
-	noise := bn.Generate(rand.Default)
+	noise := bn.Generate()
 	v := voronoi.New(noise, vc.Rect)
 
 	var meshes []Mesh
 	for _, e := range v.Edges() {
-		meshes = append(meshes, e.Stroke().Mesh())
+		meshes = append(meshes, e.Stroke(StrokeOpt{}))
 	}
 	return Merge(meshes...)
 }
 
-func DotShade(doc Layer, r Rect, c RGBA, i float32) {
+func DotShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 	bn := rand.BlueNoise{
 		Rect:    r,
 		Spacing: math.Interp(0.002, 0.009, i/N),
 	}
-	noise := bn.Generate(rand.Default)
+	noise := bn.Generate()
 	for _, xy := range noise {
-		Dot{xy, c, 0.001}.Draw(doc)
+		gfx.Dot{xy, c, 0.001}.Draw(doc)
 	}
 }

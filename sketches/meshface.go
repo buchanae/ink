@@ -4,7 +4,7 @@ import (
 	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/voronoi"
 )
@@ -36,7 +36,6 @@ TODO ideas:
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
 	for i := float32(0); i < N; i++ {
 		p := i / N
@@ -59,8 +58,8 @@ func Ink(doc *app.Doc) {
 		c := RGBA{p, p, p, 1}
 		MeshShade(doc, ra, c, i)
 
-		//Fill{ra, c}.Draw(doc)
-		Fill{rb, c}.Draw(doc)
+		//gfx.Fill{ra, c}.Draw(doc)
+		gfx.Fill{rb, c}.Draw(doc)
 	}
 
 }
@@ -74,7 +73,7 @@ func Ink(doc *app.Doc) {
 //      millions of blue noise points. would be nice to skip that
 //      if all we need is to change the color
 
-func MeshShade(doc Layer, r Rect, c RGBA, i float32) {
+func MeshShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 	space := Interp(0.002, 0.02, i/N)
 	na := BlueNoiseInBox(100000, space, r)
 	// TODO want voronoi without edges
@@ -95,34 +94,34 @@ func MeshShade(doc Layer, r Rect, c RGBA, i float32) {
 			}
 			seen[e] = struct{}{}
 
-			stk := Stroke{Width: 0.0005}
-			stk.Curves = append(stk.Curves, e)
-			s := NewShader(stk)
-			s.Set("a_color", c)
-			s.Draw(doc)
+			gfx.Stroke{
+				Target: e,
+				Width:  0.0005,
+				Color:  c,
+			}.Draw(doc)
 		}
 	}
 }
 
-func CellShade(doc Layer, r Rect, c RGBA, i float32) {
+func CellShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 	space := Interp(0.002, 0.01, i/N)
 	na := BlueNoiseInBox(50000, space, r)
 	// TODO want voronoi without edges
 	v := voronoi.New(na, r)
 	for _, e := range v.Edges() {
-		stk := Stroke{}
-		stk.Curves = append(stk.Curves, e)
-		s := NewShader(stk)
-		s.Set("a_color", c)
-		s.Draw(doc)
+
+		gfx.Stroke{
+			Target: e,
+			Color:  c,
+		}.Draw(doc)
 	}
 }
 
-func DotShade(doc Layer, r Rect, c RGBA, i float32) {
+func DotShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 	space := Interp(0.002, 0.009, i/N)
 	na := BlueNoiseInBox(100000, space, r)
 	for _, xy := range na {
-		Dot{xy, c, 0.001}.Draw(doc)
+		gfx.Dot{xy, c, 0.001}.Draw(doc)
 	}
 }
 
@@ -131,15 +130,10 @@ func Interp(from, to, p float32) float32 {
 }
 
 func BlueNoiseInBox(n int, space float32, box Rect) []XY {
-	initial := []XY{box.Center()}
-	noise := rand.BlueNoiseInitial(n, 1, 1, space, initial)
-
-	var xys []XY
-	for _, xy := range noise {
-		if !box.Contains(xy) {
-			continue
-		}
-		xys = append(xys, xy)
+	bn := rand.BlueNoise{
+		Limit:   n,
+		Rect:    box,
+		Spacing: space,
 	}
-	return xys
+	return bn.Generate()
 }

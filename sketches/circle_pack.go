@@ -1,28 +1,28 @@
 package main
 
 import (
-	. "github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/voronoi"
 )
 
-func Ink(doc *Doc) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	Clear(doc, White)
 
-	noise := rand.BlueNoise(5000, 1, 1, 0.02)
 	box := Rect{
 		A: XY{.1, .1},
 		B: XY{.9, .9},
 	}
+	bn := rand.BlueNoise{
+		Limit:   5000,
+		Rect:    box,
+		Spacing: 0.02,
+	}
 
 	var xys []XY
-	for _, xy := range noise {
-		if !box.Contains(xy) {
-			continue
-		}
+	for _, xy := range bn.Generate() {
 		if rand.Bool(0.3) {
 			continue
 		}
@@ -30,7 +30,7 @@ func Ink(doc *Doc) {
 	}
 
 	for _, xy := range xys {
-		Dot{XY: xy}.Draw(doc)
+		gfx.Dot{XY: xy}.Draw(doc)
 	}
 
 	colors := rand.Palette()
@@ -39,17 +39,18 @@ func Ink(doc *Doc) {
 	for _, cell := range v.Cells() {
 		c := rand.Color(colors)
 		c.A = 0.3
+
 		for _, tri := range cell.Tris {
-			s := NewShader(tri)
+			s := gfx.NewShader(tri)
 			s.Set("a_color", c)
 			s.Draw(doc)
 		}
 
 		for _, e := range cell.Edges {
-			m := e.Stroke()
-			m.Width = 0.002
-			s := NewShader(m)
-			s.Draw(doc)
+			gfx.Stroke{
+				Target: e,
+				Width:  0.002,
+			}.Draw(doc)
 		}
 	}
 }

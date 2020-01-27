@@ -1,10 +1,11 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
@@ -15,17 +16,14 @@ const (
 	size = 40
 )
 
-func Ink(doc *Doc) {
+func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
-	bg := Fill{Fullscreen, White}
-	bg.Draw(doc)
-
-	grid := NewGrid(size, size)
+	grid := Grid{Rows: size, Cols: size}
 	boxes := MergedGridQuades(grid, 15, gridTweak)
 	center := XY{0.5, 0.5}
 	// TODO redo monochromatic color picker
-	//colors := rand.Palette()
+	colors := rand.Palette()
 
 	for _, b := range boxes {
 		dist := b.Bounds().Center().Distance(center)
@@ -45,7 +43,7 @@ func Ink(doc *Doc) {
 		//c = color.Lighter(c, rand.Range(0.1, 1.3))
 		//}
 
-		m := NewShader(b)
+		m := gfx.NewShader(b)
 		//m.Frag = "stained_glass.frag"
 		m.Set("u_offset", rand.XYRange(0, 200))
 		m.Set("a_color", c)
@@ -62,11 +60,11 @@ func Ink(doc *Doc) {
 	}
 
 	for _, b := range boxes {
-		l := b.Stroke()
-		l.Width = lineWidth
-		s := NewShader(l)
-		s.Set("a_color", color.Black)
-		s.Draw(doc)
+		gfx.Stroke{
+			Target: b,
+			Width:  lineWidth,
+			Color:  color.Black,
+		}.Draw(doc)
 	}
 }
 

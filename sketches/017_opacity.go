@@ -1,15 +1,15 @@
 package main
 
 import (
+	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
-	. "github.com/buchanae/ink/gfx"
+	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc Layer) {
-	Clear(doc, White)
+func Ink(doc *app.Doc) {
 
-	fills := []Fill{
+	fills := []gfx.Fill{
 		{
 			Rect{XY{0.3, 0.3}, XY{0.6, 0.6}},
 			RGBA{1, 0, 0, 0.5},
