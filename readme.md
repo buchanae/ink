@@ -44,13 +44,9 @@ ink example.go
 
 Ink opens a window and renders your triangle:
 
-![Triangle example](./_static/ink_example.png)
+![Triangle example](https://buchanae.github.io/ink/assets/hello_triangle.png?1)
 
 There are more examples in the [sketches](./sketches) directory.
-
-### Status
-
-This is a young project. It's tested only on MacOS 10.14.
 
 ### Implementation Notes
 
