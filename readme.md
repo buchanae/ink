@@ -43,7 +43,7 @@ ink example.go
 
 Ink opens a window and renders your triangle:
 
-![Triangle example](https://buchanae.github.io/ink/assets/hello_triangle.png?1)
+![Triangle example](https://buchanae.github.io/ink/assets/snapshots/001_triangle.png)
 
 There are more examples in the [sketches](./sketches) directory.
 
