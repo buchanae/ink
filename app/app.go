@@ -3,6 +3,7 @@
 package app
 
 import (
+	"log"
 	"runtime"
 
 	"github.com/buchanae/ink/render"
@@ -46,6 +47,12 @@ func (app *App) Run() error {
 	return app.runWindow()
 }
 
+func (app *App) Close() {
+	app.Do(func() {
+		app.win.SetShouldClose(true)
+	})
+}
+
 func (app *App) initRenderer() {
 	if app.renderer != nil {
 		return
@@ -78,7 +85,9 @@ func (app *App) Render(doc *Doc) {
 	app.Do(func() {
 
 		app.updateConfig(doc.Config)
-		if !app.shown {
+		log.Printf("hidden %v", app.conf.Window.Hidden)
+		if !app.conf.Window.Hidden && !app.shown {
+			log.Printf("SHOW")
 			app.win.Show()
 			app.shown = true
 		}
@@ -120,7 +129,7 @@ func Run(f func(*Doc)) {
 	if err != nil {
 		panic(err)
 	}
-	doc := NewDoc()
+	doc := a.NewDoc()
 	go func() {
 		f(doc)
 		a.Render(doc)

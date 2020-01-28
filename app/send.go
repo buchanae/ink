@@ -7,9 +7,11 @@ import (
 )
 
 var enc *gob.Encoder
+var dec *gob.Decoder
 
 func init() {
 	enc = gob.NewEncoder(os.Stdout)
+	dec = gob.NewDecoder(os.Stdin)
 }
 
 type Frame struct {
@@ -30,6 +32,17 @@ func (pb Playback) Next() bool {
 func Play() bool {
 	time.Sleep(15 * time.Millisecond)
 	return true
+}
+
+func RecvDoc() *Doc {
+	doc := &Doc{}
+	err := dec.Decode(doc)
+	if err != nil {
+		os.Stderr.Write([]byte("RecvDoc: "))
+		os.Stderr.Write([]byte(err.Error()))
+		os.Stderr.Write([]byte("\n"))
+	}
+	return doc
 }
 
 func Send(doc *Doc) {

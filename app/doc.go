@@ -30,12 +30,12 @@ type Doc struct {
 	Config Config
 }
 
-func NewDoc() *Doc {
+func (app *App) NewDoc() *Doc {
 	doc := &Doc{
-		ID: nextID(),
-		// TODO need to pull this from app
-		Config: DefaultConfig(),
+		ID:     nextID(),
+		Config: app.conf,
 	}
+	// TODO this shouldn't be here
 	gfx.Clear(doc, color.White)
 	return doc
 }
