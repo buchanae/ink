@@ -16,14 +16,9 @@ const (
 
 func Ink(doc *app.Doc) {
 
-	//r := rand.New(1)
-	//noise := r.Perlin(2, 2, Octaves)
-	//rang := math.Sqrt(30.0 / 4.0)
-
 	for i := 0; i < N; i++ {
 		x := float32(i) / N
 
-		//h := rand.Noise1(x * float32(j+1) * 2)
 		h := octaves(x, 6)
 		h -= 0.7
 		h *= .2

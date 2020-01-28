@@ -32,30 +32,11 @@ func Ink(doc *app.Doc) {
 		Rect:    box,
 	}.Generate()
 
-	//m := box.Stroke(0.001)
-	//doc.Shader(m)
-
 	v := voronoi.New(noise, box)
 
 	colors := []RGBA{
 		Blue, Yellow, Green, Black, Purple,
 	}
-
-	/*
-		for _, cell := range v.Cells() {
-			c := rand.Color(colors)
-			c.A = 0.3
-			for _, tri := range cell.Tris {
-				s := doc.Shader(tri)
-				s.Set("a_color", c)
-			}
-
-			for _, e := range cell.Edges {
-				m := e.Stroke(0.002)
-				s := doc.Shader(m)
-			}
-		}
-	*/
 
 	tris := v.Triangulate()
 

@@ -85,7 +85,6 @@ func (app *App) Render(doc *Doc) {
 	app.Do(func() {
 
 		app.updateConfig(doc.Config)
-		log.Printf("hidden %v", app.conf.Window.Hidden)
 		if !app.conf.Window.Hidden && !app.shown {
 			log.Printf("SHOW")
 			app.win.Show()
@@ -125,11 +124,13 @@ func (app *App) Do(f func()) {
 }
 
 func Run(f func(*Doc)) {
-	a, err := NewApp(DefaultConfig())
+	conf := DefaultConfig()
+	a, err := NewApp(conf)
 	if err != nil {
 		panic(err)
 	}
-	doc := a.NewDoc()
+	doc := NewDoc()
+	doc.Config = conf
 	go func() {
 		f(doc)
 		a.Render(doc)

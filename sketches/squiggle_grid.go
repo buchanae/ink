@@ -12,18 +12,10 @@ func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{Rows: 10, Cols: 10}
-	//p := rand.Palette()
 
 	for _, cell := range grid.Cells() {
 		r := cell.Rect
 		bnd := r.Shrink(0.013)
-
-		/*
-			Fill{
-				Mesh:  r,
-				Color: rand.Color(p),
-			}.Draw(doc)
-		*/
 
 		current := bnd.Interpolate(rand.XYRange(0.1, 0.9))
 		pen := &Pen{}
@@ -35,7 +27,6 @@ func Ink(doc *app.Doc) {
 		for i < 20 {
 			var add XY
 
-			//if rand.Bool(0.5) {
 			if horizontal {
 				add.X = rand.Range(-0.2, 0.2)
 			} else {

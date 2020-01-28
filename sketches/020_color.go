@@ -17,7 +17,7 @@ func Ink(doc *app.Doc) {
 
 	red := color.Hex(0xff0000)
 	green := color.Hex(0x00ff00)
-	blue := color.Hex(0x0000ff)
+	blue := color.HexString("#0000ff")
 
 	s := gfx.NewShader(t)
 	s.Set("a_color", []color.RGBA{

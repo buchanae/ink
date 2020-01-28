@@ -19,8 +19,6 @@ const (
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
-	gfx.Clear(doc, White)
-
 	grid := Grid{Rows: 10, Cols: 10}
 	colors := rand.Palette()
 
@@ -40,12 +38,6 @@ func Ink(doc *app.Doc) {
 		}
 
 		for _, t := range tris {
-			// TODO Fill is very common but doesn't
-			//      merge well because of the uniform
-			//      u_color.
-			//f := Fill{t, rnd.Color(colors)}
-			//l2.Draw(f)
-
 			s := gfx.NewShader(t)
 			s.Set("a_color", rand.Color(colors))
 			s.Draw(l2)

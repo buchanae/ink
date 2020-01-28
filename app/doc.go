@@ -30,10 +30,9 @@ type Doc struct {
 	Config Config
 }
 
-func (app *App) NewDoc() *Doc {
+func NewDoc() *Doc {
 	doc := &Doc{
-		ID:     nextID(),
-		Config: app.conf,
+		ID: nextID(),
 	}
 	// TODO this shouldn't be here
 	gfx.Clear(doc, color.White)

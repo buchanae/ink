@@ -1,3 +1,5 @@
+// +build !sendonly
+
 package app
 
 import (
@@ -22,49 +24,6 @@ func (app *App) RunSketch(ctx context.Context, path string) error {
 	}
 
 	return run(ctx, app, wd, path)
-}
-
-type workdir struct {
-	path string
-}
-
-func newWorkdir() (wd workdir, err error) {
-
-	wd.path, err = ioutil.TempDir("", "ink-run-")
-	if err != nil {
-		return
-	}
-
-	mainPath := filepath.Join(wd.path, "ink_main_wrapper.go")
-	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
-	if err != nil {
-		return
-	}
-
-	// TODO should look for an existing go.mod file in the sketch directory
-	modPath := filepath.Join(wd.path, "go.mod")
-	modContent := mod
-
-	inkCode, err := findInkCode()
-	if err != nil {
-		log.Printf("error: finding ink code: %v", err)
-	}
-	if inkCode != "" {
-		modContent += "\n\nreplace github.com/buchanae/ink => " + inkCode
-	}
-
-	err = ioutil.WriteFile(modPath, []byte(modContent), 0644)
-	if err != nil {
-		return
-	}
-
-	return
-}
-
-func (w workdir) cleanup() {
-	if w.path != "" {
-		os.RemoveAll(w.path)
-	}
 }
 
 func build(wd workdir, path string) error {
@@ -127,7 +86,8 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		return fmt.Errorf("starting: %v", err)
 	}
 
-	doc := app.NewDoc()
+	doc := NewDoc()
+	doc.Config = app.conf
 	enc := gob.NewEncoder(stdin)
 	err = enc.Encode(doc)
 	if err != nil {
@@ -238,4 +198,47 @@ func findInkCode() (string, error) {
 		current = dir
 	}
 	return "", nil
+}
+
+type workdir struct {
+	path string
+}
+
+func newWorkdir() (wd workdir, err error) {
+
+	wd.path, err = ioutil.TempDir("", "ink-run-")
+	if err != nil {
+		return
+	}
+
+	mainPath := filepath.Join(wd.path, "ink_main_wrapper.go")
+	err = ioutil.WriteFile(mainPath, []byte(head), 0644)
+	if err != nil {
+		return
+	}
+
+	// TODO should look for an existing go.mod file in the sketch directory
+	modPath := filepath.Join(wd.path, "go.mod")
+	modContent := mod
+
+	inkCode, err := findInkCode()
+	if err != nil {
+		log.Printf("error: finding ink code: %v", err)
+	}
+	if inkCode != "" {
+		modContent += "\n\nreplace github.com/buchanae/ink => " + inkCode
+	}
+
+	err = ioutil.WriteFile(modPath, []byte(modContent), 0644)
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (w workdir) cleanup() {
+	if w.path != "" {
+		os.RemoveAll(w.path)
+	}
 }

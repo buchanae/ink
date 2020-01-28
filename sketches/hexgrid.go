@@ -14,19 +14,9 @@ const (
 )
 
 func Ink(doc *app.Doc) {
-	rand.SeedNow()
-	gfx.Clear(doc, White)
-
 	palette := rand.Palette()
 	grid := HexGrid{Size}
 	cells := grid.Cells()
-
-	/*
-		for i := range cells {
-			c := cells[i].Center
-			cells[i].Center = c.Add(rand.XYRange(-Z, Z))
-		}
-	*/
 
 	for _, cell := range cells {
 		col := rand.Color(palette)
