@@ -26,8 +26,11 @@ section {
   display: block;
   margin: 0 auto;
 }
-.code {
+.incode {
   font-family: monospace;
   background-color: #eee;
+  padding: 3px 10px;
+}
+pre.chroma {
   padding: 5px 15px;
 }
