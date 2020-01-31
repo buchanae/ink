@@ -107,6 +107,22 @@ func (r Rect) Shrink(amount float32) Rect {
 	}
 }
 
+// TODO should "amount" be a percentage?
+func (r Rect) ShrinkX(amount float32) Rect {
+	return Rect{
+		A: XY{r.A.X + amount, r.A.Y},
+		B: XY{r.B.X - amount, r.B.Y},
+	}
+}
+
+// TODO should "amount" be a percentage?
+func (r Rect) ShrinkY(amount float32) Rect {
+	return Rect{
+		A: XY{r.A.X, r.A.Y + amount},
+		B: XY{r.B.X, r.B.Y - amount},
+	}
+}
+
 func (r Rect) Quad() Quad {
 	return Quad{
 		XY{r.A.X, r.A.Y},
