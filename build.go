@@ -7,7 +7,7 @@ import (
 )
 
 const AssetRoot = "./assets"
-const CacheBuster = "?2"
+const CacheBuster = "?3"
 
 var tpls *template.Template
 
