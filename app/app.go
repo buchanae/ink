@@ -3,7 +3,6 @@
 package app
 
 import (
-	"log"
 	"runtime"
 
 	"github.com/buchanae/ink/render"
@@ -86,7 +85,6 @@ func (app *App) Render(doc *Doc) {
 
 		app.updateConfig(doc.Config)
 		if !app.conf.Window.Hidden && !app.shown {
-			log.Printf("SHOW")
 			app.win.Show()
 			app.shown = true
 		}
