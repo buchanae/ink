@@ -25,7 +25,7 @@ func main() {
 	log.SetFlags(0)
 
 	buildExampleData()
-	//buildSnapshots()
+	buildSnapshots()
 
 	out, err := os.Create("index.html")
 	if err != nil {

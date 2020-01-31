@@ -1382,17 +1382,9 @@
 <span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
-	<span class="nx">bg</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#260d05&#34;</span><span class="p">)</span>
-	<span class="nx">bg</span> <span class="p">=</span> <span class="nx">color</span><span class="p">.</span><span class="nx">White</span>
-	<span class="nx">gfx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">bg</span><span class="p">)</span>
-
 	<span class="nx">A</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#ebc334&#34;</span><span class="p">)</span>
 	<span class="nx">B</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#0c79e8&#34;</span><span class="p">)</span>
 
-	<span class="c1">//palette := rand.Palette()
-</span><span class="c1"></span>	<span class="c1">//A = rand.Color(palette)
-</span><span class="c1"></span>	<span class="c1">//B = rand.Color(palette)
-</span><span class="c1"></span>
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
 		<span class="nx">Mesh</span><span class="p">:</span> <span class="nx">Circle</span><span class="p">{</span>
 			<span class="nx">XY</span><span class="p">:</span>       <span class="nx">XY</span><span class="p">{</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">}</span><span class="p">,</span>
@@ -1421,7 +1413,7 @@
 		<span class="nx">chords</span> <span class="o">:=</span> <span class="nf">GenChords</span><span class="p">(</span><span class="nx">rings</span><span class="p">.</span><span class="nx">Inner</span><span class="p">,</span> <span class="nx">min</span><span class="p">,</span> <span class="nx">max</span><span class="p">)</span>
 		<span class="c1">// TODO interpcolor isn&#39;t based on visual interpolation
 </span><span class="c1"></span>		<span class="c1">//      going form orange to blue goes through green
-</span><span class="c1"></span>		<span class="nx">col</span> <span class="o">:=</span> <span class="nf">InterpColor</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">i</span><span class="o">/</span><span class="nx">Count</span><span class="p">)</span>
+</span><span class="c1"></span>		<span class="nx">col</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">Interpolate</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span> <span class="nx">i</span><span class="o">/</span><span class="nx">Count</span><span class="p">)</span>
 
 		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">in</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">chords</span> <span class="p">{</span>
 			<span class="nx">rx</span> <span class="o">:=</span> <span class="nx">rings</span>
@@ -1431,76 +1423,17 @@
 			<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nx">col</span>
 
 			<span class="k">if</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Bool</span><span class="p">(</span><span class="nx">JumpChance</span><span class="p">)</span> <span class="p">{</span>
-				<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nf">InterpColor</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span>
+				<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">Interpolate</span><span class="p">(</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">,</span>
 					<span class="nx">rand</span><span class="p">.</span><span class="nf">Range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nx">Count</span><span class="p">)</span><span class="o">/</span><span class="nx">Count</span><span class="p">,</span>
 				<span class="p">)</span>
 			<span class="p">}</span>
 
 			<span class="k">if</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Bool</span><span class="p">(</span><span class="nx">LightenChance</span><span class="p">)</span> <span class="p">{</span>
-				<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nf">Lighten</span><span class="p">(</span>
-					<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span><span class="p">,</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Range</span><span class="p">(</span><span class="o">-</span><span class="nx">LightenAmt</span><span class="p">,</span> <span class="nx">LightenAmt</span><span class="p">)</span><span class="p">,</span>
-				<span class="p">)</span>
+				<span class="nx">amt</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Range</span><span class="p">(</span><span class="o">-</span><span class="nx">LightenAmt</span><span class="p">,</span> <span class="nx">LightenAmt</span><span class="p">)</span>
+				<span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nx">rx</span><span class="p">.</span><span class="nx">Color</span><span class="p">.</span><span class="nf">Lighten</span><span class="p">(</span><span class="nx">amt</span><span class="p">)</span>
 			<span class="p">}</span>
 			<span class="nx">rx</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 		<span class="p">}</span>
-	<span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">Lighten</span><span class="p">(</span><span class="nx">c</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span><span class="p">,</span> <span class="nx">amt</span> <span class="kt">float32</span><span class="p">)</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span> <span class="p">{</span>
-	<span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">v</span> <span class="o">:=</span> <span class="nf">RGBToHSV</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nx">R</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">G</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">B</span><span class="p">)</span>
-	<span class="c1">// TODO broken?
-</span><span class="c1"></span>	<span class="nx">v</span> <span class="o">+=</span> <span class="nx">amt</span>
-	<span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span> <span class="o">:=</span> <span class="nf">HSVToRGB</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">v</span><span class="p">)</span>
-	<span class="k">return</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span><span class="p">{</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span><span class="p">,</span> <span class="nx">c</span><span class="p">.</span><span class="nx">A</span><span class="p">}</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">HSVToRGB</span><span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">v</span> <span class="kt">float32</span><span class="p">)</span> <span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">float32</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">f</span> <span class="o">:=</span> <span class="kd">func</span><span class="p">(</span><span class="nx">n</span> <span class="kt">float32</span><span class="p">)</span> <span class="kt">float32</span> <span class="p">{</span>
-		<span class="nx">k</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Mod</span><span class="p">(</span><span class="nx">n</span><span class="o">+</span><span class="nx">h</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
-		<span class="nx">m</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="nx">math</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="nx">k</span><span class="p">,</span> <span class="mi">4</span><span class="o">-</span><span class="nx">k</span><span class="p">)</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-		<span class="k">if</span> <span class="nx">m</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
-			<span class="nx">m</span> <span class="p">=</span> <span class="mi">0</span>
-		<span class="p">}</span>
-		<span class="k">return</span> <span class="nx">v</span> <span class="o">-</span> <span class="p">(</span><span class="nx">v</span> <span class="o">*</span> <span class="nx">s</span> <span class="o">*</span> <span class="nx">m</span><span class="p">)</span>
-	<span class="p">}</span>
-
-	<span class="k">return</span> <span class="nf">f</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="p">,</span> <span class="nf">f</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="p">,</span> <span class="nf">f</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">RGBToHSV</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">,</span> <span class="nx">b</span> <span class="kt">float32</span><span class="p">)</span> <span class="p">(</span><span class="nx">h</span><span class="p">,</span> <span class="nx">s</span><span class="p">,</span> <span class="nx">v</span> <span class="kt">float32</span><span class="p">)</span> <span class="p">{</span>
-	<span class="c1">// https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
-</span><span class="c1"></span>
-	<span class="nx">min</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="nx">math</span><span class="p">.</span><span class="nf">Min</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
-	<span class="nx">max</span> <span class="o">:=</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="nx">math</span><span class="p">.</span><span class="nf">Max</span><span class="p">(</span><span class="nx">r</span><span class="p">,</span> <span class="nx">g</span><span class="p">)</span><span class="p">,</span> <span class="nx">b</span><span class="p">)</span>
-
-	<span class="k">switch</span> <span class="p">{</span>
-	<span class="k">case</span> <span class="nx">max</span> <span class="o">==</span> <span class="nx">min</span><span class="p">:</span>
-	<span class="k">case</span> <span class="nx">max</span> <span class="o">==</span> <span class="nx">r</span><span class="p">:</span>
-		<span class="nx">h</span> <span class="p">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="mi">0</span> <span class="o">+</span> <span class="p">(</span><span class="p">(</span><span class="nx">g</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
-	<span class="k">case</span> <span class="nx">max</span> <span class="o">==</span> <span class="nx">g</span><span class="p">:</span>
-		<span class="nx">h</span> <span class="p">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="p">(</span><span class="nx">g</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
-	<span class="k">case</span> <span class="nx">max</span> <span class="o">==</span> <span class="nx">b</span><span class="p">:</span>
-		<span class="nx">h</span> <span class="p">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="p">(</span><span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="p">(</span><span class="nx">g</span> <span class="o">-</span> <span class="nx">b</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span><span class="p">)</span><span class="p">)</span>
-	<span class="p">}</span>
-
-	<span class="k">if</span> <span class="nx">h</span> <span class="p">&lt;</span> <span class="mi">0</span> <span class="p">{</span>
-		<span class="nx">h</span> <span class="o">+=</span> <span class="mi">360</span>
-	<span class="p">}</span>
-
-	<span class="k">if</span> <span class="nx">max</span> <span class="o">!=</span> <span class="mi">0</span> <span class="p">{</span>
-		<span class="nx">s</span> <span class="p">=</span> <span class="p">(</span><span class="nx">max</span> <span class="o">-</span> <span class="nx">min</span><span class="p">)</span> <span class="o">/</span> <span class="nx">max</span>
-	<span class="p">}</span>
-
-	<span class="nx">v</span> <span class="p">=</span> <span class="nx">max</span>
-	<span class="k">return</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">InterpColor</span><span class="p">(</span><span class="nx">from</span><span class="p">,</span> <span class="nx">to</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span><span class="p">,</span> <span class="nx">p</span> <span class="kt">float32</span><span class="p">)</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span><span class="p">{</span>
-		<span class="nx">R</span><span class="p">:</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Interp</span><span class="p">(</span><span class="nx">from</span><span class="p">.</span><span class="nx">R</span><span class="p">,</span> <span class="nx">to</span><span class="p">.</span><span class="nx">R</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span><span class="p">,</span>
-		<span class="nx">G</span><span class="p">:</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Interp</span><span class="p">(</span><span class="nx">from</span><span class="p">.</span><span class="nx">G</span><span class="p">,</span> <span class="nx">to</span><span class="p">.</span><span class="nx">G</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span><span class="p">,</span>
-		<span class="nx">B</span><span class="p">:</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Interp</span><span class="p">(</span><span class="nx">from</span><span class="p">.</span><span class="nx">B</span><span class="p">,</span> <span class="nx">to</span><span class="p">.</span><span class="nx">B</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span><span class="p">,</span>
-		<span class="nx">A</span><span class="p">:</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Interp</span><span class="p">(</span><span class="nx">from</span><span class="p">.</span><span class="nx">A</span><span class="p">,</span> <span class="nx">to</span><span class="p">.</span><span class="nx">A</span><span class="p">,</span> <span class="nx">p</span><span class="p">)</span><span class="p">,</span>
 	<span class="p">}</span>
 <span class="p">}</span>
 
@@ -1577,10 +1510,6 @@
 
 <span class="kd">func</span> <span class="nf">ChordAngle</span><span class="p">(</span><span class="nx">radius</span><span class="p">,</span> <span class="nx">length</span> <span class="kt">float32</span><span class="p">)</span> <span class="kt">float32</span> <span class="p">{</span>
 	<span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">math</span><span class="p">.</span><span class="nf">Asin</span><span class="p">(</span><span class="nx">length</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="nx">radius</span><span class="p">)</span><span class="p">)</span>
-<span class="p">}</span>
-
-<span class="kd">func</span> <span class="nf">CircleCircumference</span><span class="p">(</span><span class="nx">radius</span> <span class="kt">float32</span><span class="p">)</span> <span class="kt">float32</span> <span class="p">{</span>
-	<span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="nx">math</span><span class="p">.</span><span class="nx">Pi</span> <span class="o">*</span> <span class="nx">radius</span>
 <span class="p">}</span>
 </pre></div>
     </div>
