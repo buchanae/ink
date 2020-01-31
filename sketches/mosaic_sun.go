@@ -69,7 +69,7 @@ func Ink(doc *app.Doc) {
 		chords := GenChords(rings.Inner, min, max)
 		// TODO interpcolor isn't based on visual interpolation
 		//      going form orange to blue goes through green
-		col := InterpColor(A, B, i/Count)
+		col := color.Interpolate(A, B, i/Count)
 
 		for _, in := range chords {
 			rx := rings
@@ -79,76 +79,17 @@ func Ink(doc *app.Doc) {
 			rx.Color = col
 
 			if rand.Bool(JumpChance) {
-				rx.Color = InterpColor(A, B,
+				rx.Color = color.Interpolate(A, B,
 					rand.Range(0, Count)/Count,
 				)
 			}
 
 			if rand.Bool(LightenChance) {
-				rx.Color = Lighten(
-					rx.Color, rand.Range(-LightenAmt, LightenAmt),
-				)
+				amt := rand.Range(-LightenAmt, LightenAmt)
+				rx.Color = rx.Color.Lighten(amt)
 			}
 			rx.Draw(doc)
 		}
-	}
-}
-
-func Lighten(c color.RGBA, amt float32) color.RGBA {
-	h, s, v := RGBToHSV(c.R, c.G, c.B)
-	// TODO broken?
-	v += amt
-	r, g, b := HSVToRGB(h, s, v)
-	return color.RGBA{r, g, b, c.A}
-}
-
-func HSVToRGB(h, s, v float32) (r, g, b float32) {
-	f := func(n float32) float32 {
-		k := math.Mod(n+h/60, 6)
-		m := math.Min(math.Min(k, 4-k), 1)
-		if m < 0 {
-			m = 0
-		}
-		return v - (v * s * m)
-	}
-
-	return f(5), f(3), f(1)
-}
-
-func RGBToHSV(r, g, b float32) (h, s, v float32) {
-	// https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
-
-	min := math.Min(math.Min(r, g), b)
-	max := math.Max(math.Max(r, g), b)
-
-	switch {
-	case max == min:
-	case max == r:
-		h = 60 * (0 + ((g - b) / (max - min)))
-	case max == g:
-		h = 60 * (2 + ((g - b) / (max - min)))
-	case max == b:
-		h = 60 * (4 + ((g - b) / (max - min)))
-	}
-
-	if h < 0 {
-		h += 360
-	}
-
-	if max != 0 {
-		s = (max - min) / max
-	}
-
-	v = max
-	return
-}
-
-func InterpColor(from, to color.RGBA, p float32) color.RGBA {
-	return color.RGBA{
-		R: math.Interp(from.R, to.R, p),
-		G: math.Interp(from.G, to.G, p),
-		B: math.Interp(from.B, to.B, p),
-		A: math.Interp(from.A, to.A, p),
 	}
 }
 

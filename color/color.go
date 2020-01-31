@@ -3,6 +3,8 @@ package color
 import (
 	"fmt"
 	"image/color"
+
+	"github.com/buchanae/ink/math"
 )
 
 func NewRGBA(r, g, b, a float32) RGBA {
@@ -58,6 +60,64 @@ func FromGo(c color.Color) RGBA {
 		G: float32(g) / 65536,
 		B: float32(b) / 65536,
 		A: float32(a) / 65536,
+	}
+}
+
+func (c RGBA) Lighten(amt float32) RGBA {
+	h, s, v := RGBToHSV(c.R, c.G, c.B)
+	// TODO broken?
+	v += amt
+	r, g, b := HSVToRGB(h, s, v)
+	return RGBA{r, g, b, c.A}
+}
+
+func HSVToRGB(h, s, v float32) (r, g, b float32) {
+	f := func(n float32) float32 {
+		k := math.Mod(n+h/60, 6)
+		m := math.Min(math.Min(k, 4-k), 1)
+		if m < 0 {
+			m = 0
+		}
+		return v - (v * s * m)
+	}
+
+	return f(5), f(3), f(1)
+}
+
+func RGBToHSV(r, g, b float32) (h, s, v float32) {
+	// https://en.wikipedia.org/wiki/HSL_and_HSV#From_RGB
+
+	min := math.Min(math.Min(r, g), b)
+	max := math.Max(math.Max(r, g), b)
+
+	switch {
+	case max == min:
+	case max == r:
+		h = 60 * (0 + ((g - b) / (max - min)))
+	case max == g:
+		h = 60 * (2 + ((g - b) / (max - min)))
+	case max == b:
+		h = 60 * (4 + ((g - b) / (max - min)))
+	}
+
+	if h < 0 {
+		h += 360
+	}
+
+	if max != 0 {
+		s = (max - min) / max
+	}
+
+	v = max
+	return
+}
+
+func Interpolate(from, to RGBA, p float32) RGBA {
+	return RGBA{
+		R: math.Interp(from.R, to.R, p),
+		G: math.Interp(from.G, to.G, p),
+		B: math.Interp(from.B, to.B, p),
+		A: math.Interp(from.A, to.A, p),
 	}
 }
 
