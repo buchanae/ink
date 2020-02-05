@@ -113,9 +113,9 @@ jobs:
 
       - name: Zip
         run: |
-          zip --junk-paths ink-linux ./ink-linux/ink
+          tar -C ink-macos -pczvf ink-macos.tar.gz ink
+          tar -C ink-linux -pczvf ink-linux.tar.gz ink
           zip --junk-paths ink-windows ./ink-windows/ink.exe
-          zip --junk-paths ink-macos ./ink-macos/ink
 
       - name: Upload Mac
         uses: actions/upload-release-asset@v1.0.1
@@ -123,9 +123,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ink-macos.zip
-          asset_name: ink-macos.zip
-          asset_content_type: application/zip
+          asset_path: ./ink-macos.tar.gz
+          asset_name: ink-macos.tar.gz
+          asset_content_type: application/gzip
 
       - name: Upload Linux
         uses: actions/upload-release-asset@v1.0.1
@@ -133,9 +133,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./ink-linux.zip
-          asset_name: ink-linux.zip
-          asset_content_type: application/zip
+          asset_path: ./ink-linux.tar.gz
+          asset_name: ink-linux.tar.gz
+          asset_content_type: application/gzip
 
       - name: Upload Windows
         uses: actions/upload-release-asset@v1.0.1
