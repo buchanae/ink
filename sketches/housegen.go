@@ -76,6 +76,7 @@ func Base(doc *app.Doc) {
 		Mesh:  shape,
 		Color: randGray(),
 	}.Draw(doc)
+
 	gfx.Stroke{
 		Target: shape,
 		Color:  randGray(),
@@ -113,16 +114,6 @@ func Roof(doc *app.Doc, baseY float32) {
 		Target: quad,
 		Color:  randGray(),
 	}.Draw(doc)
-
-	/*
-		gfx.Fill{
-			Mesh: Rect{
-				A: XY{.055, .51},
-				B: XY{.945, .52},
-			},
-			Color: randGray(),
-		}.Draw(doc)
-	*/
 
 	Chimney(doc, RectAWH(
 		shape.Interpolate(XY{
@@ -200,7 +191,6 @@ func Door(doc *app.Doc) {
 		Color: randGray(),
 	}.Draw(doc)
 
-	// handle
 	DoorHandle(doc, door)
 }
 
@@ -215,13 +205,6 @@ func DoorHandle(doc *app.Doc, door Rect) {
 			Radius: rand.Range(0.002, 0.008),
 		},
 		Color: randGray(),
-	}.Draw(doc)
-}
-
-func Ground(doc *app.Doc) {
-	gfx.Stroke{
-		Target: Line{A: XY{0, .1}, B: XY{1, .1}},
-		Color:  randGray(),
 	}.Draw(doc)
 }
 
@@ -308,11 +291,17 @@ func (w Window) Gen(doc *app.Doc, base Rect) {
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	gfx.Clear(doc, White)
 
 	Base(doc)
 	Door(doc)
-	Ground(doc)
-	Bushes(doc)
 
+	Ground(doc)
+	//Bushes(doc)
+}
+
+func Ground(doc *app.Doc) {
+	gfx.Stroke{
+		Target: Line{A: XY{0, .1}, B: XY{1, .1}},
+		Color:  randGray(),
+	}.Draw(doc)
 }
