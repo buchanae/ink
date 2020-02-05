@@ -4,14 +4,6 @@ type Quad struct {
 	A, B, C, D XY
 }
 
-/*
-func (q Quad) Path() *Path {
-	path := NewPath(q.A, q.B, q.C, q.D)
-	path.Close()
-	return path
-}
-*/
-
 func (q Quad) Stroke(opt StrokeOpt) Mesh {
 	return Stroke(Path{
 		Line{q.A, q.B},
@@ -40,15 +32,24 @@ func (q Quad) Centroid() XY {
 		DivScalar(4)
 }
 
-func (q Quad) Rotate(rad float32) Quad {
-	return q.RotateAround(rad, q.Centroid())
+func (q Quad) Rotate(angle float32) Quad {
+	return q.RotateAround(angle, q.Centroid())
 }
 
-func (q Quad) RotateAround(rad float32, pivot XY) Quad {
+func (q Quad) RotateAround(angle float32, pivot XY) Quad {
 	return Quad{
-		A: q.A.Rotate(rad, pivot),
-		B: q.B.Rotate(rad, pivot),
-		C: q.C.Rotate(rad, pivot),
-		D: q.D.Rotate(rad, pivot),
+		q.A.Rotate(angle, pivot),
+		q.B.Rotate(angle, pivot),
+		q.C.Rotate(angle, pivot),
+		q.D.Rotate(angle, pivot),
+	}
+}
+
+func (q Quad) Translate(xy XY) Quad {
+	return Quad{
+		q.A.Add(xy),
+		q.B.Add(xy),
+		q.C.Add(xy),
+		q.D.Add(xy),
 	}
 }
