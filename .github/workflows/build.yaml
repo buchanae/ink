@@ -3,13 +3,49 @@ name: Build Ink
 on: repository_dispatch
 
 jobs:
-  build:
+  build-ubuntu:
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Install deps
         run: sudo apt update && sudo apt install -y build-essential xorg-dev libglfw3-dev
+
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: go build -v .
+
+  build-windows:
+
+    runs-on: window-latest
+
+    steps:
+
+      - name: Set up Go
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: go build -v .
+
+  build-mac:
+
+    runs-on: macos-latest
+
+    steps:
 
       - name: Set up Go
         uses: actions/setup-go@v1
