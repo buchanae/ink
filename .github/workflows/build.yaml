@@ -57,6 +57,9 @@ jobs:
 
     runs-on: macos-latest
 
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '10.14'
+
     steps:
 
       - name: Set up Go
