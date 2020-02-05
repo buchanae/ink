@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: ink-windows
-          path: ink
+          path: ink.exe
 
   build-mac:
 
