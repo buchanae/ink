@@ -3,7 +3,7 @@ name: Build Ink
 on: repository_dispatch
 
 jobs:
-  build-ubuntu:
+  build-linux:
 
     runs-on: ubuntu-latest
 
@@ -23,6 +23,12 @@ jobs:
       - name: Build
         run: go build -v .
 
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: ink-linux
+          path: ink
+
   build-windows:
 
     runs-on: windows-latest
@@ -41,6 +47,12 @@ jobs:
       - name: Build
         run: go build -v .
 
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: ink-windows
+          path: ink
+
   build-mac:
 
     runs-on: macos-latest
@@ -58,3 +70,32 @@ jobs:
 
       - name: Build
         run: go build -v .
+
+      - name: Upload
+        uses: actions/upload-artifact@v1
+        with:
+          name: ink-macos
+          path: ink
+
+  create-release:
+    needs: [build-linux, build-windows, build-mac]
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download Linux
+        uses: actions/download-artifact@v1
+        with:
+          name: ink-linux
+
+      - name: Download Mac
+        uses: actions/download-artifact@v1
+        with:
+          name: ink-macos
+
+      - name: Download Windows
+        uses: actions/download-artifact@v1
+        with:
+          name: ink-windows
+
+      - name: Check
+        run: echo hi
