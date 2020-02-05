@@ -25,7 +25,7 @@ jobs:
 
   build-windows:
 
-    runs-on: window-latest
+    runs-on: windows-latest
 
     steps:
 
