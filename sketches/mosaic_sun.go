@@ -30,16 +30,8 @@ const (
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
-	bg := color.HexString("#260d05")
-	bg = color.White
-	gfx.Clear(doc, bg)
-
 	A := color.HexString("#ebc334")
 	B := color.HexString("#0c79e8")
-
-	//palette := rand.Palette()
-	//A = rand.Color(palette)
-	//B = rand.Color(palette)
 
 	gfx.Fill{
 		Mesh: Circle{
@@ -166,8 +158,4 @@ func GenChords(radius, min, max float32) []Chord {
 
 func ChordAngle(radius, length float32) float32 {
 	return 2 * math.Asin(length/(2*radius))
-}
-
-func CircleCircumference(radius float32) float32 {
-	return 2 * math.Pi * radius
 }
