@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Install deps
-        run: apt update && apt install -y build-essential xorg-dev libglfw3-dev
+        run: sudo apt update && sudo apt install -y build-essential xorg-dev libglfw3-dev
 
       - name: Set up Go
         uses: actions/setup-go@v1
