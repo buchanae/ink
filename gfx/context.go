@@ -2,6 +2,7 @@ package gfx
 
 import (
 	"github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/dd"
 )
 
 type Context struct {
@@ -20,7 +21,7 @@ func NewContext(out Layer) Context {
 	}
 }
 
-func (ctx Context) Fill(m Meshable) {
+func (ctx Context) Fill(m dd.Fillable) {
 	Fill{m, ctx.FillColor}.Draw(ctx.Output)
 }
 
@@ -28,10 +29,10 @@ func (ctx Context) Clear(c color.RGBA) {
 	Clear(ctx.Output, c)
 }
 
-func (ctx Context) Stroke(s Strokeable) {
+func (ctx Context) Stroke(s dd.Strokeable) {
 	Stroke{
-		Target: s,
-		Width:  ctx.StrokeWidth,
-		Color:  ctx.StrokeColor,
+		Shape: s,
+		Width: ctx.StrokeWidth,
+		Color: ctx.StrokeColor,
 	}.Draw(ctx.Output)
 }

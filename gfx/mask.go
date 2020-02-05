@@ -12,7 +12,7 @@ func (m Mask) Draw(l Layer) {
 		Name: "Mask",
 		Vert: DefaultVert,
 		Frag: MaskFrag,
-		Mesh: m.Rect,
+		Mesh: m.Rect.Fill(),
 		Attrs: Attrs{
 			"u_source": m.Source.LayerID(),
 			"u_mask":   m.Mask.LayerID(),

@@ -41,7 +41,7 @@ func Ink(doc *app.Doc) {
 		}
 	}
 	tm := Triangles(tris)
-	ts := gfx.NewShader(tm)
+	ts := gfx.NewShader(tm.Fill())
 	ts.Draw(doc)
 
 	pal := rand.Palette()

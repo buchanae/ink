@@ -28,7 +28,7 @@ func Ink(doc *app.Doc) {
 		XY{0.5, 0.8},
 	}
 
-	s := gfx.NewShader(t)
+	s := gfx.NewShader(t.Mesh())
 	s.Set("a_color", []RGBA{
 		Red, Green, Blue,
 	})

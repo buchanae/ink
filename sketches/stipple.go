@@ -120,7 +120,7 @@ func build(doc *app.Doc, pos []dd.XY, col []color.RGBA, sizeInput float32) {
 		Segments: 20,
 	}
 
-	s := gfx.NewShader(circle)
+	s := gfx.NewShader(circle.Fill())
 	s.Set("a_color", col)
 	s.Set("a_pos", pos)
 	s.Instances = len(pos)

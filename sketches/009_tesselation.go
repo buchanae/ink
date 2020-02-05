@@ -22,7 +22,7 @@ func Ink(doc *app.Doc) {
 
 	tris := tess.Tesselate(xys)
 	m := Triangles(tris)
-	gfx.NewShader(m).Draw(doc)
+	gfx.Fill{Shape: m, Color: Black}.Draw(doc)
 
 	for _, xy := range xys {
 		d := gfx.Dot{XY: xy, Color: Red, Radius: 0.005}

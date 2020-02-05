@@ -26,34 +26,29 @@ func buildPlan(doc *Doc) render.Plan {
 	for _, op := range doc.Ops {
 
 		s := op.Shader
-		if s.Mesh == nil {
-			continue
-		}
-
-		mesh := s.Mesh.Mesh()
 
 		rs := &render.Shader{
 			Name:      s.Name,
 			Vert:      s.Vert,
 			Frag:      s.Frag,
 			Layer:     op.LayerID,
-			Vertices:  len(mesh.Verts),
+			Vertices:  len(s.Mesh.Verts),
 			Instances: s.Instances,
-			Faces:     make([]uint32, 0, len(mesh.Faces)*3),
+			Faces:     make([]uint32, 0, len(s.Mesh.Faces)*3),
 			Uniforms:  map[string]interface{}{},
 			Attrs: map[string]render.Attr{
 				"a_vert": {
-					Value: mesh.Verts,
-					Size:  len(mesh.Verts) * 2 * 4,
+					Value: s.Mesh.Verts,
+					Size:  len(s.Mesh.Verts) * 2 * 4,
 				},
 				"a_uv": {
-					Value: mesh.UV,
-					Size:  len(mesh.UV) * 2 * 4,
+					Value: s.Mesh.UV,
+					Size:  len(s.Mesh.UV) * 2 * 4,
 				},
 			},
 		}
 
-		for _, f := range mesh.Faces {
+		for _, f := range s.Mesh.Faces {
 			rs.Faces = append(rs.Faces,
 				uint32(f[0]), uint32(f[1]), uint32(f[2]),
 			)
@@ -72,7 +67,7 @@ func buildPlan(doc *Doc) render.Plan {
 				// which are set above.
 				continue
 			}
-			val := convertAttr(s, attr.Name, len(mesh.Verts))
+			val := convertAttr(s, attr.Name, len(s.Mesh.Verts))
 			rs.Attrs[attr.Name] = val
 		}
 

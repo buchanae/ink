@@ -44,7 +44,7 @@ func Ink(doc *app.Doc) {
 				Width: LineWidth,
 			})
 
-			s := gfx.NewShader(m)
+			s := gfx.NewShader(m.Fill())
 			s.Set("a_color", rand.Color(p))
 			s.Set("a_pivot", r.Center())
 			s.Draw(doc)

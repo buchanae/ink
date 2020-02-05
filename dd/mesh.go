@@ -16,7 +16,7 @@ func (m Mesh) Size() int {
 	return len(m.Verts)
 }
 
-func (m Mesh) Mesh() Mesh {
+func (m Mesh) Fill() Mesh {
 	return m
 }
 

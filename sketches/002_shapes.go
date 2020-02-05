@@ -9,7 +9,7 @@ import (
 
 func Ink(doc *app.Doc) {
 
-	shapes := []gfx.Meshable{
+	shapes := []gfx.Fillable{
 
 		Rect{
 			XY{0.1, 0.7},

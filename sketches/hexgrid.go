@@ -25,9 +25,9 @@ func Ink(doc *app.Doc) {
 
 	for _, cell := range cells {
 		gfx.Stroke{
-			Target: cell,
-			Color:  Black,
-			Width:  0.004,
+			Shape: cell,
+			Color: Black,
+			Width: 0.004,
 		}.Draw(doc)
 	}
 }

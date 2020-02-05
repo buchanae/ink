@@ -10,7 +10,6 @@ import (
 
 func Ink(doc *app.Doc) {
 	rand.SeedNow()
-	gfx.Clear(doc, color.White)
 
 	center := XY{0.5, 0.5}
 	grid := Grid{
@@ -20,8 +19,8 @@ func Ink(doc *app.Doc) {
 	}
 	sub := Grid{Rows: 3, Cols: 3}
 
-	var bold []gfx.Strokeable
-	var strokes []gfx.Strokeable
+	var bold []Strokeable
+	var strokes []Strokeable
 
 	for i, cell := range grid.Cells() {
 		r := cell.Rect.Shrink(0.003)
@@ -46,24 +45,24 @@ func Ink(doc *app.Doc) {
 
 			mask := 1 << j
 			if i&mask == mask {
-				gfx.NewShader(xr).Draw(doc)
+				gfx.Fill{xr, color.Black}.Draw(doc)
 			}
 		}
 	}
 
 	for _, stk := range strokes {
 		gfx.Stroke{
-			Target: stk,
-			Width:  0.0002,
-			Color:  color.Black,
+			Shape: stk,
+			Width: 0.0002,
+			Color: color.Black,
 		}.Draw(doc)
 	}
 
 	for _, stk := range bold {
 		gfx.Stroke{
-			Target: stk,
-			Width:  0.0009,
-			Color:  color.Black,
+			Shape: stk,
+			Width: 0.0009,
+			Color: color.Black,
 		}.Draw(doc)
 	}
 }

@@ -56,7 +56,7 @@ func Ink(doc *app.Doc) {
 			wh := XY{W, dy}
 			r := RectCenter(xy, wh)
 
-			s := gfx.NewShader(r)
+			s := gfx.NewShader(r.Fill())
 			sc := color
 			sc.A = 1 - dy/B - M
 			s.Set("a_color", sc)

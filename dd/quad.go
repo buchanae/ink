@@ -13,11 +13,11 @@ func (q Quad) Stroke(opt StrokeOpt) Mesh {
 	}, opt)
 }
 
-func (q Quad) Mesh() Mesh {
+func (q Quad) Fill() Mesh {
 	return Triangles{
 		{q.A, q.B, q.C},
 		{q.A, q.C, q.D},
-	}.Mesh()
+	}.Fill()
 }
 
 func (q Quad) Bounds() Rect {

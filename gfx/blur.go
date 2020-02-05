@@ -25,7 +25,7 @@ func (b Blur) Draw(out Layer) {
 			Name: "Blur",
 			Vert: DefaultVert,
 			Frag: BlurFrag,
-			Mesh: Fullscreen,
+			Mesh: Fullscreen.Fill(),
 			Attrs: Attrs{
 				"source":     in.LayerID(),
 				"horizontal": horizontal,

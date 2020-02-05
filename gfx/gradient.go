@@ -15,7 +15,7 @@ func (g Gradient) Draw(l Layer) {
 		Name: "Gradient",
 		Vert: DefaultVert,
 		Frag: GradientFrag,
-		Mesh: g.Rect,
+		Mesh: g.Rect.Fill(),
 		Attrs: Attrs{
 			"u_color_a": g.A,
 			"u_color_b": g.B,

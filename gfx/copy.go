@@ -4,7 +4,7 @@ func Copy(dst, src Layer) {
 	dst.AddShader(&Shader{
 		Vert: DefaultVert,
 		Frag: CopyFrag,
-		Mesh: Fullscreen,
+		Mesh: Fullscreen.Fill(),
 		Attrs: Attrs{
 			"u_image": src.LayerID(),
 		},

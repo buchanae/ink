@@ -171,7 +171,7 @@ func (r Rect) SubRect(sub Rect) Rect {
 	}
 }
 
-func (r Rect) Mesh() Mesh {
+func (r Rect) Fill() Mesh {
 	return Mesh{
 		Verts: []XY{
 			r.A, {r.A.X, r.B.Y},

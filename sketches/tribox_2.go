@@ -38,7 +38,7 @@ func Ink(doc *app.Doc) {
 		}
 
 		for _, t := range tris {
-			s := gfx.NewShader(t)
+			s := gfx.NewShader(t.Fill())
 			s.Set("a_color", rand.Color(colors))
 			s.Draw(l2)
 		}

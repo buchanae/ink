@@ -11,7 +11,7 @@ func (img Image) Draw(out Layer) {
 	out.AddShader(&Shader{
 		Vert: DefaultVert,
 		Frag: CopyFrag,
-		Mesh: img.Rect,
+		Mesh: img.Rect.Fill(),
 		Attrs: Attrs{
 			"u_image": img,
 		},

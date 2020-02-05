@@ -14,7 +14,7 @@ func Ink(doc *app.Doc) {
 		XY{0.8, 0.8},
 	}
 
-	s := gfx.NewShader(r)
+	s := gfx.Fill{Shape: r}.Shader()
 	s.Set("a_pivot", r.Center())
 	s.Set("a_rot", 0.4)
 	s.Set("a_color", color.Red)

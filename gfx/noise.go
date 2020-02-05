@@ -28,7 +28,7 @@ func (n Noise) Draw(out Layer) {
 		Name: "Noise",
 		Vert: DefaultVert,
 		Frag: NoiseFrag,
-		Mesh: n.Rect,
+		Mesh: n.Rect.Fill(),
 		Attrs: Attrs{
 			"u_size":     n.Size,
 			"u_layers":   int32(n.Layers),

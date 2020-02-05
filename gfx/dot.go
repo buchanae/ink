@@ -26,7 +26,7 @@ func (dot Dot) Draw(l Layer) {
 		Mesh: dd.Rect{
 			A: dot.XY.SubScalar(dot.Radius),
 			B: dot.XY.AddScalar(dot.Radius),
-		},
+		}.Fill(),
 		Attrs: Attrs{
 			"u_color": dot.Color,
 		},

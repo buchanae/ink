@@ -6,13 +6,9 @@ import (
 )
 
 type Stroke struct {
-	Target Strokeable
-	Width  float32
-	Color  color.RGBA
-}
-
-type Strokeable interface {
-	Stroke(dd.StrokeOpt) dd.Mesh
+	Shape dd.Strokeable
+	Width float32
+	Color color.RGBA
 }
 
 func (s Stroke) Draw(out Layer) {
@@ -20,7 +16,7 @@ func (s Stroke) Draw(out Layer) {
 		Name: "Stroke",
 		Vert: DefaultVert,
 		Frag: DefaultFrag,
-		Mesh: s.Target.Stroke(dd.StrokeOpt{
+		Mesh: s.Shape.Stroke(dd.StrokeOpt{
 			Width: s.Width,
 		}),
 		Attrs: Attrs{

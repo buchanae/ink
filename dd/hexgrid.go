@@ -17,7 +17,7 @@ type HexCell struct {
 	Row, Col int
 }
 
-func (hc HexCell) Mesh() Mesh {
+func (hc HexCell) Fill() Mesh {
 	c := hc.Center
 	rad := hc.Radius
 	rot := float32((1.0 / 6.0) * math.Pi)

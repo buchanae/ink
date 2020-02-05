@@ -26,7 +26,7 @@ func (t Triangle) Contains(p XY) bool {
 	return !(hasNeg && hasPos)
 }
 
-func (t Triangle) Mesh() Mesh {
+func (t Triangle) Fill() Mesh {
 	return Mesh{
 		Verts: []XY{t.A, t.B, t.C},
 		Faces: []Face{{0, 1, 2}},
@@ -62,7 +62,7 @@ func (t Triangle) Edges() []Line {
 
 type Triangles []Triangle
 
-func (tris Triangles) Mesh() Mesh {
+func (tris Triangles) Fill() Mesh {
 	verts := make([]XY, 0, len(tris)*3)
 	faces := make([]Face, 0, len(tris))
 

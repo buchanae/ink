@@ -25,7 +25,7 @@ func Ink(doc *app.Doc) {
 
 		xy := XY{x, 0.5 + h}
 		c := Circle{xy, 0.001, 10}
-		s := gfx.NewShader(c)
+		s := gfx.NewShader(c.Fill())
 		s.Draw(doc)
 	}
 }

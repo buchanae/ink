@@ -53,7 +53,7 @@ func (e Ellipse) Stroke(opt StrokeOpt) Mesh {
 	return Stroke(e.Path(), opt)
 }
 
-func (e Ellipse) Mesh() Mesh {
+func (e Ellipse) Fill() Mesh {
 	segments := e.Segments
 	if segments <= 0 {
 		segments = 50

@@ -108,13 +108,13 @@ func (c Circle) Ellipse() Ellipse {
 	}
 }
 
-func (c Circle) Mesh() Mesh {
-	return c.Ellipse().Mesh()
+func (c Circle) Fill() Mesh {
+	return c.Ellipse().Fill()
 }
 
 func (c Circle) Normals() []XY {
 	// TODO could every mesh have per-face normals?
-	mesh := c.Mesh()
+	mesh := c.Fill()
 	verts := mesh.Verts
 	normals := make([]XY, mesh.Size())
 

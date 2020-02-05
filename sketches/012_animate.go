@@ -22,13 +22,12 @@ func Ink(doc *app.Doc) {
 	}
 	center := XY{0.5, float32(h/3) + 0.3}
 
-	m := gfx.NewShader(t)
-	m.Draw(doc)
-
+	m := gfx.Fill{Shape: t}.Shader()
 	m.Set("a_color", []color.RGBA{
 		color.Red, color.Green, color.Blue,
 	})
 	m.Set("a_pivot", center)
+	m.Draw(doc)
 
 	var rot float32
 	for app.Play() {

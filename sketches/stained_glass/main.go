@@ -43,7 +43,7 @@ func Ink(doc *app.Doc) {
 		//c = color.Lighter(c, rand.Range(0.1, 1.3))
 		//}
 
-		m := gfx.NewShader(b)
+		m := gfx.NewShader(b.Fill())
 		//m.Frag = "stained_glass.frag"
 		m.Set("u_offset", rand.XYRange(0, 200))
 		m.Set("a_color", c)
