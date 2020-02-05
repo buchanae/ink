@@ -100,5 +100,28 @@ jobs:
         with:
           name: ink-windows
 
-      - name: Check
-        run: echo hi
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: test-release
+          release_name: Release test
+          draft: true
+          prerelease: false
+
+      - name: Zip
+        run: |
+          zip --junk-paths ink-macos ./ink-macos/ink
+
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./ink-macos.zip
+          asset_name: ink-macos.zip
+          asset_content_type: application/zip
