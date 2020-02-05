@@ -49,4 +49,8 @@ There are more examples in the [sketches](./sketches) directory.
 
 ### Implementation Notes
 
-Currently, Ink is based on OpenGL only, although other backends are desired. Ink is also focused primarily on 2D graphics so far, because everything is simpler in two dimensions, although I'd like to extend it to 3D some day.
+- Ink is based on OpenGL only, although other backends are desired. There is an experimental WebGL branch.
+- Ink is focused on 2D graphics, although 3D is desired some day.
+- Most numbers are float32, because OpenGL APIs are mostly based on float32s.
+  - This is also why I haven't used the Go stdlib `image/color`. I admit this feels messy.
+- Angles are in radians, unless otherwise noted.
