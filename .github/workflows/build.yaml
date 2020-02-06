@@ -1,6 +1,9 @@
-name: Build Ink
+name: Build and release tag
 
-on: repository_dispatch
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   build-linux:
