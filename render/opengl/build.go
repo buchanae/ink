@@ -247,6 +247,11 @@ func (pb *build) mergeable(a, b *buildPass) bool {
 		pb.trace("bindings differ", len(a.bindings), len(b.bindings))
 		return false
 	}
+	if a.instanceCount > 0 || b.instanceCount > 0 {
+		// TODO probably can be supported, but has been buggy
+		pb.trace("instanced")
+		return false
+	}
 	if len(a.uniforms) != len(b.uniforms) {
 		pb.trace("uniforms differ")
 		return false

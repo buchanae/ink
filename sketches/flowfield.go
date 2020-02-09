@@ -14,25 +14,25 @@ func Ink(doc *app.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{
-		Rows: 30,
-		Cols: 30,
-		Rect: RectWH(1.2, 1.2),
+		Rows: 10,
+		Cols: 10,
+		Rect: RectWH(1.5, 1.5),
 	}
 
 	vg := NewVectorGrid(grid)
 	for i := range vg.Angles {
-		vg.Angles[i] = rand.Angle()
+		vg.Angles[i] = rand.Angle() * 8
 	}
 
-	// TODO should be able to turn this layer off easily
-	//gridLayer := doc.NewLayer()
-	doc.Config.Trace = true
-
+	palette := rand.Palette()
 	pos := []XY{}
+	colors := []color.RGBA{}
 
-	for j := 0; j < 50000; j++ {
+	for j := 0; j < 100000; j++ {
 
 		xy := rand.XY()
+		c := rand.Color(palette)
+		c.A = 0.20
 
 		for i := 0; i < 100; i++ {
 
@@ -43,38 +43,29 @@ func Ink(doc *app.Doc) {
 			}
 
 			vec := Unit().Rotate(angle)
-			vec = vec.SetLength(0.055)
+			vec = vec.SetLength(0.008)
 
 			xy = xy.Add(vec)
-			xy = xy.Clamp(XY{}, XY{1, 1})
+			//xy = xy.Clamp(XY{}, XY{1, 1})
 
-			/*
-				line := Line{from, xy}
-				gfx.Stroke{
-					Shape: line,
-					Color: c,
-					Width: 0.001,
-				}.Draw(doc)
-			*/
 			pos = append(pos, xy)
+			colors = append(colors, c)
 		}
 	}
-
-	c := color.Black
-	c.A = 0.1
 
 	shader := gfx.Fill{
 		Shape: Circle{
 			Radius:   0.002,
-			Segments: 10,
+			Segments: 5,
 		},
-		Color: c,
 	}.Shader()
 
 	shader.Set("a_pos", pos)
+	shader.Set("a_color", colors)
 	shader.Instances = len(pos)
 	shader.Divisors = map[string]int{
-		"a_pos": 1,
+		"a_pos":   1,
+		"a_color": 1,
 	}
 	shader.Draw(doc)
 }

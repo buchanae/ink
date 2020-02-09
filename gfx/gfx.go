@@ -15,6 +15,7 @@ func Clear(l Layer, c color.RGBA) {
 var Fullscreen = dd.Rect{B: dd.XY{1, 1}}
 var Center = dd.XY{.5, .5}
 
+// TODO be able to turn layers on/off easily
 type Layer interface {
 	LayerID() int
 	NewLayer() Layer

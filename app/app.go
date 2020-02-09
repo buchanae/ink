@@ -62,6 +62,7 @@ func (app *App) initRenderer() {
 
 func (app *App) SetConfig(b Config) {
 	app.Do(func() {
+		app.conf.Trace = b.Trace
 		app.conf.Snapshot = b.Snapshot
 
 		aw := app.conf.Window
@@ -95,8 +96,18 @@ func (app *App) RenderPlan(plan render.Plan) {
 			app.shown = true
 		}
 		app.initRenderer()
+
+		if app.conf.Trace {
+			app.renderer.StartTrace()
+		}
+
 		app.renderer.Render(plan)
 		app.renderer.ToScreen(plan.RootLayer)
+
+		if app.conf.Trace {
+			app.renderer.EndTrace()
+		}
+
 		app.plan = plan
 		app.win.SwapBuffers()
 	})
