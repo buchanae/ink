@@ -2,15 +2,31 @@ package app
 
 import (
 	"encoding/gob"
+	"io"
 	"os"
 	"time"
+
+	"github.com/buchanae/ink/render"
 )
 
 var enc *gob.Encoder
 var dec *gob.Decoder
 
+type writeDebug struct {
+	w     io.Writer
+	count int
+}
+
+func (wd *writeDebug) Write(b []byte) (int, error) {
+	n, err := wd.w.Write(b)
+	wd.count += n
+	return n, err
+}
+
+var wdbg = &writeDebug{w: os.Stdout}
+
 func init() {
-	enc = gob.NewEncoder(os.Stdout)
+	enc = gob.NewEncoder(wdbg)
 	dec = gob.NewDecoder(os.Stdin)
 }
 
@@ -45,8 +61,27 @@ func RecvDoc() *Doc {
 	return doc
 }
 
+type RenderMessage struct {
+	Config Config
+	Plan   render.Plan
+}
+
 func Send(doc *Doc) {
-	err := enc.Encode(doc)
+	wdbg.count = 0
+	//start := time.Now()
+
+	// TODO move plan optimization out of opengl to client-side
+	plan := buildPlan(doc)
+
+	err := enc.Encode(RenderMessage{
+		Config: doc.Config,
+		Plan:   plan,
+	})
+
+	// TODO ongoing debugging
+	//fmt.Fprintf(os.Stderr, "sent %d bytes\n", wdbg.count)
+	//fmt.Fprintf(os.Stderr, "send took: %s\n", time.Since(start))
+
 	if err != nil {
 		os.Stderr.Write([]byte("sending: "))
 		os.Stderr.Write([]byte(err.Error()))

@@ -97,8 +97,8 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 	dec := gob.NewDecoder(stdout)
 
 	for {
-		doc := &Doc{}
-		err = dec.Decode(doc)
+		msg := &RenderMessage{}
+		err = dec.Decode(msg)
 		if err == io.EOF {
 			break
 		}
@@ -106,7 +106,8 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 			return fmt.Errorf("decoding: %v", err)
 		}
 
-		app.Render(doc)
+		app.SetConfig(msg.Config)
+		app.RenderPlan(msg.Plan)
 	}
 
 	err = cmd.Wait()
@@ -144,9 +145,11 @@ func copyFile(dstPath, srcPath, name string) error {
 
 const head = `
 package main
+import "log"
 import "github.com/buchanae/ink/app"
 
 func main() {
+	log.SetFlags(0)
 	doc := app.RecvDoc()
 	Ink(doc)
 	app.Send(doc)

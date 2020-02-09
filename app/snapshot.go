@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/render/opengl"
 )
 
 func (app *App) Snapshot() image.Image {
@@ -26,11 +26,11 @@ func (app *App) Snapshot() image.Image {
 	var img image.Image
 
 	app.Do(func() {
-		renderer := render.NewRenderer(width, height)
+		renderer := opengl.NewRenderer(width, height)
 		defer renderer.Cleanup()
 
 		renderer.Render(app.plan)
-		img = renderer.CaptureImage(app.doc.LayerID(), 0, 0, 1, 1)
+		img = renderer.CaptureImage(app.plan.RootLayer, 0, 0, 1, 1)
 	})
 
 	return img

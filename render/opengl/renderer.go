@@ -1,9 +1,10 @@
-package render
+package opengl
 
 import (
 	"image"
 	"log"
 
+	"github.com/buchanae/ink/render"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
@@ -39,7 +40,7 @@ func (r *Renderer) Cleanup() {
 	r.images = map[int]Image{}
 }
 
-func (r *Renderer) Render(plan Plan) {
+func (r *Renderer) Render(plan render.Plan) {
 	r.render(plan)
 }
 
@@ -57,7 +58,7 @@ func (r *Renderer) CaptureImage(layerID int, x, y, w, h float32) image.Image {
 	return r.texture(layerID).Image(x, y, w, h)
 }
 
-func (r *Renderer) render(plan Plan) {
+func (r *Renderer) render(plan render.Plan) {
 	r.trace("start render")
 
 	for id, img := range plan.Images {
@@ -77,7 +78,7 @@ func (r *Renderer) render(plan Plan) {
 	}
 }
 
-func (r *Renderer) renderPass(p *pass) {
+func (r *Renderer) renderPass(p *buildPass) {
 
 	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
@@ -108,6 +109,9 @@ func (r *Renderer) renderPass(p *pass) {
 	r.bindUniforms(p)
 	glBindVertexArray(p.vao)
 
+	// TODO indexed elements are not always a win.
+	//      if most verts are unique, then indicies are just
+	//      overhead.
 	r.trace("  draw elements")
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
@@ -131,7 +135,7 @@ func (r *Renderer) renderPass(p *pass) {
 //      to the preprocessed passes and resources. might
 //      make a clear separation between preprocessing and
 //      execution. might help abstract rendering backends later.
-func (r *Renderer) bindUniforms(p *pass) {
+func (r *Renderer) bindUniforms(p *buildPass) {
 	for _, uni := range p.prog.uniforms {
 
 		val, ok := p.uniforms[uni.Name]

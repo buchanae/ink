@@ -1,5 +1,3 @@
-// +build !sendonly
-
 package app
 
 import (
@@ -16,8 +14,13 @@ import (
 func buildPlan(doc *Doc) render.Plan {
 
 	plan := render.Plan{
-		Images: map[int]image.Image{},
+		RootLayer: doc.LayerID(),
+		Shaders:   map[int]render.Shader{},
+		Images:    map[int]image.Image{},
 	}
+
+	nextSID := 1
+	uniqShaders := map[render.Shader]int{}
 
 	for k, v := range doc.Images {
 		plan.Images[k] = v
@@ -27,10 +30,21 @@ func buildPlan(doc *Doc) render.Plan {
 
 		s := op.Shader
 
-		rs := &render.Shader{
+		shader := render.Shader{
+			Vert: s.Vert,
+			Frag: s.Frag,
+		}
+		sid, ok := uniqShaders[shader]
+		if !ok {
+			sid = nextSID
+			uniqShaders[shader] = sid
+			plan.Shaders[sid] = shader
+			nextSID++
+		}
+
+		rs := render.Pass{
 			Name:      s.Name,
-			Vert:      s.Vert,
-			Frag:      s.Frag,
+			ShaderID:  sid,
 			Layer:     op.LayerID,
 			Vertices:  len(s.Mesh.Verts),
 			Instances: s.Instances,
@@ -71,7 +85,7 @@ func buildPlan(doc *Doc) render.Plan {
 			rs.Attrs[attr.Name] = val
 		}
 
-		plan.Shaders = append(plan.Shaders, rs)
+		plan.Passes = append(plan.Passes, rs)
 	}
 
 	return plan

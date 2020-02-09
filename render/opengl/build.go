@@ -1,15 +1,17 @@
-package render
+package opengl
 
 import (
 	"log"
 
+	"github.com/buchanae/ink/render"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type build struct {
 	tracer
 
-	passes []*pass
+	progs  map[int]compiled
+	passes []*buildPass
 	faces  []uint32
 	// Total number of bytes needed to store all attributes.
 	attrBytes int
@@ -20,7 +22,7 @@ type build struct {
 	vaos      []uint32
 }
 
-type pass struct {
+type buildPass struct {
 	name          string
 	prog          compiled
 	uniforms      map[string]interface{}
@@ -44,40 +46,52 @@ type bindingVal struct {
 	size  int
 }
 
-func (pb *build) build(plan Plan) {
+func (pb *build) build(plan render.Plan) {
 	pb.trace("start build")
 
-	pb.passes = make([]*pass, 0, len(plan.Shaders))
-	pb.faces = make([]uint32, 0, 500)
-
-	if len(plan.Shaders) == 0 {
+	if len(plan.Passes) == 0 {
 		return
 	}
 
-	pb.trace("add shaders")
-	for _, s := range plan.Shaders {
-		pb.addShader(s)
+	pb.progs = map[int]compiled{}
+	pb.passes = make([]*buildPass, 0, len(plan.Passes))
+	pb.faces = make([]uint32, 0, 500)
+
+	pb.trace("compile shaders")
+	for id, src := range plan.Shaders {
+		prog, err := compile(shaderOpt{
+			src.Vert, src.Frag, src.Geom, src.Output,
+		})
+		if err != nil {
+			log.Printf("error: compiling shader: %v", err)
+			return
+		}
+		pb.progs[id] = prog
 	}
 
+	pb.trace("add passes")
+	for _, pass := range plan.Passes {
+		pb.addPass(pass)
+	}
+
+	// TODO batch should come before shader compilation
 	pb.batch()
 	pb.upload()
 
 	pb.trace("end build")
 }
 
-func (pb *build) addShader(shader *Shader) {
+func (pb *build) addPass(pass render.Pass) {
 
-	prog, err := compile(shaderOpt{
-		shader.Vert, shader.Frag, shader.Geom, shader.Output,
-	})
-	if err != nil {
-		log.Printf("error: compiling shader: %v", err)
+	prog, ok := pb.progs[pass.ShaderID]
+	if !ok {
+		log.Printf("missing shader with ID %d", pass.ShaderID)
 		return
 	}
 
 	uniforms := map[string]interface{}{}
 	for _, uni := range prog.uniforms {
-		val := shader.Uniforms[uni.Name]
+		val := pass.Uniforms[uni.Name]
 		if val == nil {
 			// TODO move to a "warnings" or "errors" list
 			log.Printf("missing uniform: %s", uni.Name)
@@ -86,25 +100,25 @@ func (pb *build) addShader(shader *Shader) {
 		uniforms[uni.Name] = val
 	}
 
-	if shader.Vertices == 0 {
+	if pass.Vertices == 0 {
 		log.Print("empty verts")
 	}
 
-	p := &pass{
+	p := &buildPass{
 		prog:          prog,
-		layer:         shader.Layer,
-		name:          shader.Name,
-		vertexCount:   shader.Vertices,
-		instanceCount: shader.Instances,
+		layer:         pass.Layer,
+		name:          pass.Name,
+		vertexCount:   pass.Vertices,
+		instanceCount: pass.Instances,
 		uniforms:      uniforms,
 		faceOffset:    len(pb.faces),
-		faceCount:     len(shader.Faces),
+		faceCount:     len(pass.Faces),
 	}
 	pb.passes = append(pb.passes, p)
-	pb.faces = append(pb.faces, shader.Faces...)
+	pb.faces = append(pb.faces, pass.Faces...)
 
 	for _, attr := range prog.attributes {
-		desc, ok := shader.Attrs[attr.Name]
+		desc, ok := pass.Attrs[attr.Name]
 
 		if !ok || desc.Value == nil || desc.Size == 0 {
 			continue
@@ -204,8 +218,8 @@ func (pb *build) upload() {
 func (pb *build) batch() {
 	pb.trace("batch")
 
-	var batched []*pass
-	var last *pass
+	var batched []*buildPass
+	var last *buildPass
 
 	for i, p := range pb.passes {
 		if i == 0 {
@@ -224,7 +238,7 @@ func (pb *build) batch() {
 	pb.passes = batched
 }
 
-func (pb *build) mergeable(a, b *pass) bool {
+func (pb *build) mergeable(a, b *buildPass) bool {
 	if a.prog.id != b.prog.id {
 		pb.trace("program IDs differ")
 		return false
@@ -261,7 +275,7 @@ func (pb *build) mergeable(a, b *pass) bool {
 	return true
 }
 
-func (pb *build) merge(a, b *pass) {
+func (pb *build) merge(a, b *buildPass) {
 
 	// merge faces
 	vc := uint32(a.vertexCount)

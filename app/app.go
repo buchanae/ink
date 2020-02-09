@@ -6,6 +6,7 @@ import (
 	"runtime"
 
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/render/opengl"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
@@ -23,9 +24,8 @@ func init() {
 type App struct {
 	conf      Config
 	win       *glfw.Window
-	renderer  *render.Renderer
+	renderer  *opengl.Renderer
 	commands  chan func()
-	doc       *Doc
 	plan      render.Plan
 	shown     bool
 	keyEvents chan KeyEvent
@@ -57,54 +57,47 @@ func (app *App) initRenderer() {
 		return
 	}
 	w, h := app.win.GetFramebufferSize()
-	app.renderer = render.NewRenderer(w, h)
+	app.renderer = opengl.NewRenderer(w, h)
 }
 
-func (app *App) updateConfig(b Config) {
-	app.conf.Snapshot = b.Snapshot
+func (app *App) SetConfig(b Config) {
+	app.Do(func() {
+		app.conf.Snapshot = b.Snapshot
 
-	aw := app.conf.Window
-	bw := b.Window
-	if aw.Width != bw.Width || aw.Height != bw.Height {
-		// reset renderer
-		// TODO this is bound to cause some issue
-		//      when rendering multiple docs.
-		//      need a better way to resize a renderer
-		app.renderer = nil
-		app.win.SetSize(bw.Width, bw.Height)
-	}
-	if aw.Title != bw.Title {
-		app.win.SetTitle(bw.Title)
-	}
+		aw := app.conf.Window
+		bw := b.Window
+		if aw.Width != bw.Width || aw.Height != bw.Height {
+			// reset renderer
+			// TODO this is bound to cause some issue
+			//      when rendering multiple docs.
+			//      need a better way to resize a renderer
+			app.renderer = nil
+			app.win.SetSize(bw.Width, bw.Height)
+		}
+		if aw.Title != bw.Title {
+			app.win.SetTitle(bw.Title)
+		}
 
-	app.conf.Window = b.Window
+		app.conf.Window = b.Window
+	})
 }
 
 func (app *App) Render(doc *Doc) {
-	app.Do(func() {
+	app.SetConfig(doc.Config)
+	plan := buildPlan(doc)
+	app.RenderPlan(plan)
+}
 
-		app.updateConfig(doc.Config)
+func (app *App) RenderPlan(plan render.Plan) {
+	app.Do(func() {
 		if !app.conf.Window.Hidden && !app.shown {
 			app.win.Show()
 			app.shown = true
 		}
-		plan := buildPlan(doc)
 		app.initRenderer()
-
-		if doc.Config.Trace {
-			app.renderer.StartTrace()
-		}
-
 		app.renderer.Render(plan)
-		app.renderer.ToScreen(doc.LayerID())
-
-		if doc.Config.Trace {
-			app.renderer.EndTrace()
-		}
-
-		app.doc = doc
+		app.renderer.ToScreen(plan.RootLayer)
 		app.plan = plan
-
 		app.win.SwapBuffers()
 	})
 }
