@@ -51,6 +51,15 @@ func Clamp(val, min, max float32) float32 {
 	}
 	return val
 }
+func ClampInt(val, min, max int) int {
+	if val > max {
+		return max
+	}
+	if val < min {
+		return min
+	}
+	return val
+}
 
 func Mod(x, y float32) float32 {
 	return float32(math.Mod(float64(x), float64(y)))
