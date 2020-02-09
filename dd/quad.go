@@ -38,10 +38,10 @@ func (q Quad) Rotate(angle float32) Quad {
 
 func (q Quad) RotateAround(angle float32, pivot XY) Quad {
 	return Quad{
-		q.A.Rotate(angle, pivot),
-		q.B.Rotate(angle, pivot),
-		q.C.Rotate(angle, pivot),
-		q.D.Rotate(angle, pivot),
+		q.A.RotateAround(angle, pivot),
+		q.B.RotateAround(angle, pivot),
+		q.C.RotateAround(angle, pivot),
+		q.D.RotateAround(angle, pivot),
 	}
 }
 

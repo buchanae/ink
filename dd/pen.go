@@ -1,9 +1,5 @@
 package dd
 
-func NewPen() *Pen {
-	return &Pen{}
-}
-
 type Pen struct {
 	prev     XY
 	current  *subpath

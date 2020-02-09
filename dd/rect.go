@@ -104,6 +104,7 @@ func (r Rect) Translate(xy XY) Rect {
 	}
 }
 
+// TODO note, "xy" is a percentage
 func (r Rect) Interpolate(xy XY) XY {
 	return r.B.Sub(r.A).Mul(xy).Add(r.A)
 }

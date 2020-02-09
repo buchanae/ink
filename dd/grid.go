@@ -11,6 +11,8 @@ type Cell struct {
 }
 
 func (g Grid) Cells() []Cell {
+	// TODO big problem with this is that grid.Rect.Size()
+	//      does not reflect the size of the grid used here.
 	rect := g.Rect
 	if rect.IsZero() {
 		rect = RectWH(1, 1)

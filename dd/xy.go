@@ -1,5 +1,11 @@
 package dd
 
+import "github.com/buchanae/ink/math"
+
+func Unit() XY {
+	return XY{1, 1}
+}
+
 type XY struct {
 	X, Y float32
 }
@@ -14,6 +20,10 @@ func (a XY) Sub(b XY) XY {
 
 func (a XY) Mul(b XY) XY {
 	return XY{a.X * b.X, a.Y * b.Y}
+}
+
+func (a XY) Div(b XY) XY {
+	return XY{a.X / b.X, a.Y / b.Y}
 }
 
 func (a XY) AddScalar(s float32) XY {
@@ -40,6 +50,7 @@ func (a XY) Length() float32 {
 	return sqrt(a.X*a.X + a.Y*a.Y)
 }
 
+// TODO possibly wrong
 func (a XY) SetLength(s float32) XY {
 	l := a.Length()
 	return a.Normalize().MulScalar(s / l)
@@ -81,13 +92,24 @@ func (a XY) Dot(b XY) float32 {
 	return a.X*b.X + a.Y*b.Y
 }
 
-func (a XY) Rotate(rad float32, pivot XY) XY {
-	cr := cos(rad)
-	sr := sin(rad)
+func (a XY) Rotate(angle float32) XY {
+	return a.RotateAround(angle, XY{})
+}
+
+func (a XY) RotateAround(angle float32, pivot XY) XY {
+	cr := cos(angle)
+	sr := sin(angle)
 	p := a.Sub(pivot)
 	b := XY{
 		X: p.X*cr - p.Y*sr,
 		Y: p.X*sr + p.Y*cr,
 	}
 	return b.Add(pivot)
+}
+
+func (a XY) Clamp(min, max XY) XY {
+	return XY{
+		math.Clamp(a.X, min.X, max.X),
+		math.Clamp(a.Y, min.Y, max.Y),
+	}
 }
