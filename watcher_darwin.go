@@ -32,7 +32,7 @@ func (w *watcher) init(path string) {
 	}
 
 	es := &fsevents.EventStream{
-		Latency: 500 * time.Millisecond,
+		Latency: 10 * time.Millisecond,
 		Flags:   fsevents.FileEvents | fsevents.NoDefer,
 		Paths:   []string{path},
 		Device:  dev,
