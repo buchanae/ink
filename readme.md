@@ -12,11 +12,6 @@ go get github.com/buchanae/ink
 ```
 build-essential
 xorg-dev 
-libgflw3-dev
-libxcursor-dev 
-libxinerama-dev 
-libxi-dev
-pkg-config
 ```
 
 Write `example.go`:
