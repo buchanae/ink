@@ -8,7 +8,16 @@ Install:
 go get github.com/buchanae/ink
 ```
 
-(Building Ink is a little tricky, because it depends on GLFW. You might need to install build-essential, xorg-dev, libgflw3-dev, etc).
+(Building Ink is a little tricky, because it depends on GLFW. You might need to install these packages:
+```
+build-essential
+xorg-dev 
+libgflw3-dev
+libxcursor-dev 
+libxinerama-dev 
+libxi-dev
+pkg-config
+```
 
 Write `example.go`:
 ```go
@@ -27,8 +36,7 @@ func Ink(doc *app.Doc) {
 		XY{0.8, 0.2},
 		XY{0.5, 0.8},
 	}
-
-	s := gfx.NewShader(t.Mesh())
+	s := gfx.Fill{Shape: t}.Shader()
 	s.Set("a_color", []RGBA{
 		Red, Green, Blue,
 	})
