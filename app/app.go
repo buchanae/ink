@@ -3,8 +3,11 @@
 package app
 
 import (
+	"context"
 	"runtime"
 
+	"github.com/buchanae/ink/app/runner"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/render/opengl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -83,9 +86,13 @@ func (app *App) SetConfig(b Config) {
 	})
 }
 
-func (app *App) Render(doc *Doc) {
-	app.SetConfig(doc.Config)
-	plan := buildPlan(doc)
+func (app *App) RunSketch(ctx context.Context, path string) error {
+	return runner.RunSketch(ctx, app, path)
+}
+
+func (app *App) Render(doc *gfx.Doc) {
+	//app.SetConfig(doc.Config)
+	plan := render.BuildPlan(doc)
 	app.RenderPlan(plan)
 }
 
@@ -125,14 +132,15 @@ func (app *App) Do(f func()) {
 	<-done
 }
 
-func Run(f func(*Doc)) {
+func Run(f func(*gfx.Doc)) {
 	conf := DefaultConfig()
 	a, err := NewApp(conf)
 	if err != nil {
 		panic(err)
 	}
-	doc := NewDoc()
-	doc.Config = conf
+	doc := gfx.NewDoc()
+	// TODO
+	//doc.Config = conf
 	go func() {
 		f(doc)
 		a.Render(doc)

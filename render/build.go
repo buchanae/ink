@@ -1,4 +1,4 @@
-package app
+package render
 
 import (
 	"image"
@@ -8,19 +8,18 @@ import (
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/internal/glsl"
-	"github.com/buchanae/ink/render"
 )
 
-func buildPlan(doc *Doc) render.Plan {
+func BuildPlan(doc *gfx.Doc) Plan {
 
-	plan := render.Plan{
+	plan := Plan{
 		RootLayer: doc.LayerID(),
-		Shaders:   map[int]render.Shader{},
+		Shaders:   map[int]Shader{},
 		Images:    map[int]image.Image{},
 	}
 
 	nextSID := 1
-	uniqShaders := map[render.Shader]int{}
+	uniqShaders := map[Shader]int{}
 
 	for k, v := range doc.Images {
 		plan.Images[k] = v
@@ -30,7 +29,7 @@ func buildPlan(doc *Doc) render.Plan {
 
 		s := op.Shader
 
-		shader := render.Shader{
+		shader := Shader{
 			Vert: s.Vert,
 			Frag: s.Frag,
 		}
@@ -42,7 +41,7 @@ func buildPlan(doc *Doc) render.Plan {
 			nextSID++
 		}
 
-		rs := render.Pass{
+		rs := Pass{
 			Name:      s.Name,
 			ShaderID:  sid,
 			Layer:     op.LayerID,
@@ -50,7 +49,7 @@ func buildPlan(doc *Doc) render.Plan {
 			Instances: s.Instances,
 			Faces:     make([]uint32, 0, len(s.Mesh.Faces)*3),
 			Uniforms:  map[string]interface{}{},
-			Attrs: map[string]render.Attr{
+			Attrs: map[string]Attr{
 				"a_vert": {
 					Value: s.Mesh.Verts,
 					Size:  len(s.Mesh.Verts) * 2 * 4,
@@ -91,8 +90,8 @@ func buildPlan(doc *Doc) render.Plan {
 	return plan
 }
 
-func convertAttr(s *gfx.Shader, name string, verts int) render.Attr {
-	attr := render.Attr{
+func convertAttr(s *gfx.Shader, name string, verts int) Attr {
+	attr := Attr{
 		Divisor: s.Divisors[name],
 	}
 

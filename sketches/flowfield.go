@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -9,8 +8,7 @@ import (
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
-
+func Ink(doc *gfx.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{
@@ -28,7 +26,7 @@ func Ink(doc *app.Doc) {
 	pos := []XY{}
 	colors := []color.RGBA{}
 
-	for j := 0; j < 100000; j++ {
+	for j := 0; j < 100; j++ {
 
 		xy := rand.XY()
 		c := rand.Color(palette)
@@ -126,7 +124,7 @@ func (vg VectorGrid) Interpolate(percent XY) (float32, bool) {
 	return math.Interp(e, f, p.Y), true
 }
 
-func (vg VectorGrid) DrawArrows(doc *app.Doc) {
+func (vg VectorGrid) DrawArrows(doc *gfx.Doc) {
 
 	for _, cell := range vg.grid.Cells() {
 		center := cell.Center()

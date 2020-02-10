@@ -53,7 +53,10 @@ func main() {
 
 			wg.Add(1)
 			go func() {
-				a.RunSketch(ctx, args[0])
+				err := a.RunSketch(ctx, args[0])
+				if err != nil {
+					log.Printf("error: %v", err)
+				}
 				wg.Done()
 			}()
 

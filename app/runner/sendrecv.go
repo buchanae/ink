@@ -1,4 +1,4 @@
-package app
+package runner
 
 import (
 	"encoding/gob"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 )
 
@@ -50,8 +51,8 @@ func Play() bool {
 	return true
 }
 
-func RecvDoc() *Doc {
-	doc := &Doc{}
+func RecvDoc() *gfx.Doc {
+	doc := &gfx.Doc{}
 	err := dec.Decode(doc)
 	if err != nil {
 		os.Stderr.Write([]byte("RecvDoc: "))
@@ -62,16 +63,16 @@ func RecvDoc() *Doc {
 }
 
 type RenderMessage struct {
-	Config Config
+	Config gfx.Config
 	Plan   render.Plan
 }
 
-func Send(doc *Doc) {
+func Send(doc *gfx.Doc) {
 	wdbg.count = 0
 	//start := time.Now()
 
 	// TODO move plan optimization out of opengl to client-side
-	plan := buildPlan(doc)
+	plan := render.BuildPlan(doc)
 
 	err := enc.Encode(RenderMessage{
 		Config: doc.Config,
