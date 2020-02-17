@@ -25,7 +25,7 @@ func (app *App) RunSketch(ctx context.Context, path string) error {
 	return run(ctx, app, wd, path)
 }
 
-func (app *App) NewDoc() *client.Doc {
+func newDoc(app *App) *client.Doc {
 
 	doc := client.NewDoc()
 	c := &gfx.Config{}
@@ -106,7 +106,7 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		return fmt.Errorf("starting: %v", err)
 	}
 
-	doc := app.NewDoc()
+	doc := newDoc(app)
 
 	enc := gob.NewEncoder(stdin)
 	err = enc.Encode(doc)

@@ -3,7 +3,6 @@ package app
 import (
 	"runtime"
 
-	"github.com/buchanae/ink/app/client"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/render/opengl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -81,11 +80,6 @@ func (app *App) SetConfig(b Config) {
 	})
 }
 
-func (app *App) Render(doc *client.Doc) {
-	plan := doc.Plan()
-	app.RenderPlan(plan)
-}
-
 func (app *App) RenderPlan(plan render.Plan) {
 	app.Do(func() {
 		if !app.conf.Window.Hidden && !app.shown {
@@ -112,18 +106,4 @@ func (app *App) Do(f func()) {
 		close(done)
 	}
 	<-done
-}
-
-func Run(f func(*client.Doc)) {
-	conf := DefaultConfig()
-	a, err := NewApp(conf)
-	if err != nil {
-		panic(err)
-	}
-	doc := a.NewDoc()
-	go func() {
-		f(doc)
-		a.Render(doc)
-	}()
-	a.Run()
 }
