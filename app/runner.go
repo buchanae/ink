@@ -184,10 +184,6 @@ func main() {
 }
 `
 
-const mod = `
-module temp
-`
-
 // search directory tree for a "go.mod" file for the ink module
 // in order to decide if ink should build against a local codebase.
 func findInkCode() (string, error) {
@@ -250,7 +246,7 @@ func newWorkdir() (wd workdir, err error) {
 
 	// TODO should look for an existing go.mod file in the sketch directory
 	modPath := filepath.Join(wd.path, "go.mod")
-	modContent := mod
+	modContent := "module temp\n"
 
 	inkCode, err := findInkCode()
 	if err != nil {
