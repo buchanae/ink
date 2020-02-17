@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -14,7 +13,7 @@ const (
 	Height = 30
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	center := XY{.5, .5}
 	grid := Grid{
@@ -40,9 +39,9 @@ func Ink(doc *app.Doc) {
 		q = q.RotateAround(ang, r.Center())
 
 		gfx.Stroke{
-			Target: q,
-			Width:  0.001,
-			Color:  Black,
+			Shape: q,
+			Width: 0.001,
+			Color: Black,
 		}.Draw(doc)
 	}
 }
