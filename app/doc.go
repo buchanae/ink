@@ -39,23 +39,6 @@ func NewDoc() *Doc {
 	return doc
 }
 
-func (d *Doc) Filter(layerID ...int) *Doc {
-	out := &Doc{
-		ID:     nextID(),
-		Images: d.Images,
-		Config: d.Config,
-	}
-	for _, op := range d.Ops {
-		for _, id := range layerID {
-			if op.LayerID == id {
-				out.Ops = append(out.Ops, op)
-				break
-			}
-		}
-	}
-	return out
-}
-
 func (d *Doc) LayerID() int {
 	return d.ID
 }
