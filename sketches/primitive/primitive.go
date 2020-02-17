@@ -29,7 +29,7 @@ func main() {
 	}
 
 	res := make(chan *Attempt, 100)
-	doc := app.NewDoc()
+	doc := a.NewDoc()
 
 	go run(res)
 	go func() {

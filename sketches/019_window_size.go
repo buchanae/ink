@@ -1,15 +1,19 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *app.Doc) {
-	doc.Config.Window.Width = 300
-	doc.Config.Window.Height = 300
+func Ink(doc gfx.Doc) {
+
+	conf := doc.Config()
+	conf.Title = "example: set window size"
+	conf.Width = 300
+	conf.Height = 300
+	conf.Snapshot.Width = 500
+	conf.Snapshot.Height = 500
 
 	t := Triangle{
 		XY{0.2, 0.2},

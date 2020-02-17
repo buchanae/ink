@@ -15,16 +15,26 @@ func Clear(l Layer, c color.RGBA) {
 var Fullscreen = dd.Rect{B: dd.XY{1, 1}}
 var Center = dd.XY{.5, .5}
 
+type Config struct {
+	Title         string
+	X, Y          int
+	Width, Height int
+
+	Snapshot struct {
+		Width, Height int
+	}
+}
+
 type Doc interface {
 	Layer
 
 	// TODO should be on Layer?
 	LoadImage(name string) Image
 
+	Config() *Config
+
 	/*
 		TODO
-		- load image
-		- create image
 		- get/set config
 			- window title, size
 			- doc size
@@ -32,7 +42,6 @@ type Doc interface {
 		- animation
 			- get animation frame
 			- send updates
-			- clear doc?
 		- get events
 			- key press, mouse move
 	*/

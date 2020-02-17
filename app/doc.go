@@ -6,7 +6,6 @@ import (
 	_ "image/png"
 	"os"
 
-	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
@@ -27,20 +26,16 @@ type Doc struct {
 	ID     int
 	Images map[int]image.Image
 	Ops    []Op
-	Config Config
-}
 
-func NewDoc() *Doc {
-	doc := &Doc{
-		ID: nextID(),
-	}
-	// TODO this shouldn't be here
-	gfx.Clear(doc, color.White)
-	return doc
+	Conf *gfx.Config
 }
 
 func (d *Doc) Clear() {
 	d.Ops = nil
+}
+
+func (d *Doc) Config() *gfx.Config {
+	return d.Conf
 }
 
 func (d *Doc) LayerID() int {
@@ -62,7 +57,7 @@ func (d *Doc) NewImage(img image.Image) gfx.Image {
 	d.Images[id] = img
 
 	w, h := img.Bounds().Dx(), img.Bounds().Dy()
-	win := d.Config.Window
+	win := d.Conf
 	rw := float32(w) / float32(win.Width)
 	rh := float32(h) / float32(win.Height)
 	rect := dd.RectCenter(

@@ -83,7 +83,6 @@ func (app *App) SetConfig(b Config) {
 }
 
 func (app *App) Render(doc *Doc) {
-	app.SetConfig(doc.Config)
 	plan := buildPlan(doc)
 	app.RenderPlan(plan)
 }
@@ -122,8 +121,7 @@ func Run(f func(*Doc)) {
 	if err != nil {
 		panic(err)
 	}
-	doc := NewDoc()
-	doc.Config = conf
+	doc := a.NewDoc()
 	go func() {
 		f(doc)
 		a.Render(doc)

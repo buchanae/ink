@@ -14,6 +14,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/trac"
 )
 
@@ -26,6 +28,23 @@ func (app *App) RunSketch(ctx context.Context, path string) error {
 	}
 
 	return run(ctx, app, wd, path)
+}
+
+func (app *App) NewDoc() *Doc {
+	doc := &Doc{
+		ID: nextID(),
+	}
+	// TODO this shouldn't be here
+	gfx.Clear(doc, color.White)
+
+	c := &gfx.Config{}
+	doc.Conf = c
+	c.Width = app.conf.Window.Width
+	c.Height = app.conf.Window.Height
+	c.Snapshot.Width = app.conf.Snapshot.Width
+	c.Snapshot.Height = app.conf.Snapshot.Height
+
+	return doc
 }
 
 func build(wd workdir, path string) error {
@@ -96,8 +115,8 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		return fmt.Errorf("starting: %v", err)
 	}
 
-	doc := NewDoc()
-	doc.Config = app.conf
+	doc := app.NewDoc()
+
 	enc := gob.NewEncoder(stdin)
 	err = enc.Encode(doc)
 	if err != nil {
@@ -118,7 +137,14 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		}
 		trac.Log("received")
 
-		app.SetConfig(msg.Config)
+		c := app.conf
+		c.Window.Title = msg.Config.Title
+		c.Window.Width = msg.Config.Width
+		c.Window.Height = msg.Config.Height
+		c.Snapshot.Width = msg.Config.Snapshot.Width
+		c.Snapshot.Height = msg.Config.Snapshot.Height
+
+		app.SetConfig(c)
 		app.RenderPlan(msg.Plan)
 		trac.Log("next loop")
 		rdr.started = false

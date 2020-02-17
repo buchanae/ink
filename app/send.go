@@ -63,7 +63,7 @@ func RecvDoc() *Doc {
 }
 
 type RenderMessage struct {
-	Config Config
+	Config gfx.Config
 	Plan   render.Plan
 }
 
@@ -82,7 +82,7 @@ func Send(doc *Doc) {
 	plan := buildPlan(doc)
 
 	err := enc.Encode(RenderMessage{
-		Config: doc.Config,
+		Config: *doc.Conf,
 		Plan:   plan,
 	})
 
