@@ -28,7 +28,7 @@ func Ink(doc *app.Doc) {
 		Vert:      gfx.DefaultVert,
 		Frag:      gfx.DefaultFrag,
 		Instances: N,
-		Mesh:      RectWH(0.05, 0.05),
+		Mesh:      RectWH(0.05, 0.05).Fill(),
 		Attrs: gfx.Attrs{
 			"a_pos":   pos,
 			"a_rot":   rot,
