@@ -5,12 +5,11 @@ import (
 	"log"
 
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/trac"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type Renderer struct {
-	tracer
-
 	width, height int
 	multisamples  int
 	textures      map[int]msaa
@@ -59,19 +58,17 @@ func (r *Renderer) CaptureImage(layerID int, x, y, w, h float32) image.Image {
 }
 
 func (r *Renderer) render(plan render.Plan) {
-	r.trace("start render")
+	trac.Log("start render")
 
 	for id, img := range plan.Images {
 		r.AddImage(id, img)
 	}
 
-	pb := &build{
-		tracer: r.tracer,
-	}
+	pb := &build{}
 	pb.build(plan)
 	defer pb.cleanup()
 
-	r.trace("passes %d", len(pb.passes))
+	trac.Log("passes %d", len(pb.passes))
 
 	for _, p := range pb.passes {
 		r.renderPass(p)
@@ -92,8 +89,8 @@ func (r *Renderer) renderPass(p *buildPass) {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	r.trace("render pass %s", p.name)
-	r.trace("  output to %d", p.layer)
+	trac.Log("render pass %s", p.name)
+	trac.Log("  output to %d", p.layer)
 
 	// TODO clear existing program entirely
 	count := 1
@@ -101,7 +98,7 @@ func (r *Renderer) renderPass(p *buildPass) {
 		count = p.instanceCount
 	}
 
-	r.trace("  gl config")
+	trac.Log("  gl config")
 	output := r.texture(p.layer)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, output.Write.FBO)
@@ -112,7 +109,7 @@ func (r *Renderer) renderPass(p *buildPass) {
 	// TODO indexed elements are not always a win.
 	//      if most verts are unique, then indicies are just
 	//      overhead.
-	r.trace("  draw elements")
+	trac.Log("  draw elements")
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
 		int32(p.faceCount),
@@ -124,7 +121,7 @@ func (r *Renderer) renderPass(p *buildPass) {
 
 	output.Paint()
 
-	r.trace("  pass done")
+	trac.Log("  pass done")
 }
 
 // TODO bind uniforms should be a dead simple loop

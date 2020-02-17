@@ -4,12 +4,11 @@ import (
 	"log"
 
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/trac"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type build struct {
-	tracer
-
 	progs  map[int]compiled
 	passes []*buildPass
 	faces  []uint32
@@ -47,7 +46,7 @@ type bindingVal struct {
 }
 
 func (pb *build) build(plan render.Plan) {
-	pb.trace("start build")
+	trac.Log("start build")
 
 	if len(plan.Passes) == 0 {
 		return
@@ -57,7 +56,7 @@ func (pb *build) build(plan render.Plan) {
 	pb.passes = make([]*buildPass, 0, len(plan.Passes))
 	pb.faces = make([]uint32, 0, 500)
 
-	pb.trace("compile shaders")
+	trac.Log("compile shaders")
 	for id, src := range plan.Shaders {
 		prog, err := compile(shaderOpt{
 			src.Vert, src.Frag, src.Geom, src.Output,
@@ -69,7 +68,7 @@ func (pb *build) build(plan render.Plan) {
 		pb.progs[id] = prog
 	}
 
-	pb.trace("add passes")
+	trac.Log("add passes")
 	for _, pass := range plan.Passes {
 		pb.addPass(pass)
 	}
@@ -78,7 +77,7 @@ func (pb *build) build(plan render.Plan) {
 	pb.batch()
 	pb.upload()
 
-	pb.trace("end build")
+	trac.Log("end build")
 }
 
 func (pb *build) addPass(pass render.Pass) {
@@ -159,7 +158,7 @@ func (pb *build) uploadFaces() {
 }
 
 func (pb *build) upload() {
-	pb.trace("upload")
+	trac.Log("upload")
 
 	// upload faces (vertex index)
 	pb.uploadFaces()
@@ -216,7 +215,7 @@ func (pb *build) upload() {
 }
 
 func (pb *build) batch() {
-	pb.trace("batch")
+	trac.Log("batch")
 
 	var batched []*buildPass
 	var last *buildPass
@@ -234,30 +233,30 @@ func (pb *build) batch() {
 		}
 	}
 	batched = append(batched, last)
-	pb.trace("  merged passes %d to %d", len(pb.passes), len(batched))
+	trac.Log("  merged passes %d to %d", len(pb.passes), len(batched))
 	pb.passes = batched
 }
 
 func (pb *build) mergeable(a, b *buildPass) bool {
 	if a.prog.id != b.prog.id {
-		pb.trace("program IDs differ")
+		trac.Log("program IDs differ")
 		return false
 	}
 	if len(a.bindings) != len(b.bindings) {
-		pb.trace("bindings differ", len(a.bindings), len(b.bindings))
+		trac.Log("bindings differ", len(a.bindings), len(b.bindings))
 		return false
 	}
 	if a.instanceCount > 0 || b.instanceCount > 0 {
 		// TODO probably can be supported, but has been buggy
-		pb.trace("instanced")
+		trac.Log("instanced")
 		return false
 	}
 	if len(a.uniforms) != len(b.uniforms) {
-		pb.trace("uniforms differ")
+		trac.Log("uniforms differ")
 		return false
 	}
 	if a.layer != b.layer {
-		pb.trace("layers differ")
+		trac.Log("layers differ")
 		return false
 	}
 	for i := range b.bindings {

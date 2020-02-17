@@ -10,10 +10,13 @@ import (
 	"sync"
 
 	"github.com/buchanae/ink/app"
+	"github.com/buchanae/ink/trac"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
 func main() {
+	flag.BoolVar(&trac.Enabled, "trace", false, "Enable trace logging.")
+
 	log.SetFlags(0)
 	flag.Parse()
 	args := flag.Args()
@@ -53,8 +56,13 @@ func main() {
 
 			wg.Add(1)
 			go func() {
+				defer wg.Done()
+
+				trac.Reset()
+				trac.Log("run sketch")
+				defer trac.Log("done")
+
 				a.RunSketch(ctx, args[0])
-				wg.Done()
 			}()
 
 			<-watch.changes

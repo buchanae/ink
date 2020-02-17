@@ -13,6 +13,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+
+	"github.com/buchanae/ink/trac"
 )
 
 func (app *App) RunSketch(ctx context.Context, path string) error {
@@ -53,14 +55,21 @@ func build(wd workdir, path string) error {
 
 func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 
+	span := trac.Start("go build")
 	err := build(wd, sketchPath)
 	if err != nil {
 		return err
 	}
+	span.End()
 
 	binPath := filepath.Join(wd.path, "inkbin")
 	cmd := exec.Command(binPath)
 	cmd.Dir = filepath.Dir(sketchPath)
+	cmd.Env = []string{}
+	cmd.Env = append(cmd.Env, os.Environ()...)
+	if trac.Enabled {
+		cmd.Env = append(cmd.Env, "INK_TRACE=true")
+	}
 
 	stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -81,6 +90,7 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		stdout.Close()
 	}()
 
+	trac.Log("exec sketch")
 	err = cmd.Start()
 	if err != nil {
 		return fmt.Errorf("starting: %v", err)
@@ -94,7 +104,8 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		return fmt.Errorf("sending initial doc: %v", err)
 	}
 
-	dec := gob.NewDecoder(stdout)
+	rdr := &dbgread{R: stdout}
+	dec := gob.NewDecoder(rdr)
 
 	for {
 		msg := &RenderMessage{}
@@ -105,9 +116,12 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		if err != nil {
 			return fmt.Errorf("decoding: %v", err)
 		}
+		trac.Log("received")
 
 		app.SetConfig(msg.Config)
 		app.RenderPlan(msg.Plan)
+		trac.Log("next loop")
+		rdr.started = false
 	}
 
 	err = cmd.Wait()
@@ -116,6 +130,20 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 	}
 
 	return nil
+}
+
+type dbgread struct {
+	R       io.Reader
+	started bool
+}
+
+func (d *dbgread) Read(p []byte) (int, error) {
+	n, err := d.R.Read(p)
+	if !d.started {
+		trac.Log("first byte")
+		d.started = true
+	}
+	return n, err
 }
 
 func copyFile(dstPath, srcPath, name string) error {
