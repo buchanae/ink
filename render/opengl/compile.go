@@ -58,19 +58,3 @@ type compiled struct {
 	// defined in the program's shader code.
 	uniforms []uniform
 }
-
-func (c *compiled) UniformNames() []string {
-	var names []string
-	for _, uni := range c.uniforms {
-		names = append(names, uni.Name)
-	}
-	return names
-}
-
-func (c *compiled) AttributeNames() []string {
-	var names []string
-	for _, attr := range c.attributes {
-		names = append(names, attr.Name)
-	}
-	return names
-}
