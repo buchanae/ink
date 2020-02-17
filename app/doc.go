@@ -39,6 +39,10 @@ func NewDoc() *Doc {
 	return doc
 }
 
+func (d *Doc) Clear() {
+	d.Ops = nil
+}
+
 func (d *Doc) LayerID() int {
 	return d.ID
 }
@@ -101,6 +105,11 @@ func (l *layer) LayerID() int {
 
 func (l *layer) NewLayer() gfx.Layer {
 	return l.doc.NewLayer()
+}
+
+func (l *layer) Clear() {
+	// TODO wrong. needs fixes to layer ops. see AddShader.
+	l.doc.Ops = nil
 }
 
 func (l *layer) NewImage(img image.Image) gfx.Image {
