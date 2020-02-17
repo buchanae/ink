@@ -44,13 +44,13 @@ func Ink(doc *app.Doc) {
 		}
 
 		gfx.Fill{
-			Mesh:  ca.Mesh(),
+			Shape: ca.Mesh(),
 			Color: c,
 		}.Draw(doc)
 
 		gfx.Fill{
+			Shape: rb,
 			Color: c,
-			Mesh:  rb,
 		}.Draw(doc)
 	}
 }
