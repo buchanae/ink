@@ -3,7 +3,6 @@ package main
 import (
 	"io/ioutil"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -21,7 +20,7 @@ const (
 	S          float32 = .3
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	/*
 			noiseLayer := doc.NewLayer()
@@ -66,7 +65,7 @@ func Ink(doc *app.Doc) {
 			Instances: N,
 			Vert:      loadShader("paint.vert"),
 			Frag:      loadShader("paint.frag"),
-			Mesh:      rec,
+			Mesh:      rec.Fill(),
 			Divisors: map[string]int{
 				"a_pos":  1,
 				"a_rot":  1,

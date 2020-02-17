@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -21,7 +20,7 @@ const (
 	LineWidth = 0.003
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	redDot := gfx.Dot{Color: Red, Radius: 0.003}
@@ -76,9 +75,9 @@ func Ink(doc *app.Doc) {
 			c.A = 0.3
 
 			gfx.Stroke{
-				Target: curves,
-				Width:  LineWidth,
-				Color:  c,
+				Shape: curves,
+				Width: LineWidth,
+				Color: c,
 			}.Draw(doc)
 		}
 	}

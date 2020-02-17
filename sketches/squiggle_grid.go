@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{Rows: 10, Cols: 10}
@@ -47,9 +46,9 @@ func Ink(doc *app.Doc) {
 		pen.Close()
 
 		gfx.Stroke{
-			Target: pen,
-			Width:  0.001,
-			Color:  color.Black,
+			Shape: pen,
+			Width: 0.001,
+			Color: color.Black,
 		}.Draw(doc)
 	}
 }

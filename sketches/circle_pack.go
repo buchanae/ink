@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 	"github.com/buchanae/ink/voronoi"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	box := Rect{
@@ -41,15 +40,13 @@ func Ink(doc *app.Doc) {
 		c.A = 0.3
 
 		for _, tri := range cell.Tris {
-			s := gfx.NewShader(tri)
-			s.Set("a_color", c)
-			s.Draw(doc)
+			gfx.Fill{tri, c}.Draw(doc)
 		}
 
 		for _, e := range cell.Edges {
 			gfx.Stroke{
-				Target: e,
-				Width:  0.002,
+				Shape: e,
+				Width: 0.002,
 			}.Draw(doc)
 		}
 	}

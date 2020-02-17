@@ -1,13 +1,12 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	grid := Grid{Rows: 20, Cols: 20}
 	palette := rand.Palette()

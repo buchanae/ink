@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	a := Triangle{
@@ -33,9 +32,9 @@ func Ink(doc *app.Doc) {
 
 	for _, t := range tris {
 		gfx.Stroke{
-			Target: t,
-			Width:  0.0005,
-			Color:  color.Black,
+			Shape: t,
+			Width: 0.0005,
+			Color: color.Black,
 		}.Draw(layer)
 	}
 
@@ -45,14 +44,14 @@ func Ink(doc *app.Doc) {
 		Segments: 100,
 	}
 	gfx.Cut{
-		Shape:  cir,
+		Shape:  cir.Fill(),
 		Source: layer,
 	}.Draw(doc)
 
 	gfx.Stroke{
-		Target: cir,
-		Width:  0.005,
-		Color:  color.Black,
+		Shape: cir,
+		Width: 0.005,
+		Color: color.Black,
 	}.Draw(doc)
 
 }

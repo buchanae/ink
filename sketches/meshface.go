@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -34,7 +33,7 @@ TODO ideas:
 	where a variable grows how I want
 */
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	for i := float32(0); i < N; i++ {
@@ -95,9 +94,9 @@ func MeshShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 			seen[e] = struct{}{}
 
 			gfx.Stroke{
-				Target: e,
-				Width:  0.0005,
-				Color:  c,
+				Shape: e,
+				Width: 0.0005,
+				Color: c,
 			}.Draw(doc)
 		}
 	}
@@ -111,8 +110,8 @@ func CellShade(doc gfx.Layer, r Rect, c RGBA, i float32) {
 	for _, e := range v.Edges() {
 
 		gfx.Stroke{
-			Target: e,
-			Color:  c,
+			Shape: e,
+			Color: c,
 		}.Draw(doc)
 	}
 }

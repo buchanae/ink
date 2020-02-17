@@ -4,7 +4,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
@@ -30,7 +29,7 @@ const (
 	M    = 0.4
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 	palette := rand.Palette()
 

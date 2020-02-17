@@ -1,13 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/dd"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	pen := &Pen{}
 	pen.MoveTo(XY{0.1, 0.4})
@@ -22,7 +22,7 @@ func Ink(doc *app.Doc) {
 	pen.QuadraticTo(XY{0.8, 0.5}, XY{0.9, 0.5})
 	pen.Close()
 
-	shapes := []gfx.Strokeable{
+	shapes := []dd.Strokeable{
 		pen,
 
 		Rect{
@@ -56,9 +56,9 @@ func Ink(doc *app.Doc) {
 
 	for _, s := range shapes {
 		gfx.Stroke{
-			Target: s,
-			Color:  color.Red,
-			Width:  0.002,
+			Shape: s,
+			Color: color.Red,
+			Width: 0.002,
 		}.Draw(doc)
 	}
 }

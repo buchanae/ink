@@ -1,9 +1,7 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
-	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
@@ -16,7 +14,7 @@ const (
 	size = 40
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{Rows: size, Cols: size}
@@ -61,9 +59,9 @@ func Ink(doc *app.Doc) {
 
 	for _, b := range boxes {
 		gfx.Stroke{
-			Target: b,
-			Width:  lineWidth,
-			Color:  color.Black,
+			Shape: b,
+			Width: lineWidth,
+			Color: color.Black,
 		}.Draw(doc)
 	}
 }

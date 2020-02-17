@@ -4,7 +4,6 @@ import (
 	"log"
 	"math"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
@@ -19,7 +18,7 @@ var Right = XY{1, 0}
 var Left = XY{-1, 0}
 var Origin = XY{}
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	log.SetFlags(0)
 	rand.SeedNow()
 	palette := rand.Palette()
@@ -37,7 +36,7 @@ func Ink(doc *app.Doc) {
 
 	for _, b := range Flatten(trunk) {
 		gfx.Fill{
-			Mesh:  b.Stroke(),
+			Shape: b,
 			Color: rand.Color(palette),
 		}.Draw(doc)
 	}
@@ -61,9 +60,9 @@ func Grow(branch *Branch) {
 			b := node.NewBranch()
 			b.Depth = branch.Depth + 1
 			if rand.Bool(0.5) {
-				b.Direction = node.Direction.Rotate(math.Pi/2, Origin)
+				b.Direction = node.Direction.RotateAround(math.Pi/2, Origin)
 			} else {
-				b.Direction = node.Direction.Rotate(-math.Pi/2, Origin)
+				b.Direction = node.Direction.RotateAround(-math.Pi/2, Origin)
 			}
 		}
 
@@ -116,7 +115,7 @@ type Branch struct {
 	Nodes     []*Node
 }
 
-func (branch *Branch) Stroke() Mesh {
+func (branch *Branch) Fill() Mesh {
 	if len(branch.Nodes) == 0 {
 		return Mesh{}
 	}
@@ -133,7 +132,7 @@ func (branch *Branch) Stroke() Mesh {
 			line.A.Add(rnorm),
 			line.B.Add(lnorm),
 			line.B.Add(rnorm),
-		}.Mesh()
+		}.Fill()
 	}
 
 	var tris []Triangle

@@ -9,7 +9,7 @@ import (
 	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	a := 0.6
 	h := (math.Sqrt(3) / 2) * a
@@ -34,7 +34,7 @@ func Ink(doc *app.Doc) {
 		// TODO want animation system to handle clearing
 		//      for you. But also like the ability to easily
 		//      accumulate changes over frames by not clearing.
-		doc.Ops = nil
+		doc.Clear()
 		//gfx.Clear(doc, color.Black)
 
 		m.Set("a_rot", rot)

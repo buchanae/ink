@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	"github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -27,14 +26,14 @@ const (
 	TweakAmt      = -0.001
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	A := color.HexString("#ebc334")
 	B := color.HexString("#0c79e8")
 
 	gfx.Fill{
-		Mesh: Circle{
+		Shape: Circle{
 			XY:       XY{.5, .5},
 			Radius:   Start - Gap,
 			Segments: 5,

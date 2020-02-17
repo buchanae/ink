@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	gfx.Clear(doc, White)
 
 	grid := Grid{
@@ -32,11 +31,14 @@ func Ink(doc *app.Doc) {
 			Y: r.B.Y,
 		}
 		rot := rand.Angle()
-		l := Line{a.Rotate(rot, center), b.Rotate(rot, center)}
+
 		gfx.Stroke{
-			Target: l,
-			Color:  col,
-			Width:  0.0025,
+			Shape: Line{
+				a.RotateAround(rot, center),
+				b.RotateAround(rot, center),
+			},
+			Color: col,
+			Width: 0.0025,
 		}.Draw(doc)
 	}
 }

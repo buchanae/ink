@@ -1,10 +1,8 @@
 package main
 
-import (
-	"github.com/buchanae/ink/app"
-)
+import "github.com/buchanae/ink/gfx"
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	img := doc.LoadImage("toshiro.png")
 	img.Draw(doc)
 }

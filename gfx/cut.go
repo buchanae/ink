@@ -3,7 +3,7 @@ package gfx
 import "github.com/buchanae/ink/dd"
 
 type Cut struct {
-	Mesh   dd.Mesh
+	Shape  dd.Mesh
 	Source Layer
 }
 
@@ -21,7 +21,7 @@ func (cut Cut) Draw(out Layer) {
 				color = texture(u_image, v_vert);
 			}
 		`,
-		Mesh: cut.Mesh,
+		Mesh: cut.Shape,
 		Attrs: Attrs{
 			"u_image": cut.Source.LayerID(),
 		},

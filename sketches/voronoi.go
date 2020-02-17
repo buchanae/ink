@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -9,7 +8,7 @@ import (
 	"github.com/buchanae/ink/voronoi"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	box := Rect{
@@ -44,14 +43,14 @@ func Ink(doc *app.Doc) {
 		c := rand.Color(colors)
 		c.A = 0.3
 		gfx.Fill{
-			Mesh:  t,
+			Shape: t,
 			Color: c,
 		}.Draw(doc)
 	}
 
 	gfx.Stroke{
-		Target: Triangles(tris),
-		Width:  0.001,
-		Color:  Black,
+		Shape: Triangles(tris),
+		Width: 0.001,
+		Color: Black,
 	}.Draw(doc)
 }

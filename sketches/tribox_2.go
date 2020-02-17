@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -16,7 +15,7 @@ const (
 	StrokeWidth  = 0.001
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	grid := Grid{Rows: 10, Cols: 10}
@@ -45,14 +44,14 @@ func Ink(doc *app.Doc) {
 
 		if ShouldStroke {
 			gfx.Stroke{
-				Target: tris,
-				Width:  StrokeWidth,
-				Color:  White,
+				Shape: tris,
+				Width: StrokeWidth,
+				Color: White,
 			}.Draw(l2)
 		}
 
 		gfx.Fill{
-			Mesh: Circle{
+			Shape: Circle{
 				XY:       r.Center(),
 				Radius:   CircleRadius,
 				Segments: 40,

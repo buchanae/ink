@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -13,7 +12,7 @@ const (
 	Z    = 0.015
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	palette := rand.Palette()
 	grid := HexGrid{Size}
 	cells := grid.Cells()

@@ -4,7 +4,6 @@ import (
 	"image"
 	colorlib "image/color"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/math"
@@ -28,7 +27,7 @@ const (
 	AlphaOffset = -0.3
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 	palette := rand.Palette()
 
@@ -59,7 +58,7 @@ func Ink(doc *app.Doc) {
 			Mesh: Rect{
 				XY{0, y - MaxD},
 				XY{1, y + MaxD},
-			},
+			}.Fill(),
 			Attrs: gfx.Attrs{
 				"u_heightmap":    heightmap,
 				"u_color":        rand.Color(palette),

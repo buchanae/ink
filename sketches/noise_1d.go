@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
@@ -14,7 +13,7 @@ const (
 	Shift   = 0.55
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 
 	for i := 0; i < N; i++ {
 		x := float32(i) / N

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -59,7 +58,7 @@ Decorative:
 - Windows
 */
 
-func Base(doc *app.Doc) {
+func Base(doc gfx.Layer) {
 	wh := rand.XYRange(.3, .4)
 	shape := Rect{
 		A: XY{
@@ -73,12 +72,12 @@ func Base(doc *app.Doc) {
 	}
 
 	gfx.Fill{
-		Mesh:  shape,
+		Shape: shape,
 		Color: randGray(),
 	}.Draw(doc)
 	gfx.Stroke{
-		Target: shape,
-		Color:  randGray(),
+		Shape: shape,
+		Color: randGray(),
 	}.Draw(doc)
 
 	Roof(doc, shape.B.Y)
@@ -90,7 +89,7 @@ func randGray() RGBA {
 	return RGBA{g, g, g, 1}
 }
 
-func Roof(doc *app.Doc, baseY float32) {
+func Roof(doc gfx.Layer, baseY float32) {
 	wh := rand.XYRange(.2, .4)
 	shape := Rect{
 		A: XY{.5 - wh.X, baseY},
@@ -105,18 +104,18 @@ func Roof(doc *app.Doc, baseY float32) {
 	}
 
 	gfx.Fill{
-		Mesh:  quad,
+		Shape: quad,
 		Color: randGray(),
 	}.Draw(doc)
 
 	gfx.Stroke{
-		Target: quad,
-		Color:  randGray(),
+		Shape: quad,
+		Color: randGray(),
 	}.Draw(doc)
 
 	/*
 		gfx.Fill{
-			Mesh: Rect{
+			Shape: Rect{
 				A: XY{.055, .51},
 				B: XY{.945, .52},
 			},
@@ -136,14 +135,14 @@ func Roof(doc *app.Doc, baseY float32) {
 	))
 }
 
-func Chimney(doc *app.Doc, rect Rect) {
+func Chimney(doc gfx.Layer, rect Rect) {
 	gfx.Fill{
-		Mesh:  rect,
+		Shape: rect,
 		Color: randGray(),
 	}.Draw(doc)
 }
 
-func Bushes(doc *app.Doc) {
+func Bushes(doc gfx.Layer) {
 	circles := []Circle{
 		{
 			XY:     XY{0.1, 0.13},
@@ -177,7 +176,7 @@ func Bushes(doc *app.Doc) {
 	}
 }
 
-func Door(doc *app.Doc) {
+func Door(doc gfx.Layer) {
 	base := Rect{
 		A: XY{.42, .1},
 		B: XY{.58, .3},
@@ -185,7 +184,7 @@ func Door(doc *app.Doc) {
 
 	// Door trim
 	gfx.Fill{
-		Mesh:  base,
+		Shape: base,
 		Color: randGray(),
 	}.Draw(doc)
 
@@ -196,7 +195,7 @@ func Door(doc *app.Doc) {
 		B: XY{base.B.X - amt, base.B.Y - amt},
 	}
 	gfx.Fill{
-		Mesh:  door,
+		Shape: door,
 		Color: randGray(),
 	}.Draw(doc)
 
@@ -204,13 +203,13 @@ func Door(doc *app.Doc) {
 	DoorHandle(doc, door)
 }
 
-func DoorHandle(doc *app.Doc, door Rect) {
+func DoorHandle(doc gfx.Layer, door Rect) {
 	handle := door.Interpolate(XY{
 		X: rand.Range(0.8, .95),
 		Y: rand.Range(0.4, 0.6),
 	})
 	gfx.Fill{
-		Mesh: Circle{
+		Shape: Circle{
 			XY:     handle,
 			Radius: rand.Range(0.002, 0.008),
 		},
@@ -218,14 +217,14 @@ func DoorHandle(doc *app.Doc, door Rect) {
 	}.Draw(doc)
 }
 
-func Ground(doc *app.Doc) {
+func Ground(doc gfx.Layer) {
 	gfx.Stroke{
-		Target: Line{A: XY{0, .1}, B: XY{1, .1}},
-		Color:  randGray(),
+		Shape: Line{A: XY{0, .1}, B: XY{1, .1}},
+		Color: randGray(),
 	}.Draw(doc)
 }
 
-func Windows(doc *app.Doc, base Rect) {
+func Windows(doc gfx.Layer, base Rect) {
 
 	win := Window{
 		Rows:       rand.IntRange(1, 5),
@@ -254,7 +253,7 @@ func Windows(doc *app.Doc, base Rect) {
 	SecondFloor(doc, win, second)
 }
 
-func SecondFloor(doc *app.Doc, win Window, base Rect) {
+func SecondFloor(doc gfx.Layer, win Window, base Rect) {
 	win.Rows = rand.IntRange(1, 5)
 	win.Cols = rand.IntRange(1, 5)
 	win.ShrinkBase = rand.Range(0.004, 0.007)
@@ -285,9 +284,9 @@ type Window struct {
 	TrimColor  RGBA
 }
 
-func (w Window) Gen(doc *app.Doc, base Rect) {
+func (w Window) Gen(doc gfx.Layer, base Rect) {
 	gfx.Fill{
-		Mesh:  base,
+		Shape: base,
 		Color: w.TrimColor,
 	}.Draw(doc)
 
@@ -300,13 +299,13 @@ func (w Window) Gen(doc *app.Doc, base Rect) {
 	for _, cell := range grid.Cells() {
 		pane := cell.Rect.Shrink(w.ShrinkPane)
 		gfx.Fill{
-			Mesh:  pane,
+			Shape: pane,
 			Color: w.PaneColor,
 		}.Draw(doc)
 	}
 }
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 	gfx.Clear(doc, White)
 

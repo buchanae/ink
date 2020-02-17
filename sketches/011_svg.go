@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
@@ -12,7 +11,7 @@ import (
 	"github.com/buchanae/ink/tess"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
 
 	paths, err := svg.Parse(oregon, 800, 800)
@@ -20,7 +19,7 @@ func Ink(doc *app.Doc) {
 		log.Fatal(err)
 	}
 
-	lines := p.Lines()
+	lines := paths.Lines()
 	var xys []XY
 	var prev XY
 

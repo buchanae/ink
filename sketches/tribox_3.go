@@ -1,8 +1,6 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
-	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
@@ -13,10 +11,8 @@ const (
 	RandPoint  = 0.03
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	rand.SeedNow()
-
-	gfx.Clear(doc, White)
 
 	grid := Grid{Rows: 10, Cols: 10}
 	colors := rand.Palette()
