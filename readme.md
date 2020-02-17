@@ -19,13 +19,12 @@ Write `example.go`:
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc gfx.Doc) {
 	t := Triangle{
 		XY{0.2, 0.2},
 		XY{0.8, 0.2},
