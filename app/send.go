@@ -3,9 +3,11 @@ package app
 import (
 	"encoding/gob"
 	"io"
+	"log"
 	"os"
 	"time"
 
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 )
 
@@ -34,8 +36,7 @@ type Frame struct {
 	Time time.Time
 }
 
-type Playback struct {
-}
+type Playback struct{}
 
 // TODO wants a better design with start/stop/pause
 //      accurate timing, frame delta time, etc.
@@ -64,6 +65,13 @@ func RecvDoc() *Doc {
 type RenderMessage struct {
 	Config Config
 	Plan   render.Plan
+}
+
+func Main(inkfunc func(gfx.Doc)) {
+	log.SetFlags(0)
+	doc := RecvDoc()
+	inkfunc(doc)
+	Send(doc)
 }
 
 func Send(doc *Doc) {

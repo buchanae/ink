@@ -173,14 +173,10 @@ func copyFile(dstPath, srcPath, name string) error {
 
 const head = `
 package main
-import "log"
 import "github.com/buchanae/ink/app"
 
 func main() {
-	log.SetFlags(0)
-	doc := app.RecvDoc()
-	Ink(doc)
-	app.Send(doc)
+	app.Main(Ink)
 }
 `
 
