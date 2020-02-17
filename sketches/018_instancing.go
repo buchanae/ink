@@ -1,14 +1,13 @@
 package main
 
 import (
-	"github.com/buchanae/ink/app"
 	. "github.com/buchanae/ink/color"
 	. "github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/rand"
 )
 
-func Ink(doc *app.Doc) {
+func Ink(doc *gfx.Doc) {
 	rand.SeedNow()
 
 	const N = 100000
@@ -28,7 +27,7 @@ func Ink(doc *app.Doc) {
 		Vert:      gfx.DefaultVert,
 		Frag:      gfx.DefaultFrag,
 		Instances: N,
-		Mesh:      RectWH(0.05, 0.05),
+		Mesh:      RectWH(0.05, 0.05).Fill(),
 		Attrs: gfx.Attrs{
 			"a_pos":   pos,
 			"a_rot":   rot,

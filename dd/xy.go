@@ -1,9 +1,11 @@
 package dd
 
-import "github.com/buchanae/ink/math"
+import (
+	"github.com/buchanae/ink/math"
+)
 
 func Unit() XY {
-	return XY{1, 1}
+	return XY{1, 0}
 }
 
 type XY struct {
@@ -52,17 +54,27 @@ func (a XY) Length() float32 {
 
 // TODO possibly wrong
 func (a XY) SetLength(s float32) XY {
-	l := a.Length()
-	return a.Normalize().MulScalar(s / l)
+	return a.Normalize().MulScalar(s)
 }
 
 func (a XY) Distance(b XY) float32 {
 	return b.Sub(a).Length()
 }
 
+func (a XY) IsZero() bool {
+	return a == XY{}
+}
+
 func (a XY) DistanceToLine(l Line) float32 {
 	n := a.nearestToLine(l)
 	return a.Distance(n)
+}
+
+func (a XY) InterpolateTo(b XY, p float32) XY {
+	return XY{
+		a.X + ((b.X - a.X) * p),
+		a.Y + ((b.Y - a.Y) * p),
+	}
 }
 
 func (a XY) nearestToLine(l Line) XY {
@@ -105,6 +117,10 @@ func (a XY) RotateAround(angle float32, pivot XY) XY {
 		Y: p.X*sr + p.Y*cr,
 	}
 	return b.Add(pivot)
+}
+
+func (a XY) Angle() float32 {
+	return atan2(a.Y, a.X)
 }
 
 func (a XY) Clamp(min, max XY) XY {

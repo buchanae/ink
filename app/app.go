@@ -5,6 +5,7 @@ package app
 import (
 	"runtime"
 
+	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/render/opengl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -62,7 +63,6 @@ func (app *App) initRenderer() {
 
 func (app *App) SetConfig(b Config) {
 	app.Do(func() {
-		app.conf.Trace = b.Trace
 		app.conf.Snapshot = b.Snapshot
 
 		aw := app.conf.Window
@@ -83,9 +83,9 @@ func (app *App) SetConfig(b Config) {
 	})
 }
 
-func (app *App) Render(doc *Doc) {
-	app.SetConfig(doc.Config)
-	plan := buildPlan(doc)
+func (app *App) Render(doc *gfx.Doc) {
+	//app.SetConfig(doc.Config)
+	plan := doc.Plan()
 	app.RenderPlan(plan)
 }
 
@@ -97,16 +97,8 @@ func (app *App) RenderPlan(plan render.Plan) {
 		}
 		app.initRenderer()
 
-		if app.conf.Trace {
-			app.renderer.StartTrace()
-		}
-
 		app.renderer.Render(plan)
 		app.renderer.ToScreen(plan.RootLayer)
-
-		if app.conf.Trace {
-			app.renderer.EndTrace()
-		}
 
 		app.plan = plan
 		app.win.SwapBuffers()
@@ -125,14 +117,14 @@ func (app *App) Do(f func()) {
 	<-done
 }
 
-func Run(f func(*Doc)) {
+func Run(f func(*gfx.Doc)) {
 	conf := DefaultConfig()
 	a, err := NewApp(conf)
 	if err != nil {
 		panic(err)
 	}
-	doc := NewDoc()
-	doc.Config = conf
+	doc := gfx.NewDoc()
+	//doc.Config = conf
 	go func() {
 		f(doc)
 		a.Render(doc)

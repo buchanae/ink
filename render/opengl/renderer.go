@@ -5,12 +5,11 @@ import (
 	"log"
 
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/trac"
 	"github.com/go-gl/gl/v3.3-core/gl"
 )
 
 type Renderer struct {
-	tracer
-
 	width, height int
 	multisamples  int
 	textures      map[int]msaa
@@ -59,26 +58,27 @@ func (r *Renderer) CaptureImage(layerID int, x, y, w, h float32) image.Image {
 }
 
 func (r *Renderer) render(plan render.Plan) {
-	r.trace("start render")
+	trac.Log("start render")
 
-	for id, img := range plan.Images {
-		r.AddImage(id, img)
-	}
+	/*
+		for id, img := range plan.Images {
+			r.AddImage(id, img)
+		}
+	*/
 
-	pb := &build{
-		tracer: r.tracer,
-	}
-	pb.build(plan)
+	pb := &build{}
+	passes := pb.build(plan)
 	defer pb.cleanup()
 
-	r.trace("passes %d", len(pb.passes))
+	trac.Log("passes %d", len(passes))
 
-	for _, p := range pb.passes {
+	for _, p := range passes {
 		r.renderPass(p)
 	}
 }
 
-func (r *Renderer) renderPass(p *buildPass) {
+func (r *Renderer) renderPass(pass buildPass) {
+	// TODO clear existing program entirely
 
 	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
@@ -92,39 +92,38 @@ func (r *Renderer) renderPass(p *buildPass) {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	r.trace("render pass %s", p.name)
-	r.trace("  output to %d", p.layer)
+	trac.Log("render pass %s", pass.Name)
+	trac.Log("  output to %d", pass.Layer)
 
-	// TODO clear existing program entirely
 	count := 1
-	if p.instanceCount > 1 {
-		count = p.instanceCount
+	if pass.Instances > 1 {
+		count = pass.Instances
 	}
 
-	r.trace("  gl config")
-	output := r.texture(p.layer)
+	trac.Log("  gl config")
+	output := r.texture(pass.Layer)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, output.Write.FBO)
-	glUseProgram(p.prog.id)
-	r.bindUniforms(p)
-	glBindVertexArray(p.vao)
+	glUseProgram(pass.prog.id)
+	r.bindUniforms(pass)
+	glBindVertexArray(pass.vao)
 
 	// TODO indexed elements are not always a win.
 	//      if most verts are unique, then indicies are just
 	//      overhead.
-	r.trace("  draw elements")
+	trac.Log("  draw elements")
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
-		int32(p.faceCount),
+		int32(pass.Faces.Count*3),
 		gl.UNSIGNED_INT,
 		// 4 bytes in each uint32 face index
-		glPtrOffset(p.faceOffset*4),
+		glPtrOffset(pass.Faces.Offset*4),
 		int32(count),
 	)
 
 	output.Paint()
 
-	r.trace("  pass done")
+	trac.Log("  pass done")
 }
 
 // TODO bind uniforms should be a dead simple loop
@@ -135,10 +134,10 @@ func (r *Renderer) renderPass(p *buildPass) {
 //      to the preprocessed passes and resources. might
 //      make a clear separation between preprocessing and
 //      execution. might help abstract rendering backends later.
-func (r *Renderer) bindUniforms(p *buildPass) {
+func (r *Renderer) bindUniforms(p buildPass) {
 	for _, uni := range p.prog.uniforms {
 
-		val, ok := p.uniforms[uni.Name]
+		val, ok := p.Uniforms[uni.Name]
 		if !ok {
 			// TODO return error list from render
 			log.Printf("  missing uniform: %s", uni.Name)

@@ -85,6 +85,16 @@ func (r *Rand) XYInTriangle(t dd.Triangle) dd.XY {
 	return dd.XY{x, y}
 }
 
+func (r *Rand) XYInCircle(c dd.Circle) dd.XY {
+	xy := r.XY()
+	t := xy.Y * 2 * math.Pi
+	s := c.Radius * math.Sqrt(xy.X)
+	return c.XY.Add(dd.XY{
+		s * math.Cos(t),
+		s * math.Sin(t),
+	})
+}
+
 func (r *Rand) Noise1(x float32) float32 {
 	return r.noise.Eval2(x, 1)
 }
@@ -142,6 +152,10 @@ func XYInTriangle(t dd.Triangle) dd.XY {
 
 func XYInRect(r dd.Rect) dd.XY {
 	return src.XYInRect(r)
+}
+
+func XYInCircle(c dd.Circle) dd.XY {
+	return src.XYInCircle(c)
 }
 
 func Color(c []color.RGBA) color.RGBA {

@@ -4,21 +4,10 @@ package gfx
 import (
 	"encoding/gob"
 	"image"
-
-	"github.com/buchanae/ink/color"
-	"github.com/buchanae/ink/dd"
 )
 
 func init() {
-	// core shader + mesh
-	gob.Register(Shader{})
-	gob.Register(dd.Mesh{})
-
-	// supported in shader attributes
-	gob.Register(color.RGBA{})
-	gob.Register(dd.XY{})
-	gob.Register([]color.RGBA{})
-	gob.Register([]dd.XY{})
+	gob.Register([4]float32{})
 
 	// images
 	gob.Register(Image{})
