@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>Ink</title>
-  <link rel="stylesheet" href="./assets/style.css?3" />
+  <link rel="stylesheet" href="./assets/style.css?4" />
   <style>/* Background */ .chroma { background-color: #f7f7f7; -moz-tab-size: 4; -o-tab-size: 4; tab-size: 4 }
 /* Error */ .chroma .err {  }
 /* LineTableTD */ .chroma .lntd { vertical-align: top; padding: 0; margin: 0; border: 0; }
@@ -58,12 +58,11 @@
 <h1>Ink</h1>
 
 <div>
-  <p>This is a quick and dirty introduction to Ink: a framework for 2D graphics in Go, focused on creative coding, and based on OpenGL.</p>
+  <p>Ink is a framework for 2D graphics in Go, focused on creative coding, and based on OpenGL.</p>
 
-  <p><em>Disclaimer:</em> Although I've been working towards Ink for years, the project is still very young in many ways. There are many TODOs, bugs, and ugly APIs. I will rewrite and break and (hopefully) improve things over time.</p>
+  <p>The project is still young in many ways. There are many TODOs, bugs, and ugly APIs. I will rewrite and break and hopefully improve things over time.</p>
 
-
-  <p>There's more that doesn't have examples here. Check out the <a href="https://godoc.org/github.com/buchanae/ink">docs</a>, the <a href="https://github.com/buchanae/ink/tree/master/sketches">sketches directory</a>, or just browse through <a href="https://github.com/buchanae/ink">the code</a>.</p>
+  <p>There's code that doesn't have examples here. Check out the <a href="https://godoc.org/github.com/buchanae/ink">docs</a>, the <a href="https://github.com/buchanae/ink/tree/master/sketches">sketches directory</a>, or just browse through <a href="https://github.com/buchanae/ink">the code</a>.</p>
 </div>
 
 
@@ -102,13 +101,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="c1">// The &#34;hello, world&#34; of graphics:
 </span><span class="c1"></span>	<span class="c1">// a triangle with different colored vertices.
@@ -118,7 +116,7 @@
 		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">}</span><span class="p">,</span>
 	<span class="p">}</span>
 
-	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">Shape</span><span class="p">:</span> <span class="nx">t</span><span class="p">}</span><span class="p">.</span><span class="nf">Shader</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="p">[</span><span class="p">]</span><span class="nx">RGBA</span><span class="p">{</span>
 		<span class="nx">Red</span><span class="p">,</span> <span class="nx">Green</span><span class="p">,</span> <span class="nx">Blue</span><span class="p">,</span>
 	<span class="p">}</span><span class="p">)</span>
@@ -141,15 +139,15 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
+	<span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
-	<span class="nx">shapes</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">gfx</span><span class="p">.</span><span class="nx">Meshable</span><span class="p">{</span>
+	<span class="nx">shapes</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">dd</span><span class="p">.</span><span class="nx">Fillable</span><span class="p">{</span>
 
 		<span class="nx">Rect</span><span class="p">{</span>
 			<span class="nx">XY</span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">}</span><span class="p">,</span>
@@ -201,20 +199,19 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">Rect</span><span class="p">{</span>
 		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
 		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">}</span><span class="p">,</span>
 	<span class="p">}</span>
 
-	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">Shape</span><span class="p">:</span> <span class="nx">r</span><span class="p">}</span><span class="p">.</span><span class="nf">Shader</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_pivot&#34;</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Center</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_rot&#34;</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">)</span>
 	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Red</span><span class="p">)</span>
@@ -237,13 +234,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
+	<span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">pen</span> <span class="o">:=</span> <span class="o">&amp;</span><span class="nx">Pen</span><span class="p">{</span><span class="p">}</span>
 	<span class="nx">pen</span><span class="p">.</span><span class="nf">MoveTo</span><span class="p">(</span><span class="nx">XY</span><span class="p">{</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">}</span><span class="p">)</span>
@@ -258,7 +255,7 @@
 	<span class="nx">pen</span><span class="p">.</span><span class="nf">QuadraticTo</span><span class="p">(</span><span class="nx">XY</span><span class="p">{</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">}</span><span class="p">,</span> <span class="nx">XY</span><span class="p">{</span><span class="mf">0.9</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">}</span><span class="p">)</span>
 	<span class="nx">pen</span><span class="p">.</span><span class="nf">Close</span><span class="p">(</span><span class="p">)</span>
 
-	<span class="nx">shapes</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">gfx</span><span class="p">.</span><span class="nx">Strokeable</span><span class="p">{</span>
+	<span class="nx">shapes</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">dd</span><span class="p">.</span><span class="nx">Strokeable</span><span class="p">{</span>
 		<span class="nx">pen</span><span class="p">,</span>
 
 		<span class="nx">Rect</span><span class="p">{</span>
@@ -292,9 +289,9 @@
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">s</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">shapes</span> <span class="p">{</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">s</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Red</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.002</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">s</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Red</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -315,14 +312,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">r</span> <span class="o">:=</span> <span class="nx">Rect</span><span class="p">{</span>
 		<span class="nx">A</span><span class="p">:</span> <span class="nx">XY</span><span class="p">{</span><span class="mf">.1</span><span class="p">,</span> <span class="mf">.1</span><span class="p">}</span><span class="p">,</span>
@@ -357,13 +353,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span><span class="nx">Rows</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span> <span class="nx">Cols</span><span class="p">:</span> <span class="mi">20</span><span class="p">}</span>
 	<span class="nx">palette</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Palette</span><span class="p">(</span><span class="p">)</span>
@@ -391,14 +386,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/tess&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">xys</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">XY</span><span class="p">{</span>
 		<span class="p">{</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
@@ -412,7 +406,7 @@
 
 	<span class="nx">tris</span> <span class="o">:=</span> <span class="nx">tess</span><span class="p">.</span><span class="nf">Tesselate</span><span class="p">(</span><span class="nx">xys</span><span class="p">)</span>
 	<span class="nx">m</span> <span class="o">:=</span> <span class="nf">Triangles</span><span class="p">(</span><span class="nx">tris</span><span class="p">)</span>
-	<span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">m</span><span class="p">)</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">Shape</span><span class="p">:</span> <span class="nx">m</span><span class="p">,</span> <span class="nx">Color</span><span class="p">:</span> <span class="nx">Black</span><span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">xy</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">xys</span> <span class="p">{</span>
 		<span class="nx">d</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Dot</span><span class="p">{</span><span class="nx">XY</span><span class="p">:</span> <span class="nx">xy</span><span class="p">,</span> <span class="nx">Color</span><span class="p">:</span> <span class="nx">Red</span><span class="p">,</span> <span class="nx">Radius</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">}</span>
@@ -436,13 +430,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Gradient</span><span class="p">{</span>
 		<span class="nx">Rect</span><span class="p">:</span> <span class="nx">Rect</span><span class="p">{</span>
@@ -470,16 +463,15 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
-		<span class="nx">Mesh</span><span class="p">:</span> <span class="nx">Rect</span><span class="p">{</span>
+		<span class="nx">Shape</span><span class="p">:</span> <span class="nx">Rect</span><span class="p">{</span>
 			<span class="nx">XY</span><span class="p">{</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
 			<span class="nx">XY</span><span class="p">{</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">}</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">,</span>
@@ -508,12 +500,11 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">n</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">DefaultNoise</span>
 	<span class="nx">n</span><span class="p">.</span><span class="nx">Size</span> <span class="p">=</span> <span class="mi">30</span>
 	<span class="nx">n</span><span class="p">.</span><span class="nx">Color</span> <span class="p">=</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Red</span>
@@ -536,21 +527,20 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">c</span> <span class="o">:=</span> <span class="nx">Circle</span><span class="p">{</span>
 		<span class="nx">XY</span><span class="p">:</span>       <span class="nx">XY</span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">}</span><span class="p">,</span>
 		<span class="nx">Radius</span><span class="p">:</span>   <span class="mf">0.3</span><span class="p">,</span>
 		<span class="nx">Segments</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
 	<span class="p">}</span>
-	<span class="nx">m</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">Mesh</span><span class="p">(</span><span class="p">)</span>
+	<span class="nx">m</span> <span class="o">:=</span> <span class="nx">c</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">m</span> <span class="p">=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">TweakMesh</span><span class="p">(</span><span class="nx">m</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">)</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">m</span><span class="p">,</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Red</span><span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
@@ -571,11 +561,9 @@
     <div class="left">
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
-<span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
-<span class="p">)</span>
+<span class="kn">import</span> <span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">img</span> <span class="o">:=</span> <span class="nx">doc</span><span class="p">.</span><span class="nf">LoadImage</span><span class="p">(</span><span class="s">&#34;toshiro.png&#34;</span><span class="p">)</span>
 	<span class="nx">img</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="p">}</span>
@@ -596,13 +584,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">fills</span> <span class="o">:=</span> <span class="p">[</span><span class="p">]</span><span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
 		<span class="p">{</span>
@@ -657,14 +644,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="kd">const</span> <span class="nx">N</span> <span class="p">=</span> <span class="mi">100000</span>
@@ -684,7 +670,7 @@
 		<span class="nx">Vert</span><span class="p">:</span>      <span class="nx">gfx</span><span class="p">.</span><span class="nx">DefaultVert</span><span class="p">,</span>
 		<span class="nx">Frag</span><span class="p">:</span>      <span class="nx">gfx</span><span class="p">.</span><span class="nx">DefaultFrag</span><span class="p">,</span>
 		<span class="nx">Instances</span><span class="p">:</span> <span class="nx">N</span><span class="p">,</span>
-		<span class="nx">Mesh</span><span class="p">:</span>      <span class="nf">RectWH</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="p">,</span>
+		<span class="nx">Mesh</span><span class="p">:</span>      <span class="nf">RectWH</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
 		<span class="nx">Attrs</span><span class="p">:</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Attrs</span><span class="p">{</span>
 			<span class="s">&#34;a_pos&#34;</span><span class="p">:</span>   <span class="nx">pos</span><span class="p">,</span>
 			<span class="s">&#34;a_rot&#34;</span><span class="p">:</span>   <span class="nx">rot</span><span class="p">,</span>
@@ -706,45 +692,6 @@
 </section>
 
 <section>
-  <h2>Window Size</h2>
-  <p>Change the window size from the sketch code.</p>
-
-  <div class="split">
-    <div class="left">
-      <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
-
-<span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
-	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
-	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
-	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
-<span class="p">)</span>
-
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
-	<span class="nx">doc</span><span class="p">.</span><span class="nx">Config</span><span class="p">.</span><span class="nx">Window</span><span class="p">.</span><span class="nx">Width</span> <span class="p">=</span> <span class="mi">300</span>
-	<span class="nx">doc</span><span class="p">.</span><span class="nx">Config</span><span class="p">.</span><span class="nx">Window</span><span class="p">.</span><span class="nx">Height</span> <span class="p">=</span> <span class="mi">300</span>
-
-	<span class="nx">t</span> <span class="o">:=</span> <span class="nx">Triangle</span><span class="p">{</span>
-		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
-		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
-		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">}</span><span class="p">,</span>
-	<span class="p">}</span>
-
-	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
-	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="p">[</span><span class="p">]</span><span class="nx">RGBA</span><span class="p">{</span>
-		<span class="nx">Red</span><span class="p">,</span> <span class="nx">Green</span><span class="p">,</span> <span class="nx">Blue</span><span class="p">,</span>
-	<span class="p">}</span><span class="p">)</span>
-	<span class="nx">s</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
-<span class="p">}</span>
-</pre></div>
-    </div>
-    <div class="right">
-      <img src="assets/snapshots/019_window_size.png" width="400" />
-    </div>
-  </div>
-</section>
-
-<section>
   <h2>Hex Color</h2>
   <p>Convert hex to a color.</p>
 
@@ -753,13 +700,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">t</span> <span class="o">:=</span> <span class="nx">Triangle</span><span class="p">{</span>
 		<span class="nx">XY</span><span class="p">{</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">}</span><span class="p">,</span>
@@ -771,7 +717,7 @@
 	<span class="nx">green</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">Hex</span><span class="p">(</span><span class="mh">0x00ff00</span><span class="p">)</span>
 	<span class="nx">blue</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#0000ff&#34;</span><span class="p">)</span>
 
-	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+	<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 	<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="p">[</span><span class="p">]</span><span class="nx">color</span><span class="p">.</span><span class="nx">RGBA</span><span class="p">{</span>
 		<span class="nx">red</span><span class="p">,</span> <span class="nx">green</span><span class="p">,</span> <span class="nx">blue</span><span class="p">,</span>
 	<span class="p">}</span><span class="p">)</span>
@@ -794,13 +740,12 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewContext</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 
 	<span class="nx">ctx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">color</span><span class="p">.</span><span class="nx">White</span><span class="p">)</span>
@@ -834,14 +779,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/voronoi&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">box</span> <span class="o">:=</span> <span class="nx">Rect</span><span class="p">{</span>
@@ -874,15 +818,13 @@
 		<span class="nx">c</span><span class="p">.</span><span class="nx">A</span> <span class="p">=</span> <span class="mf">0.3</span>
 
 		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">tri</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cell</span><span class="p">.</span><span class="nx">Tris</span> <span class="p">{</span>
-			<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">tri</span><span class="p">)</span>
-			<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="nx">c</span><span class="p">)</span>
-			<span class="nx">s</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+			<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">tri</span><span class="p">,</span> <span class="nx">c</span><span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 		<span class="p">}</span>
 
 		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">e</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cell</span><span class="p">.</span><span class="nx">Edges</span> <span class="p">{</span>
 			<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-				<span class="nx">Target</span><span class="p">:</span> <span class="nx">e</span><span class="p">,</span>
-				<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.002</span><span class="p">,</span>
+				<span class="nx">Shape</span><span class="p">:</span> <span class="nx">e</span><span class="p">,</span>
+				<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.002</span><span class="p">,</span>
 			<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
@@ -904,16 +846,14 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
-	<span class="nx">gfx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">color</span><span class="p">.</span><span class="nx">White</span><span class="p">)</span>
 
 	<span class="nx">center</span> <span class="o">:=</span> <span class="nx">XY</span><span class="p">{</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">}</span>
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span>
@@ -923,8 +863,8 @@
 	<span class="p">}</span>
 	<span class="nx">sub</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span><span class="nx">Rows</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="nx">Cols</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
 
-	<span class="kd">var</span> <span class="nx">bold</span> <span class="p">[</span><span class="p">]</span><span class="nx">gfx</span><span class="p">.</span><span class="nx">Strokeable</span>
-	<span class="kd">var</span> <span class="nx">strokes</span> <span class="p">[</span><span class="p">]</span><span class="nx">gfx</span><span class="p">.</span><span class="nx">Strokeable</span>
+	<span class="kd">var</span> <span class="nx">bold</span> <span class="p">[</span><span class="p">]</span><span class="nx">Strokeable</span>
+	<span class="kd">var</span> <span class="nx">strokes</span> <span class="p">[</span><span class="p">]</span><span class="nx">Strokeable</span>
 
 	<span class="k">for</span> <span class="nx">i</span><span class="p">,</span> <span class="nx">cell</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">grid</span><span class="p">.</span><span class="nf">Cells</span><span class="p">(</span><span class="p">)</span> <span class="p">{</span>
 		<span class="nx">r</span> <span class="o">:=</span> <span class="nx">cell</span><span class="p">.</span><span class="nx">Rect</span><span class="p">.</span><span class="nf">Shrink</span><span class="p">(</span><span class="mf">0.003</span><span class="p">)</span>
@@ -949,24 +889,24 @@
 </span><span class="c1"></span>
 			<span class="nx">mask</span> <span class="o">:=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="nx">j</span>
 			<span class="k">if</span> <span class="nx">i</span><span class="o">&amp;</span><span class="nx">mask</span> <span class="o">==</span> <span class="nx">mask</span> <span class="p">{</span>
-				<span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">xr</span><span class="p">)</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
+				<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span><span class="nx">xr</span><span class="p">,</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 			<span class="p">}</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">stk</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">strokes</span> <span class="p">{</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">stk</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.0002</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">stk</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.0002</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">stk</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">bold</span> <span class="p">{</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">stk</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.0009</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">stk</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.0009</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -987,14 +927,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/math&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">ctx</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewContext</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
@@ -1053,7 +992,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -1068,7 +1006,7 @@
 	<span class="nx">Margin</span>  <span class="p">=</span> <span class="nx">Padding</span> <span class="o">*</span> <span class="mi">2</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="nb">float32</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">N</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
@@ -1096,13 +1034,13 @@
 		<span class="p">}</span>
 
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
-			<span class="nx">Mesh</span><span class="p">:</span>  <span class="nx">ca</span><span class="p">.</span><span class="nf">Mesh</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">ca</span><span class="p">.</span><span class="nf">Mesh</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
 			<span class="nx">Color</span><span class="p">:</span> <span class="nx">c</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">rb</span><span class="p">,</span>
 			<span class="nx">Color</span><span class="p">:</span> <span class="nx">c</span><span class="p">,</span>
-			<span class="nx">Mesh</span><span class="p">:</span>  <span class="nx">rb</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -1143,7 +1081,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -1155,7 +1092,7 @@
 	<span class="nx">Z</span>    <span class="p">=</span> <span class="mf">0.015</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">palette</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Palette</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">HexGrid</span><span class="p">{</span><span class="nx">Size</span><span class="p">}</span>
 	<span class="nx">cells</span> <span class="o">:=</span> <span class="nx">grid</span><span class="p">.</span><span class="nf">Cells</span><span class="p">(</span><span class="p">)</span>
@@ -1167,9 +1104,9 @@
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">cell</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">cells</span> <span class="p">{</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">cell</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">Black</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.004</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">cell</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.004</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -1190,14 +1127,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">a</span> <span class="o">:=</span> <span class="nx">Triangle</span><span class="p">{</span>
@@ -1222,9 +1158,9 @@
 
 	<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">t</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tris</span> <span class="p">{</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">t</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.0005</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">t</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">layer</span><span class="p">)</span>
 	<span class="p">}</span>
 
@@ -1234,14 +1170,14 @@
 		<span class="nx">Segments</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span>
 	<span class="p">}</span>
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Cut</span><span class="p">{</span>
-		<span class="nx">Shape</span><span class="p">:</span>  <span class="nx">cir</span><span class="p">,</span>
+		<span class="nx">Shape</span><span class="p">:</span>  <span class="nx">cir</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
 		<span class="nx">Source</span><span class="p">:</span> <span class="nx">layer</span><span class="p">,</span>
 	<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-		<span class="nx">Target</span><span class="p">:</span> <span class="nx">cir</span><span class="p">,</span>
-		<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.005</span><span class="p">,</span>
-		<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
+		<span class="nx">Shape</span><span class="p">:</span> <span class="nx">cir</span><span class="p">,</span>
+		<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.005</span><span class="p">,</span>
+		<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
 	<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 
 <span class="p">}</span>
@@ -1303,16 +1239,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
-
-	<span class="nx">gfx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">White</span><span class="p">)</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span>
 		<span class="nx">Rows</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
@@ -1353,7 +1286,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -1379,14 +1311,14 @@
 	<span class="nx">TweakAmt</span>      <span class="p">=</span> <span class="o">-</span><span class="mf">0.001</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">A</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#ebc334&#34;</span><span class="p">)</span>
 	<span class="nx">B</span> <span class="o">:=</span> <span class="nx">color</span><span class="p">.</span><span class="nf">HexString</span><span class="p">(</span><span class="s">&#34;#0c79e8&#34;</span><span class="p">)</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
-		<span class="nx">Mesh</span><span class="p">:</span> <span class="nx">Circle</span><span class="p">{</span>
+		<span class="nx">Shape</span><span class="p">:</span> <span class="nx">Circle</span><span class="p">{</span>
 			<span class="nx">XY</span><span class="p">:</span>       <span class="nx">XY</span><span class="p">{</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">}</span><span class="p">,</span>
 			<span class="nx">Radius</span><span class="p">:</span>   <span class="nx">Start</span> <span class="o">-</span> <span class="nx">Gap</span><span class="p">,</span>
 			<span class="nx">Segments</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
@@ -1528,7 +1460,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -1541,7 +1472,7 @@
 	<span class="nx">Height</span> <span class="p">=</span> <span class="mi">30</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="nx">center</span> <span class="o">:=</span> <span class="nx">XY</span><span class="p">{</span><span class="mf">.5</span><span class="p">,</span> <span class="mf">.5</span><span class="p">}</span>
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span>
@@ -1567,9 +1498,9 @@
 		<span class="nx">q</span> <span class="p">=</span> <span class="nx">q</span><span class="p">.</span><span class="nf">RotateAround</span><span class="p">(</span><span class="nx">ang</span><span class="p">,</span> <span class="nx">r</span><span class="p">.</span><span class="nf">Center</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">q</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.001</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">q</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">Black</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -1590,7 +1521,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
@@ -1603,7 +1533,7 @@
 	<span class="nx">Shift</span>   <span class="p">=</span> <span class="mf">0.55</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 
 	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">N</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
 		<span class="nx">x</span> <span class="o">:=</span> <span class="nb">float32</span><span class="p">(</span><span class="nx">i</span><span class="p">)</span> <span class="o">/</span> <span class="nx">N</span>
@@ -1614,7 +1544,7 @@
 
 		<span class="nx">xy</span> <span class="o">:=</span> <span class="nx">XY</span><span class="p">{</span><span class="nx">x</span><span class="p">,</span> <span class="mf">0.5</span> <span class="o">+</span> <span class="nx">h</span><span class="p">}</span>
 		<span class="nx">c</span> <span class="o">:=</span> <span class="nx">Circle</span><span class="p">{</span><span class="nx">xy</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mi">10</span><span class="p">}</span>
-		<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">c</span><span class="p">)</span>
+		<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">c</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 		<span class="nx">s</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -1648,14 +1578,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">gfx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">White</span><span class="p">)</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span>
@@ -1679,11 +1608,14 @@
 			<span class="nx">Y</span><span class="p">:</span> <span class="nx">r</span><span class="p">.</span><span class="nx">B</span><span class="p">.</span><span class="nx">Y</span><span class="p">,</span>
 		<span class="p">}</span>
 		<span class="nx">rot</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Angle</span><span class="p">(</span><span class="p">)</span>
-		<span class="nx">l</span> <span class="o">:=</span> <span class="nx">Line</span><span class="p">{</span><span class="nx">a</span><span class="p">.</span><span class="nf">Rotate</span><span class="p">(</span><span class="nx">rot</span><span class="p">,</span> <span class="nx">center</span><span class="p">)</span><span class="p">,</span> <span class="nx">b</span><span class="p">.</span><span class="nf">Rotate</span><span class="p">(</span><span class="nx">rot</span><span class="p">,</span> <span class="nx">center</span><span class="p">)</span><span class="p">}</span>
+
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">l</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">col</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.0025</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">Line</span><span class="p">{</span>
+				<span class="nx">a</span><span class="p">.</span><span class="nf">RotateAround</span><span class="p">(</span><span class="nx">rot</span><span class="p">,</span> <span class="nx">center</span><span class="p">)</span><span class="p">,</span>
+				<span class="nx">b</span><span class="p">.</span><span class="nf">RotateAround</span><span class="p">(</span><span class="nx">rot</span><span class="p">,</span> <span class="nx">center</span><span class="p">)</span><span class="p">,</span>
+			<span class="p">}</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">col</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.0025</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -1704,7 +1636,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -1724,7 +1655,7 @@
 	<span class="nx">LineWidth</span> <span class="p">=</span> <span class="mf">0.003</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">redDot</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Dot</span><span class="p">{</span><span class="nx">Color</span><span class="p">:</span> <span class="nx">Red</span><span class="p">,</span> <span class="nx">Radius</span><span class="p">:</span> <span class="mf">0.003</span><span class="p">}</span>
@@ -1779,9 +1710,9 @@
 			<span class="nx">c</span><span class="p">.</span><span class="nx">A</span> <span class="p">=</span> <span class="mf">0.3</span>
 
 			<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-				<span class="nx">Target</span><span class="p">:</span> <span class="nx">curves</span><span class="p">,</span>
-				<span class="nx">Width</span><span class="p">:</span>  <span class="nx">LineWidth</span><span class="p">,</span>
-				<span class="nx">Color</span><span class="p">:</span>  <span class="nx">c</span><span class="p">,</span>
+				<span class="nx">Shape</span><span class="p">:</span> <span class="nx">curves</span><span class="p">,</span>
+				<span class="nx">Width</span><span class="p">:</span> <span class="nx">LineWidth</span><span class="p">,</span>
+				<span class="nx">Color</span><span class="p">:</span> <span class="nx">c</span><span class="p">,</span>
 			<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 		<span class="p">}</span>
 	<span class="p">}</span>
@@ -1806,7 +1737,6 @@
 	<span class="s">&#34;log&#34;</span>
 	<span class="s">&#34;time&#34;</span>
 
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/math&#34;</span>
@@ -1832,7 +1762,7 @@
 	<span class="nx">M</span>    <span class="p">=</span> <span class="mf">0.4</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">palette</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Palette</span><span class="p">(</span><span class="p">)</span>
 
@@ -1858,7 +1788,7 @@
 			<span class="nx">wh</span> <span class="o">:=</span> <span class="nx">XY</span><span class="p">{</span><span class="nx">W</span><span class="p">,</span> <span class="nx">dy</span><span class="p">}</span>
 			<span class="nx">r</span> <span class="o">:=</span> <span class="nf">RectCenter</span><span class="p">(</span><span class="nx">xy</span><span class="p">,</span> <span class="nx">wh</span><span class="p">)</span>
 
-			<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">r</span><span class="p">)</span>
+			<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 			<span class="nx">sc</span> <span class="o">:=</span> <span class="nx">color</span>
 			<span class="nx">sc</span><span class="p">.</span><span class="nx">A</span> <span class="p">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="nx">dy</span><span class="o">/</span><span class="nx">B</span> <span class="o">-</span> <span class="nx">M</span>
 			<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="nx">sc</span><span class="p">)</span>
@@ -1888,7 +1818,6 @@
 	<span class="s">&#34;image&#34;</span>
 	<span class="nx">colorlib</span> <span class="s">&#34;image/color&#34;</span>
 
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/math&#34;</span>
@@ -1912,7 +1841,7 @@
 	<span class="nx">AlphaOffset</span> <span class="p">=</span> <span class="o">-</span><span class="mf">0.3</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 	<span class="nx">palette</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Palette</span><span class="p">(</span><span class="p">)</span>
 
@@ -1943,7 +1872,7 @@
 			<span class="nx">Mesh</span><span class="p">:</span> <span class="nx">Rect</span><span class="p">{</span>
 				<span class="nx">XY</span><span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="nx">y</span> <span class="o">-</span> <span class="nx">MaxD</span><span class="p">}</span><span class="p">,</span>
 				<span class="nx">XY</span><span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="nx">y</span> <span class="o">+</span> <span class="nx">MaxD</span><span class="p">}</span><span class="p">,</span>
-			<span class="p">}</span><span class="p">,</span>
+			<span class="p">}</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
 			<span class="nx">Attrs</span><span class="p">:</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Attrs</span><span class="p">{</span>
 				<span class="s">&#34;u_heightmap&#34;</span><span class="p">:</span>    <span class="nx">heightmap</span><span class="p">,</span>
 				<span class="s">&#34;u_color&#34;</span><span class="p">:</span>        <span class="nx">rand</span><span class="p">.</span><span class="nf">Color</span><span class="p">(</span><span class="nx">palette</span><span class="p">)</span><span class="p">,</span>
@@ -2002,14 +1931,13 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span><span class="nx">Rows</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">Cols</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
@@ -2048,9 +1976,9 @@
 		<span class="nx">pen</span><span class="p">.</span><span class="nf">Close</span><span class="p">(</span><span class="p">)</span>
 
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-			<span class="nx">Target</span><span class="p">:</span> <span class="nx">pen</span><span class="p">,</span>
-			<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.001</span><span class="p">,</span>
-			<span class="nx">Color</span><span class="p">:</span>  <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">pen</span><span class="p">,</span>
+			<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+			<span class="nx">Color</span><span class="p">:</span> <span class="nx">color</span><span class="p">.</span><span class="nx">Black</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 <span class="p">}</span>
@@ -2071,7 +1999,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -2086,7 +2013,7 @@
 	<span class="nx">StrokeWidth</span>  <span class="p">=</span> <span class="mf">0.001</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span><span class="nx">Rows</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">Cols</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
@@ -2108,21 +2035,21 @@
 		<span class="p">}</span>
 
 		<span class="k">for</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">t</span> <span class="o">:=</span> <span class="k">range</span> <span class="nx">tris</span> <span class="p">{</span>
-			<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">)</span>
+			<span class="nx">s</span> <span class="o">:=</span> <span class="nx">gfx</span><span class="p">.</span><span class="nf">NewShader</span><span class="p">(</span><span class="nx">t</span><span class="p">.</span><span class="nf">Fill</span><span class="p">(</span><span class="p">)</span><span class="p">)</span>
 			<span class="nx">s</span><span class="p">.</span><span class="nf">Set</span><span class="p">(</span><span class="s">&#34;a_color&#34;</span><span class="p">,</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Color</span><span class="p">(</span><span class="nx">colors</span><span class="p">)</span><span class="p">)</span>
 			<span class="nx">s</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">l2</span><span class="p">)</span>
 		<span class="p">}</span>
 
 		<span class="k">if</span> <span class="nx">ShouldStroke</span> <span class="p">{</span>
 			<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-				<span class="nx">Target</span><span class="p">:</span> <span class="nx">tris</span><span class="p">,</span>
-				<span class="nx">Width</span><span class="p">:</span>  <span class="nx">StrokeWidth</span><span class="p">,</span>
-				<span class="nx">Color</span><span class="p">:</span>  <span class="nx">White</span><span class="p">,</span>
+				<span class="nx">Shape</span><span class="p">:</span> <span class="nx">tris</span><span class="p">,</span>
+				<span class="nx">Width</span><span class="p">:</span> <span class="nx">StrokeWidth</span><span class="p">,</span>
+				<span class="nx">Color</span><span class="p">:</span> <span class="nx">White</span><span class="p">,</span>
 			<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">l2</span><span class="p">)</span>
 		<span class="p">}</span>
 
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
-			<span class="nx">Mesh</span><span class="p">:</span> <span class="nx">Circle</span><span class="p">{</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">Circle</span><span class="p">{</span>
 				<span class="nx">XY</span><span class="p">:</span>       <span class="nx">r</span><span class="p">.</span><span class="nf">Center</span><span class="p">(</span><span class="p">)</span><span class="p">,</span>
 				<span class="nx">Radius</span><span class="p">:</span>   <span class="nx">CircleRadius</span><span class="p">,</span>
 				<span class="nx">Segments</span><span class="p">:</span> <span class="mi">40</span><span class="p">,</span>
@@ -2154,8 +2081,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
-	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/rand&#34;</span>
@@ -2166,10 +2091,8 @@
 	<span class="nx">RandPoint</span>  <span class="p">=</span> <span class="mf">0.03</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
-
-	<span class="nx">gfx</span><span class="p">.</span><span class="nf">Clear</span><span class="p">(</span><span class="nx">doc</span><span class="p">,</span> <span class="nx">White</span><span class="p">)</span>
 
 	<span class="nx">grid</span> <span class="o">:=</span> <span class="nx">Grid</span><span class="p">{</span><span class="nx">Rows</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="nx">Cols</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
 	<span class="nx">colors</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Palette</span><span class="p">(</span><span class="p">)</span>
@@ -2212,7 +2135,6 @@
       <div class="code"><pre class="chroma"><span class="kn">package</span> <span class="nx">main</span>
 
 <span class="kn">import</span> <span class="p">(</span>
-	<span class="s">&#34;github.com/buchanae/ink/app&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/color&#34;</span>
 	<span class="p">.</span> <span class="s">&#34;github.com/buchanae/ink/dd&#34;</span>
 	<span class="s">&#34;github.com/buchanae/ink/gfx&#34;</span>
@@ -2220,7 +2142,7 @@
 	<span class="s">&#34;github.com/buchanae/ink/voronoi&#34;</span>
 <span class="p">)</span>
 
-<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="o">*</span><span class="nx">app</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
+<span class="kd">func</span> <span class="nf">Ink</span><span class="p">(</span><span class="nx">doc</span> <span class="nx">gfx</span><span class="p">.</span><span class="nx">Doc</span><span class="p">)</span> <span class="p">{</span>
 	<span class="nx">rand</span><span class="p">.</span><span class="nf">SeedNow</span><span class="p">(</span><span class="p">)</span>
 
 	<span class="nx">box</span> <span class="o">:=</span> <span class="nx">Rect</span><span class="p">{</span>
@@ -2255,15 +2177,15 @@
 		<span class="nx">c</span> <span class="o">:=</span> <span class="nx">rand</span><span class="p">.</span><span class="nf">Color</span><span class="p">(</span><span class="nx">colors</span><span class="p">)</span>
 		<span class="nx">c</span><span class="p">.</span><span class="nx">A</span> <span class="p">=</span> <span class="mf">0.3</span>
 		<span class="nx">gfx</span><span class="p">.</span><span class="nx">Fill</span><span class="p">{</span>
-			<span class="nx">Mesh</span><span class="p">:</span>  <span class="nx">t</span><span class="p">,</span>
+			<span class="nx">Shape</span><span class="p">:</span> <span class="nx">t</span><span class="p">,</span>
 			<span class="nx">Color</span><span class="p">:</span> <span class="nx">c</span><span class="p">,</span>
 		<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 	<span class="p">}</span>
 
 	<span class="nx">gfx</span><span class="p">.</span><span class="nx">Stroke</span><span class="p">{</span>
-		<span class="nx">Target</span><span class="p">:</span> <span class="nf">Triangles</span><span class="p">(</span><span class="nx">tris</span><span class="p">)</span><span class="p">,</span>
-		<span class="nx">Width</span><span class="p">:</span>  <span class="mf">0.001</span><span class="p">,</span>
-		<span class="nx">Color</span><span class="p">:</span>  <span class="nx">Black</span><span class="p">,</span>
+		<span class="nx">Shape</span><span class="p">:</span> <span class="nf">Triangles</span><span class="p">(</span><span class="nx">tris</span><span class="p">)</span><span class="p">,</span>
+		<span class="nx">Width</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+		<span class="nx">Color</span><span class="p">:</span> <span class="nx">Black</span><span class="p">,</span>
 	<span class="p">}</span><span class="p">.</span><span class="nf">Draw</span><span class="p">(</span><span class="nx">doc</span><span class="p">)</span>
 <span class="p">}</span>
 </pre></div>

@@ -80,11 +80,13 @@ var Examples = []*Example{
 		Description: "Generate thousands of instances of the same shape efficiently using OpenGL.",
 		Sketch:      "018_instancing.go",
 	},
-	{
-		Title:       "Window Size",
-		Description: "Change the window size from the sketch code.",
-		Sketch:      "019_window_size.go",
-	},
+	/*
+		{
+			Title:       "Window Size",
+			Description: "Change the window size from the sketch code.",
+			Sketch:      "019_window_size.go",
+		},
+	*/
 	{
 		Title:       "Hex Color",
 		Description: "Convert hex to a color.",
