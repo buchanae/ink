@@ -1,10 +1,9 @@
-// +build !sendonly
-
 package app
 
 import (
 	"runtime"
 
+	"github.com/buchanae/ink/app/client"
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/render/opengl"
 	"github.com/go-gl/glfw/v3.3/glfw"
@@ -82,8 +81,8 @@ func (app *App) SetConfig(b Config) {
 	})
 }
 
-func (app *App) Render(doc *Doc) {
-	plan := buildPlan(doc)
+func (app *App) Render(doc *client.Doc) {
+	plan := doc.Plan()
 	app.RenderPlan(plan)
 }
 
@@ -115,7 +114,7 @@ func (app *App) Do(f func()) {
 	<-done
 }
 
-func Run(f func(*Doc)) {
+func Run(f func(*client.Doc)) {
 	conf := DefaultConfig()
 	a, err := NewApp(conf)
 	if err != nil {

@@ -1,5 +1,3 @@
-// +build !sendonly
-
 package app
 
 import (

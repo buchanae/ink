@@ -1,5 +1,3 @@
-// +build !sendonly
-
 package app
 
 import (
@@ -14,7 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/buchanae/ink/color"
+	"github.com/buchanae/ink/app/client"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/trac"
 )
@@ -30,13 +28,9 @@ func (app *App) RunSketch(ctx context.Context, path string) error {
 	return run(ctx, app, wd, path)
 }
 
-func (app *App) NewDoc() *Doc {
-	doc := &Doc{
-		ID: nextID(),
-	}
-	// TODO this shouldn't be here
-	gfx.Clear(doc, color.White)
+func (app *App) NewDoc() *client.Doc {
 
+	doc := client.NewDoc()
 	c := &gfx.Config{}
 	doc.Conf = c
 	c.Width = app.conf.Window.Width
@@ -61,7 +55,7 @@ func build(wd workdir, path string) error {
 	}
 
 	cmd := exec.Command(
-		"go", "build", "-tags=sendonly", "-o=inkbin", ".",
+		"go", "build", "-o=inkbin", ".",
 	)
 	cmd.Env = []string{}
 	cmd.Env = append(cmd.Env, os.Environ()...)
@@ -127,7 +121,7 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 	dec := gob.NewDecoder(rdr)
 
 	for {
-		msg := &RenderMessage{}
+		msg := &client.RenderMessage{}
 		err = dec.Decode(msg)
 		if err == io.EOF {
 			break
@@ -199,10 +193,10 @@ func copyFile(dstPath, srcPath, name string) error {
 
 const head = `
 package main
-import "github.com/buchanae/ink/app"
+import "github.com/buchanae/ink/app/client"
 
 func main() {
-	app.Main(Ink)
+	client.Main(Ink)
 }
 `
 
