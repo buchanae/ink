@@ -65,17 +65,18 @@ func (r *Renderer) render(plan render.Plan) {
 	}
 
 	pb := &build{}
-	pb.build(plan)
+	passes := pb.build(plan)
 	defer pb.cleanup()
 
-	trac.Log("passes %d", len(pb.passes))
+	trac.Log("passes %d", len(passes))
 
-	for _, p := range pb.passes {
+	for _, p := range passes {
 		r.renderPass(p)
 	}
 }
 
-func (r *Renderer) renderPass(p *buildPass) {
+func (r *Renderer) renderPass(p buildPass) {
+	// TODO clear existing program entirely
 
 	glViewport(0, 0, int32(r.width), int32(r.height))
 	glEnable(gl.MULTISAMPLE)
@@ -89,17 +90,16 @@ func (r *Renderer) renderPass(p *buildPass) {
 	*/
 	glBlendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
 
-	trac.Log("render pass %s", p.name)
-	trac.Log("  output to %d", p.layer)
+	trac.Log("render pass %s", p.Name)
+	trac.Log("  output to %d", p.Layer)
 
-	// TODO clear existing program entirely
 	count := 1
-	if p.instanceCount > 1 {
-		count = p.instanceCount
+	if p.Instances > 1 {
+		count = p.Instances
 	}
 
 	trac.Log("  gl config")
-	output := r.texture(p.layer)
+	output := r.texture(p.Layer)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, output.Write.FBO)
 	glUseProgram(p.prog.id)
@@ -112,10 +112,10 @@ func (r *Renderer) renderPass(p *buildPass) {
 	trac.Log("  draw elements")
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
-		int32(p.faceCount),
+		int32(p.Faces.Count*3),
 		gl.UNSIGNED_INT,
 		// 4 bytes in each uint32 face index
-		glPtrOffset(p.faceOffset*4),
+		glPtrOffset(p.Faces.Offset*4),
 		int32(count),
 	)
 
@@ -132,10 +132,10 @@ func (r *Renderer) renderPass(p *buildPass) {
 //      to the preprocessed passes and resources. might
 //      make a clear separation between preprocessing and
 //      execution. might help abstract rendering backends later.
-func (r *Renderer) bindUniforms(p *buildPass) {
+func (r *Renderer) bindUniforms(p buildPass) {
 	for _, uni := range p.prog.uniforms {
 
-		val, ok := p.uniforms[uni.Name]
+		val, ok := p.Uniforms[uni.Name]
 		if !ok {
 			// TODO return error list from render
 			log.Printf("  missing uniform: %s", uni.Name)

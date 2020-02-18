@@ -5,7 +5,6 @@ import (
 	_ "image/png"
 	"os"
 
-	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
@@ -35,8 +34,6 @@ func NewDoc() *Doc {
 	doc := &Doc{
 		ID: nextID(),
 	}
-	// TODO this shouldn't be here
-	gfx.Clear(doc, color.White)
 	return doc
 }
 

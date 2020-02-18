@@ -59,10 +59,13 @@ func main() {
 				defer wg.Done()
 
 				trac.Reset()
-				trac.Log("run sketch")
-				defer trac.Log("done")
+				span := trac.Start("run sketch")
+				defer span.End()
 
-				a.RunSketch(ctx, args[0])
+				err := a.RunSketch(ctx, args[0])
+				if err != nil {
+					log.Print(err)
+				}
 			}()
 
 			<-watch.changes

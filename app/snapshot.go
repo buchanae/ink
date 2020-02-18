@@ -27,6 +27,8 @@ func (app *App) Snapshot() image.Image {
 		renderer := opengl.NewRenderer(width, height)
 		defer renderer.Cleanup()
 
+		// TODO snapshot without re-uploading the plan data
+		//      just change the textures.
 		renderer.Render(app.plan)
 		img = renderer.CaptureImage(app.plan.RootLayer, 0, 0, 1, 1)
 	})

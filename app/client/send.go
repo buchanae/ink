@@ -76,19 +76,13 @@ func Main(inkfunc func(gfx.Doc)) {
 
 func Send(doc *Doc) {
 	wdbg.count = 0
-	//start := time.Now()
 
-	// TODO move plan optimization out of opengl to client-side
 	plan := buildPlan(doc)
 
 	err := enc.Encode(RenderMessage{
 		Config: *doc.Conf,
 		Plan:   plan,
 	})
-
-	// TODO ongoing debugging
-	//fmt.Fprintf(os.Stderr, "sent %d bytes\n", wdbg.count)
-	//fmt.Fprintf(os.Stderr, "send took: %s\n", time.Since(start))
 
 	if err != nil {
 		os.Stderr.Write([]byte("sending: "))
