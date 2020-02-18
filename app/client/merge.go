@@ -10,7 +10,7 @@ func mergeBatches(batches []*batch) []*batch {
 	before := len(batches)
 	defer func() {
 		after := len(merged)
-		trac.Log("merged %d to %b", before, after)
+		trac.Log("merged %d to %d", before, after)
 	}()
 
 	for i, b := range batches {
@@ -30,6 +30,7 @@ func mergeBatches(batches []*batch) []*batch {
 }
 
 func merge(a, b *batch) {
+	a.pass.Faces.Count += b.pass.Faces.Count
 	a.meshes = append(a.meshes, b.meshes...)
 	for k, v := range a.attrs {
 		bv := b.attrs[k]

@@ -109,13 +109,15 @@ func (r *Renderer) renderPass(p buildPass) {
 	// TODO indexed elements are not always a win.
 	//      if most verts are unique, then indicies are just
 	//      overhead.
-	trac.Log("  draw elements")
+	elcount := p.Faces.Count * 3
+	offset := p.Faces.Offset * 4
+	trac.Log("  draw elements: %d %d", elcount, offset)
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
-		int32(p.Faces.Count*3),
+		int32(elcount),
 		gl.UNSIGNED_INT,
 		// 4 bytes in each uint32 face index
-		glPtrOffset(p.Faces.Offset*4),
+		glPtrOffset(offset),
 		int32(count),
 	)
 

@@ -7,8 +7,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/buchanae/ink/color"
 	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/trac"
 )
 
 var enc *gob.Encoder
@@ -70,6 +72,8 @@ type RenderMessage struct {
 func Main(inkfunc func(gfx.Doc)) {
 	log.SetFlags(0)
 	doc := RecvDoc()
+	// TODO find a better what to do this
+	gfx.Clear(doc, color.White)
 	inkfunc(doc)
 	Send(doc)
 }
@@ -78,6 +82,11 @@ func Send(doc *Doc) {
 	wdbg.count = 0
 
 	plan := buildPlan(doc)
+
+	trac.Log("plan: %d attrs, %d faces",
+		len(plan.AttrData),
+		len(plan.FaceData),
+	)
 
 	err := enc.Encode(RenderMessage{
 		Config: *doc.Conf,
