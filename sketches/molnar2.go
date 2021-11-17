@@ -10,14 +10,14 @@ import (
 func Ink(doc gfx.Doc) {
 
 	grid := Grid{
-		Rows: 15,
-		Cols: 15,
-		Rect: SquareCenter(gfx.Center, .8),
+		Rows: 95,
+		Cols: 95,
+		Rect: SquareCenter(gfx.Center, .2),
 	}
 
 	for _, cell := range grid.Cells() {
-		const Z = 0.007
-		const G = 0.005
+		const Z = 0.109
+		const G = 0.125
 
 		r := cell.Rect.Translate(XY{
 			Y: rand.Range(-Z, Z),
@@ -27,7 +27,7 @@ func Ink(doc gfx.Doc) {
 		r.B.X += grow
 
 		col := Red
-		col.A = 0.7
+		col.A = 0.1
 		gfx.Fill{r, col}.Draw(doc)
 	}
 }

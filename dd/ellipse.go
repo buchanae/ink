@@ -5,13 +5,14 @@ import (
 )
 
 type Ellipse struct {
+	// TODO this exposes methods that aren't wanted, like Rotate
 	XY
 	Size     XY
 	Segments int
 }
 
 func (e Ellipse) Interpolate(p float32) XY {
-	t := math.Pi * 2 * p
+	t := math.Pi * 2 * -p
 	xy := XY{
 		e.Size.X * math.Cos(t),
 		e.Size.Y * math.Sin(t),

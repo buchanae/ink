@@ -10,7 +10,6 @@ import (
 	"path/filepath"
 
 	"github.com/buchanae/ink/app/client"
-	"github.com/buchanae/ink/gfx"
 	"github.com/buchanae/ink/trac"
 )
 
@@ -23,19 +22,6 @@ func (app *App) RunSketch(ctx context.Context, path string) error {
 	}
 
 	return run(ctx, app, wd, path)
-}
-
-func newDoc(app *App) *client.Doc {
-
-	doc := client.NewDoc()
-	c := &gfx.Config{}
-	doc.Conf = c
-	c.Width = app.conf.Window.Width
-	c.Height = app.conf.Window.Height
-	c.Snapshot.Width = app.conf.Snapshot.Width
-	c.Snapshot.Height = app.conf.Snapshot.Height
-
-	return doc
 }
 
 func build(wd workdir, path string) error {
@@ -78,12 +64,7 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 	cmd.Env = []string{}
 	cmd.Env = append(cmd.Env, os.Environ()...)
 	if trac.Enabled {
-		cmd.Env = append(cmd.Env, "INK_TRACE=true")
-	}
-
-	stdin, err := cmd.StdinPipe()
-	if err != nil {
-		return fmt.Errorf("getting stdin pipe: %v", err)
+		cmd.Env = append(cmd.Env, "INK_TRACE=true", "INK_TRACE_NS=c ")
 	}
 
 	stdout, err := cmd.StdoutPipe()
@@ -106,14 +87,6 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		return fmt.Errorf("starting: %v", err)
 	}
 
-	doc := newDoc(app)
-
-	enc := gob.NewEncoder(stdin)
-	err = enc.Encode(doc)
-	if err != nil {
-		return fmt.Errorf("sending initial doc: %v", err)
-	}
-
 	rdr := &dbgread{R: stdout}
 	dec := gob.NewDecoder(rdr)
 
@@ -121,6 +94,7 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		msg := &client.RenderMessage{}
 		err = dec.Decode(msg)
 		if err == io.EOF {
+			trac.Log("eof break")
 			break
 		}
 		if err != nil {
@@ -129,11 +103,13 @@ func run(ctx context.Context, app *App, wd workdir, sketchPath string) error {
 		trac.Log("received")
 
 		c := app.conf
-		c.Window.Title = msg.Config.Title
-		c.Window.Width = msg.Config.Width
-		c.Window.Height = msg.Config.Height
-		c.Snapshot.Width = msg.Config.Snapshot.Width
-		c.Snapshot.Height = msg.Config.Snapshot.Height
+		//c.Window.Title = msg.Config.Title
+		//c.Window.Width = msg.Config.Width
+		//c.Window.Height = msg.Config.Height
+		//c.Snapshot.Width = msg.Config.Snapshot.Width
+		//c.Snapshot.Height = msg.Config.Snapshot.Height
+
+		trac.Log("msg passes %d", len(msg.Plan.Passes))
 
 		app.SetConfig(c)
 		app.RenderPlan(msg.Plan)

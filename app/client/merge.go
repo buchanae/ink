@@ -7,6 +7,7 @@ func mergeBatches(batches []*batch) []*batch {
 	var merged []*batch
 	var last *batch
 
+	trac.Log("start merge")
 	before := len(batches)
 	defer func() {
 		after := len(merged)

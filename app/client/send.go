@@ -71,8 +71,8 @@ type RenderMessage struct {
 
 func Main(inkfunc func(gfx.Doc)) {
 	log.SetFlags(0)
-	doc := RecvDoc()
-	// TODO find a better what to do this
+	doc := NewDoc()
+	// TODO find a better way to do this
 	gfx.Clear(doc, color.White)
 	inkfunc(doc)
 	Send(doc)
@@ -80,6 +80,8 @@ func Main(inkfunc func(gfx.Doc)) {
 
 func Send(doc *Doc) {
 	wdbg.count = 0
+
+	trac.Log("start send")
 
 	plan := buildPlan(doc)
 

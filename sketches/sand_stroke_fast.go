@@ -11,9 +11,9 @@ import (
 )
 
 const (
-	Lines   = 3
-	Strokes = 10
-	N       = 300
+	Lines   = 20
+	Strokes = 20
+	N       = 5000
 	W       = 1 / float32(N)
 
 	Amp = 1000

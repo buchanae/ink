@@ -73,6 +73,7 @@ func (r *Renderer) render(plan render.Plan) {
 	for _, p := range passes {
 		r.renderPass(p)
 	}
+	trac.Log("passes done")
 }
 
 func (r *Renderer) renderPass(p buildPass) {

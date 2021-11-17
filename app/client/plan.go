@@ -7,6 +7,7 @@ import (
 	"github.com/buchanae/ink/dd"
 	"github.com/buchanae/ink/internal/glsl"
 	"github.com/buchanae/ink/render"
+	"github.com/buchanae/ink/trac"
 )
 
 type batcher struct {
@@ -125,10 +126,12 @@ func buildPlan(doc *Doc) render.Plan {
 		},
 	}
 
+	trac.Log("add ops %d", len(doc.Ops))
 	for _, op := range doc.Ops {
 		build.Add(op)
 	}
 
+	trac.Log("alloc data")
 	plan.FaceData = make([]uint32, 0, build.faces)
 	plan.AttrData = make([]float32, 0, build.attrs)
 

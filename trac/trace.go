@@ -10,11 +10,13 @@ import (
 var logger *log.Logger
 var Enabled bool
 var start time.Time
+var ns string
 
 func init() {
 	logger = log.New(os.Stderr, "", 0)
 	//log.Ltime|log.Lmicroseconds)
 	Enabled = os.Getenv("INK_TRACE") == "true"
+	ns = os.Getenv("INK_TRACE_NS")
 	Reset()
 }
 
@@ -41,9 +43,7 @@ func Log(msg string, args ...interface{}) {
 	if !Enabled {
 		return
 	}
-	//prefix := time.Now().Format("04:05.000")
-	//prefix := time.Now().Format("05.000")
 	d := time.Since(start)
-	prefix := fmt.Sprintf("%.3f", d.Seconds())
-	logger.Printf(prefix+" "+msg, args...)
+	prefix := fmt.Sprintf("%.2fs", d.Seconds())
+	logger.Printf(ns+prefix+" "+msg, args...)
 }

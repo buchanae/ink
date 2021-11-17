@@ -5,6 +5,18 @@ import (
 	"github.com/buchanae/ink/dd"
 )
 
+type Dots struct {
+	XYs    []dd.XY
+	Color  color.RGBA
+	Radius float32
+}
+
+func (dots Dots) Draw(l Layer) {
+	for _, xy := range dots.XYs {
+		Dot{xy, dots.Color, dots.Radius}.Draw(l)
+	}
+}
+
 // TODO Dot doesn't batch
 type Dot struct {
 	XY     dd.XY

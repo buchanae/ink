@@ -4,13 +4,17 @@ type Quad struct {
 	A, B, C, D XY
 }
 
-func (q Quad) Stroke(opt StrokeOpt) Mesh {
-	return Stroke(Path{
+func (q Quad) Path() Path {
+	return Path{
 		Line{q.A, q.B},
 		Line{q.B, q.C},
 		Line{q.C, q.D},
 		Line{q.D, q.A},
-	}, opt)
+	}
+}
+
+func (q Quad) Stroke(opt StrokeOpt) Mesh {
+	return Stroke(q.Path(), opt)
 }
 
 func (q Quad) Fill() Mesh {

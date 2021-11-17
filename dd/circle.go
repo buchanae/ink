@@ -141,3 +141,7 @@ func (c Circle) Normals() []XY {
 func (c Circle) Stroke(opt StrokeOpt) Mesh {
 	return c.Ellipse().Stroke(opt)
 }
+
+func (c Circle) Path() Path {
+	return c.Ellipse().Path()
+}

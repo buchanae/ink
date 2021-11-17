@@ -32,7 +32,8 @@ type Doc struct {
 
 func NewDoc() *Doc {
 	doc := &Doc{
-		ID: nextID(),
+		ID:   nextID(),
+		Conf: &gfx.Config{},
 	}
 	return doc
 }

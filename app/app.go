@@ -5,6 +5,7 @@ import (
 
 	"github.com/buchanae/ink/render"
 	"github.com/buchanae/ink/render/opengl"
+	"github.com/buchanae/ink/trac"
 	"github.com/go-gl/glfw/v3.3/glfw"
 )
 
@@ -82,6 +83,7 @@ func (app *App) SetConfig(b Config) {
 
 func (app *App) RenderPlan(plan render.Plan) {
 	app.Do(func() {
+		trac.Log("start render plan")
 		if !app.conf.Window.Hidden && !app.shown {
 			app.win.Show()
 			app.shown = true
@@ -89,16 +91,19 @@ func (app *App) RenderPlan(plan render.Plan) {
 		app.initRenderer()
 
 		app.renderer.Render(plan)
+
+		trac.Log("to screen")
 		app.renderer.ToScreen(plan.RootLayer)
 
 		app.plan = plan
+		trac.Log("swap")
 		app.win.SwapBuffers()
 	})
 }
 
 // Do queues a function for execution on the main thread.
 // OS windows typically require that code which accesses
-// windows
+// windows run on the main thread.
 func (app *App) Do(f func()) {
 	done := make(chan struct{})
 	app.commands <- func() {

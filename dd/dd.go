@@ -9,3 +9,5 @@ type Fillable interface {
 type Strokeable interface {
 	Stroke(StrokeOpt) Mesh
 }
+
+// TODO http://www.realtimerendering.com/intersections.html

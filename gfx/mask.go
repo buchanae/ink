@@ -37,6 +37,6 @@ out vec4 color;
 void main() {
   vec4 m = texture(u_mask, v_uv);
   vec4 s = texture(u_source, v_uv);
-	color = vec4(s.rgb, m.a * s.a);
+	color = vec4(s.rgb, s.a * m.r);
 }
 `

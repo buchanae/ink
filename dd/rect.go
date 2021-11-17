@@ -77,6 +77,11 @@ func (r Rect) Center() XY {
 	return r.B.Sub(r.A).MulScalar(0.5).Add(r.A)
 }
 
+func (r Rect) Area() float32 {
+	size := r.Size()
+	return size.X * size.Y
+}
+
 func (r Rect) Size() XY {
 	return r.B.Sub(r.A)
 }
@@ -193,4 +198,8 @@ func (r Rect) Fill() Mesh {
 
 func (r Rect) Stroke(opt StrokeOpt) Mesh {
 	return r.Quad().Stroke(opt)
+}
+
+func (r Rect) Path() Path {
+	return r.Quad().Path()
 }

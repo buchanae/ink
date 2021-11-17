@@ -11,9 +11,15 @@ import (
 )
 
 const (
-	Lines   = 20
+	// Number of _potential_ horizontal strokes
+	Lines = 20
+
+	// Actual horizontal strokes.
+	// If this is greater than Lines, then the same line will
+	// get multiple passes.
+	// TODO maybe overcomplicated
 	Strokes = 20
-	N       = 1000
+	N       = 5000
 	// percentage of W
 	// only works for small N
 	Padding = 0.00
@@ -29,35 +35,41 @@ const (
 	M    = 0.4
 )
 
-func Ink(doc gfx.Doc) {
-	rand.SeedNow()
-	palette := rand.Palette()
-
-	start := time.Now()
-	ys := make([]float32, Lines)
-	for i := range ys {
-		ys[i] = rand.Range(MinY, MaxY)
+func random_float32s_in_range(r *rand.Rand, count int, min float32, max float32) []float32 {
+	floats := make([]float32, count)
+	for i := range floats {
+		floats[i] = r.Range(min, max)
 	}
+	return floats
+}
+
+func Ink(doc gfx.Doc) {
+	r := rand.New(time.Now().Unix())
+	start := time.Now()
+	palette := r.Palette()
+
+	// random y-axis positions
+	y_positions := random_float32s_in_range(r, Lines, MinY, MaxY)
 
 	for j := 0; j < Strokes; j++ {
 
-		y := ys[rand.Intn(len(ys))]
-		dy := rand.Range(0.01, 0.1)
+		y := y_positions[rand.Intn(len(y_positions))]
+		h := rand.Range(0.01, 0.1)
 		color := rand.Color(palette)
 
 		for i := 0; i < N; i++ {
 			x := float32(i) / N
 
-			dy += rand.Range(-D, D)
-			dy = math.Clamp(dy, 0, MaxD)
+			h += rand.Range(-D, D)
+			h = math.Clamp(h, 0, MaxD)
 
 			xy := XY{x, y}
-			wh := XY{W, dy}
+			wh := XY{W, h}
 			r := RectCenter(xy, wh)
 
 			s := gfx.NewShader(r.Fill())
 			sc := color
-			sc.A = 1 - dy/B - M
+			sc.A = 1 - h/B - M
 			s.Set("a_color", sc)
 			s.Draw(doc)
 		}
