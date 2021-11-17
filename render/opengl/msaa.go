@@ -28,10 +28,11 @@ type msaa struct {
 func newMsaa(id, w, h, multisamples int) msaa {
 
 	m := msaa{
-		ID:           id,
-		Width:        w,
-		Height:       h,
-		Multisamples: multisamples,
+		ID:                 id,
+		Width:              w,
+		Height:             h,
+		Multisamples:       multisamples,
+		DisableMultisample: false,
 	}
 
 	// Create two textures:
@@ -104,11 +105,11 @@ func newMsaa(id, w, h, multisamples int) msaa {
 
 func (m msaa) Clear() {
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Read.FBO)
-	glClearColor(0, 0, 0, 1)
+	glClearColor(0, 0, 0, 0)
 	glClear(gl.COLOR_BUFFER_BIT)
 
 	glBindFramebuffer(gl.FRAMEBUFFER, m.Write.FBO)
-	glClearColor(0, 0, 0, 1)
+	glClearColor(0, 0, 0, 0)
 	glClear(gl.COLOR_BUFFER_BIT)
 }
 

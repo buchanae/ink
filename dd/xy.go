@@ -12,6 +12,10 @@ type XY struct {
 	X, Y float32
 }
 
+func (a XY) Copy() XY {
+	return XY{a.X, a.Y}
+}
+
 func (a XY) Add(b XY) XY {
 	return XY{a.X + b.X, a.Y + b.Y}
 }

@@ -60,6 +60,10 @@ func (r *Renderer) CaptureImage(layerID int, x, y, w, h float32) image.Image {
 func (r *Renderer) render(plan render.Plan) {
 	trac.Log("start render")
 
+	for _, tex := range r.textures {
+		tex.Clear()
+	}
+
 	for id, img := range plan.Images {
 		r.AddImage(id, img)
 	}
@@ -111,13 +115,15 @@ func (r *Renderer) renderPass(p buildPass) {
 	//      if most verts are unique, then indicies are just
 	//      overhead.
 	elcount := p.Faces.Count * 3
+	// 4 bytes in each uint32 face index
 	offset := p.Faces.Offset * 4
+
 	trac.Log("  draw elements: %d %d", elcount, offset)
+
 	glDrawElementsInstanced(
 		gl.TRIANGLES,
 		int32(elcount),
 		gl.UNSIGNED_INT,
-		// 4 bytes in each uint32 face index
 		glPtrOffset(offset),
 		int32(count),
 	)

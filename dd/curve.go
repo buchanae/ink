@@ -7,6 +7,17 @@ type Curve interface {
 	Interpolate(p float32) XY
 }
 
+func XYsToPath(xys []XY) Path {
+	lines := XYsToLines(xys...)
+	path := Path{}
+
+	for _, line := range lines {
+		path = append(path, line)
+	}
+	path = append(path, Line{xys[len(xys)-1], xys[0]})
+	return path
+}
+
 type Path []Curve
 
 func (p Path) Stroke(opt StrokeOpt) Mesh {
